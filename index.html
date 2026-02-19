@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CryptoPulse • Bitcoin & Crypto Analytics</title>
-  <meta name="description" content="Real-time Bitcoin and crypto market analytics dashboard with live data."/>
+  <meta name="description" content="Real-time Bitcoin, Ethereum & crypto market analytics dashboard with live data."/>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,11 +12,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
   
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-    
     body {
       font-family: 'Inter', system-ui, sans-serif;
     }
@@ -35,6 +33,248 @@
 
     @keyframes pulse {
       0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .chart-card {
+      background: #0f172a;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .chart-wrapper {
+      height: 640px;
+    }
+
+    @media (max-width: 1024px) {
+      .chart-wrapper {
+        height: 580px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .chart-wrapper {
+        height: 520px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .chart-wrapper {
+        height: 480px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#0a0f1c] text-slate-200 min-h-screen">
+
+  <!-- Top Navbar -->
+  <nav class="border-b border-slate-800 bg-black/70 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-screen-2xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center text-3xl font-bold">₿</div>
+        <span class="title-font text-3xl font-semibold tracking-tighter">CryptoPulse</span>
+      </div>
+      
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-1.5 rounded-3xl text-sm font-medium">
+          <span class="relative flex h-3 w-3">
+            <span class="live-dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+          </span>
+          LIVE DATA
+        </div>
+        <button onclick="refreshData()" 
+                class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 rounded-3xl text-sm font-medium transition-all">
+          <i id="refresh-icon" class="fas fa-sync-alt"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-screen-2xl mx-auto px-6 py-12">
+
+    <!-- Live Prices Banner – BTC + ETH -->
+    <div class="mb-12 grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <!-- Bitcoin Price -->
+      <div>
+        <p class="text-slate-400 text-lg tracking-wide mb-2">BITCOIN PRICE</p>
+        <div id="btc-price" class="title-font text-6xl lg:text-7xl font-bold tracking-tighter text-white">$67,842</div>
+        <div id="btc-change" class="text-3xl font-semibold mt-4 flex items-center gap-3"></div>
+      </div>
+
+      <!-- Ethereum Price -->
+      <div>
+        <p class="text-slate-400 text-lg tracking-wide mb-2">ETHEREUM PRICE</p>
+        <div id="eth-price" class="title-font text-6xl lg:text-7xl font-bold tracking-tighter text-white">$1,959</div>
+        <div id="eth-change" class="text-3xl font-semibold mt-4 flex items-center gap-3"></div>
+      </div>
+    </div>
+
+    <!-- Key Real-Time Stats -->
+    <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Charts Section – BTC + ETH side by side on desktop, stacked on mobile -->
+    <div class="mb-16">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="title-font text-4xl font-semibold tracking-tight">Price History Analytics</h2>
+          <p class="text-slate-400 mt-2">Interactive long-term charts • Public Google Sheets data</p>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-10">
+        <!-- Bitcoin Chart -->
+        <div class="chart-card">
+          <div class="p-6 border-b border-slate-700">
+            <h3 class="title-font text-2xl font-semibold">Bitcoin (BTC) Price History</h3>
+            <p class="text-slate-400 text-sm mt-1">Long-term interactive view</p>
+          </div>
+          <div class="chart-wrapper">
+            <iframe 
+              src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive"
+              width="100%" 
+              height="100%" 
+              frameborder="0"
+              allowfullscreen>
+            </iframe>
+          </div>
+        </div>
+
+        <!-- Ethereum Chart -->
+        <div class="chart-card">
+          <div class="p-6 border-b border-slate-700">
+            <h3 class="title-font text-2xl font-semibold">Ethereum (ETH) Price History</h3>
+            <p class="text-slate-400 text-sm mt-1">Long-term interactive view</p>
+          </div>
+          <div class="chart-wrapper">
+            <iframe 
+              src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=1143695036&format=interactive"
+              width="100%" 
+              height="100%" 
+              frameborder="0"
+              allowfullscreen>
+            </iframe>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubhtml" 
+           target="_blank" 
+           class="text-indigo-400 hover:text-indigo-300 text-sm font-medium inline-flex items-center gap-2">
+          View full source spreadsheet <i class="fas fa-external-link-alt"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-slate-500 text-sm py-12 border-t border-slate-800">
+      <p>Data powered by <a href="https://www.coingecko.com" target="_blank" class="hover:text-slate-300">CoinGecko</a> API • Real-time updates every 60 seconds • Not financial advice</p>
+      <p class="mt-2 text-xs">Optimized for mobile & desktop • GitHub Pages ready • February 2026</p>
+    </footer>
+  </div>
+
+  <script>
+    function formatLargeNumber(num) {
+      if (!num) return "$0";
+      if (num >= 1e12) return "$" + (num / 1e12).toFixed(2) + "T";
+      if (num >= 1e9) return "$" + (num / 1e9).toFixed(2) + "B";
+      return "$" + num.toLocaleString();
+    }
+
+    function formatPrice(price) {
+      return price.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    }
+
+    async function fetchData() {
+      try {
+        const [globalRes, btcRes, ethRes] = await Promise.all([
+          fetch("https://api.coingecko.com/api/v3/global"),
+          fetch("https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false"),
+          fetch("https://api.coingecko.com/api/v3/coins/ethereum?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false")
+        ]);
+
+        const global = await globalRes.json();
+        const btc = await btcRes.json();
+        const eth = await ethRes.json();
+
+        const g = global.data;
+        const b = btc.market_data;
+        const e = eth.market_data;
+
+        // Bitcoin Price & Change
+        document.getElementById("btc-price").textContent = "$" + formatPrice(b.current_price.usd);
+        const btcChange = b.price_change_percentage_24h;
+        const btcUp = btcChange >= 0;
+        document.getElementById("btc-change").innerHTML = `
+          <span class="${btcUp ? 'text-emerald-400' : 'text-red-400'} flex items-center gap-2">
+            <i class="fas fa-arrow-trend-${btcUp ? 'up' : 'down'}"></i>
+            ${btcUp ? '+' : ''}${btcChange.toFixed(2)}%
+          </span>
+        `;
+
+        // Ethereum Price & Change
+        document.getElementById("eth-price").textContent = "$" + formatPrice(e.current_price.usd);
+        const ethChange = e.price_change_percentage_24h;
+        const ethUp = ethChange >= 0;
+        document.getElementById("eth-change").innerHTML = `
+          <span class="${ethUp ? 'text-emerald-400' : 'text-red-400'} flex items-center gap-2">
+            <i class="fas fa-arrow-trend-${ethUp ? 'up' : 'down'}"></i>
+            ${ethUp ? '+' : ''}${ethChange.toFixed(2)}%
+          </span>
+        `;
+
+        // Stats Grid
+        const statsHTML = `
+          <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
+            <p class="text-slate-400 text-sm">Total Market Cap</p>
+            <p class="text-3xl font-semibold mt-3">${formatLargeNumber(g.total_market_cap.usd)}</p>
+          </div>
+
+          <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
+            <p class="text-slate-400 text-sm">24h Global Volume</p>
+            <p class="text-3xl font-semibold mt-3">${formatLargeNumber(g.total_volume.usd)}</p>
+          </div>
+
+          <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
+            <p class="text-slate-400 text-sm">BTC Dominance</p>
+            <p class="text-3xl font-semibold mt-3">${g.market_cap_percentage.btc.toFixed(1)}%</p>
+          </div>
+
+          <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
+            <p class="text-slate-400 text-sm">ETH Dominance</p>
+            <p class="text-3xl font-semibold mt-3">${g.market_cap_percentage.eth.toFixed(1)}%</p>
+          </div>
+        `;
+        document.getElementById("stats-grid").innerHTML = statsHTML;
+
+        // Last updated (optional global last-updated if you want one)
+        // document.getElementById("last-updated").innerHTML = `Last updated: <span class="font-mono">${new Date().toLocaleTimeString()}</span>`;
+
+      } catch (err) {
+        console.error("API error:", err);
+      }
+    }
+
+    function refreshData() {
+      const icon = document.getElementById("refresh-icon");
+      icon.classList.add("fa-spin");
+      fetchData().finally(() => {
+        setTimeout(() => icon.classList.remove("fa-spin"), 800);
+      });
+    }
+
+    // Load data on start + refresh every 60s
+    fetchData();
+    setInterval(fetchData, 60000);
+  </script>
+</body>
+</html>      0%, 100% { opacity: 1; }
       50% { opacity: 0.4; }
     }
 
