@@ -3,211 +3,236 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Crypto Pulse • Bitcoin & Crypto Analytics</title>
-  <meta name="description" content="Real-time Bitcoin price analytics, charts, and crypto market insights."/>
+  <title>CryptoPulse • Bitcoin & Crypto Analytics</title>
+  <meta name="description" content="Real-time Bitcoin and crypto market analytics dashboard with live data."/>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
   
-  <!-- Google Fonts: Modern sans-serif + mono for numbers -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  
   <style>
-    :root {
-      --bg: #0f0f17;
-      --bg-card: #161b2e;
-      --text: #e2e8f0;
-      --text-muted: #94a3b8;
-      --primary: #6366f1;        /* indigo */
-      --primary-glow: #818cf8;
-      --accent: #a855f7;         /* purple for crypto vibe */
-      --green: #10b981;
-      --red: #ef4444;
-      --border: #334155;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+    
     body {
-      background: var(--bg);
-      color: var(--text);
       font-family: 'Inter', system-ui, sans-serif;
-      line-height: 1.6;
-      min-height: 100vh;
+    }
+    .title-font {
+      font-family: 'Space Grotesk', sans-serif;
     }
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
+    .glass {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
     }
 
-    header {
-      padding: 2.5rem 0 1.5rem;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(to bottom, rgba(99,102,241,0.08), transparent);
+    .live-dot {
+      animation: pulse 2s infinite;
     }
 
-    h1 {
-      font-size: 2.8rem;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      background: linear-gradient(90deg, #c084fc, #818cf8, #60a5fa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 0.5rem;
-    }
-
-    .tagline {
-      font-size: 1.2rem;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .hero-chart {
-      margin: 3rem 0 4rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.7);
-      overflow: hidden;
-    }
-
-    .hero-chart h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: var(--primary-glow);
-      font-family: 'JetBrains Mono', monospace;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
 
     .chart-wrapper {
-      position: relative;
-      height: 70vh;
-      min-height: 500px;
-      background: #0a0e1a;
-      border-radius: 0.75rem;
+      height: 680px;
+      background: #0f172a;
+      border-radius: 24px;
       overflow: hidden;
-    }
-
-    iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-      margin: 3rem 0;
-    }
-
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 40px -15px rgba(99,102,241,0.25);
-    }
-
-    .stat-value {
-      font-size: 2.2rem;
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      margin: 0.5rem 0;
-      color: var(--primary-glow);
-    }
-
-    .stat-label {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    footer {
-      text-align: center;
-      padding: 3rem 0 2rem;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      border-top: 1px solid var(--border);
+      border: 1px solid #334155;
     }
 
     @media (max-width: 768px) {
-      h1 { font-size: 2.2rem; }
-      .hero-chart { padding: 1rem; }
-      .chart-wrapper { height: 60vh; min-height: 400px; }
+      .chart-wrapper {
+        height: 520px;
+      }
     }
   </style>
 </head>
-<body>
+<body class="bg-[#0a0f1c] text-slate-200 min-h-screen">
 
-  <header>
-    <div class="container">
-      <h1>Crypto Pulse</h1>
-      <p class="tagline">Bitcoin & Crypto Market Analytics • On-chain Insights • Price Tracking</p>
+  <!-- Top Navbar -->
+  <nav class="border-b border-slate-800 bg-black/70 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-screen-2xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center text-3xl font-bold">₿</div>
+        <span class="title-font text-3xl font-semibold tracking-tighter">CryptoPulse</span>
+      </div>
+      
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-1.5 rounded-3xl text-sm font-medium">
+          <span class="relative flex h-3 w-3">
+            <span class="live-dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+          </span>
+          LIVE DATA
+        </div>
+        <button onclick="refreshData()" 
+                class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 rounded-3xl text-sm font-medium transition-all">
+          <i id="refresh-icon" class="fas fa-sync-alt"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
     </div>
-  </header>
+  </nav>
 
-  <main class="container">
+  <div class="max-w-screen-2xl mx-auto px-6 py-12">
 
-    <!-- Your chart as the first / hero piece of content -->
-    <section class="hero-chart">
-      <h2>Bitcoin Price History (Interactive Chart)</h2>
-      <div class="chart-wrapper">
-        <!-- 
-          Embedded published Google Sheets chart 
-          (interactive mode works well on modern browsers)
-        -->
+    <!-- Live Bitcoin Price Banner -->
+    <div class="mb-12">
+      <div class="flex flex-col lg:flex-row lg:items-end gap-8">
+        <div>
+          <p class="text-slate-400 text-lg tracking-wide">BITCOIN PRICE</p>
+          <div id="btc-price" class="title-font text-7xl lg:text-8xl font-bold tracking-tighter text-white">$67,842</div>
+        </div>
+        <div id="btc-change" class="text-4xl font-semibold flex items-center gap-3"></div>
+      </div>
+      <p id="last-updated" class="text-slate-500 text-sm mt-3">Updated moments ago</p>
+    </div>
+
+    <!-- Key Real-Time Stats (exactly what you asked for) -->
+    <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Your Google Sheets Chart - FIRST MAIN CONTENT -->
+    <div class="mb-16">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="title-font text-3xl font-semibold tracking-tight">Bitcoin Price History &amp; Analytics</h2>
+          <p class="text-slate-400">Interactive long-term chart • Public data</p>
+        </div>
+        <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869" 
+           target="_blank" 
+           class="text-indigo-400 hover:text-white flex items-center gap-2 text-sm font-medium">
+          Open full sheet <i class="fas fa-external-link-alt ml-1"></i>
+        </a>
+      </div>
+      
+      <div class="chart-wrapper shadow-2xl">
         <iframe 
-          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive"
-          allowfullscreen 
-          sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin">
+          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&amp;format=interactive"
+          width="100%" 
+          height="100%" 
+          frameborder="0"
+          allowfullscreen>
         </iframe>
       </div>
-    </section>
+    </div>
 
-    <!-- Placeholder stats section – you can update with real data later -->
-    <section class="stats-bar">
-      <div class="stat-card">
-        <div class="stat-label">Market Cap</div>
-        <div class="stat-value">$1.82T</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">24h Volume</div>
-        <div class="stat-value">$68.4B</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">BTC Dominance</div>
-        <div class="stat-value">52.7%</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">24h Change</div>
-        <div class="stat-value" style="color: var(--green);">+3.4%</div>
-      </div>
-    </section>
+    <!-- Footer -->
+    <footer class="text-center text-slate-500 text-sm py-12 border-t border-slate-800">
+      <p>Data powered by <a href="https://www.coingecko.com" target="_blank" class="hover:text-slate-300">CoinGecko</a> • Real-time updates every 60 seconds • Not financial advice</p>
+      <p class="mt-2 text-xs">Perfect for GitHub Pages • Mobile + Desktop optimized</p>
+    </footer>
+  </div>
 
-    <!-- More sections can be added here later: e.g. other charts, tables, API-fed prices -->
+  <script>
+    // Tailwind script already loaded
 
-  </main>
+    function formatLargeNumber(num) {
+      if (!num) return "$0";
+      if (num >= 1e12) return "$" + (num / 1e12).toFixed(2) + "T";
+      if (num >= 1e9) return "$" + (num / 1e9).toFixed(2) + "B";
+      return "$" + num.toLocaleString();
+    }
 
-  <footer>
-    <p>Powered by public data sources • Not financial advice • Last updated February 2026</p>
-  </footer>
+    async function fetchData() {
+      try {
+        const [globalRes, btcRes] = await Promise.all([
+          fetch("https://api.coingecko.com/api/v3/global"),
+          fetch("https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false")
+        ]);
 
+        const global = await globalRes.json();
+        const btc = await btcRes.json();
+
+        const g = global.data;
+        const b = btc.market_data;
+
+        // Live BTC Price
+        const priceEl = document.getElementById("btc-price");
+        priceEl.textContent = "$" + b.current_price.usd.toLocaleString();
+
+        // 24h Change
+        const change = b.price_change_percentage_24h;
+        const changeEl = document.getElementById("btc-change");
+        const isUp = change >= 0;
+        changeEl.innerHTML = `
+          <span class="${isUp ? 'text-emerald-400' : 'text-red-400'} flex items-center gap-2">
+            <i class="fas fa-arrow-trend-${isUp ? 'up' : 'down'}"></i>
+            ${isUp ? '+' : ''}${change.toFixed(2)}%
+          </span>
+        `;
+
+        // Stats Grid (Market Cap, Volume, BTC Dominance, 24h Volume again for emphasis)
+        const statsHTML = `
+          <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
+            <div class="flex justify-between">
+              <div>
+                <p class="text-slate-400 text-sm">Total Market Cap</p>
+                <p class="text-3xl font-semibold mt-3">${formatLargeNumber(g.total_market_cap.usd)}</p>
+              </div>
+              <i class="fas fa-globe text-4xl text-indigo-400 opacity-70"></i>
+            </div>
+          </div>
+
+          <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
+            <div class="flex justify-between">
+              <div>
+                <p class="text-slate-400 text-sm">24h Global Volume</p>
+                <p class="text-3xl font-semibold mt-3">${formatLargeNumber(g.total_volume.usd)}</p>
+              </div>
+              <i class="fas fa-chart-line text-4xl text-purple-400 opacity-70"></i>
+            </div>
+          </div>
+
+          <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
+            <div class="flex justify-between">
+              <div>
+                <p class="text-slate-400 text-sm">BTC Dominance</p>
+                <p class="text-3xl font-semibold mt-3">${g.market_cap_percentage.btc.toFixed(1)}%</p>
+              </div>
+              <i class="fas fa-percentage text-4xl text-amber-400 opacity-70"></i>
+            </div>
+          </div>
+
+          <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
+            <div class="flex justify-between">
+              <div>
+                <p class="text-slate-400 text-sm">BTC 24h Change</p>
+                <p class="text-3xl font-semibold mt-3 ${isUp ? 'text-emerald-400' : 'text-red-400'}">${isUp ? '+' : ''}${change.toFixed(2)}%</p>
+              </div>
+              <i class="fas fa-clock text-4xl text-rose-400 opacity-70"></i>
+            </div>
+          </div>
+        `;
+        document.getElementById("stats-grid").innerHTML = statsHTML;
+
+        // Last updated
+        document.getElementById("last-updated").innerHTML = `Last updated: <span class="font-mono">${new Date().toLocaleTimeString()}</span>`;
+
+      } catch (err) {
+        console.error("API error:", err);
+      }
+    }
+
+    // Manual refresh with animation
+    function refreshData() {
+      const icon = document.getElementById("refresh-icon");
+      icon.classList.add("fa-spin");
+      fetchData().finally(() => {
+        setTimeout(() => icon.classList.remove("fa-spin"), 800);
+      });
+    }
+
+    // Initial load + auto-refresh
+    fetchData();
+    setInterval(fetchData, 60000); // every 60 seconds
+  </script>
 </body>
 </html>
