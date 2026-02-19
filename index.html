@@ -123,7 +123,7 @@
   (function() {
     // ----- Configuration -----
     const COINGECKO_API = 'https://api.coingecko.com/api/v3';
-    const TIMEOUT_MS = 1000; // 8 seconds
+    const TIMEOUT_MS = 8000; // 8 seconds
     const RETRY_COUNT = 1;
 
     // ----- DOM Elements -----
@@ -248,7 +248,8 @@
         console.error('Fetch attempt failed:', error);
         if (attempt < RETRY_COUNT) {
           // Retry after 1 second
-          setTimeout(() => fetchData(attempt + 1), 1000);
+            // Inside fetchData() catch block
+        setTimeout(() => fetchData(attempt + 1), 3000); // Wait 3 seconds before retrying instead of 1
         } else {
           // No more retries – show error and fallback to cache if available
           if (!cachedGlobal || !cachedPrices) {
