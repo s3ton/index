@@ -250,9 +250,13 @@
 
             // Allow scrolling the tooltip with the mouse wheel while hovering the chart
             const wheelHandler = (event) => {
-              // Find the tooltip in the document. Plotly might render it outside
+              // Find all tooltips in the document. Plotly might render it outside
               // the chart container, so we search globally for the visible one.
-              const hovertext = document.querySelector('.hovertext');
+              const hovertexts = document.querySelectorAll('.hovertext');
+              // There might be multiple hovertext elements in the DOM if there are multiple charts,
+              // but only one should be visible at a time. We find the one that is
+              // currently being displayed by checking its clientHeight.
+              const hovertext = Array.from(hovertexts).find(ht => ht.clientHeight > 0);
               if (hovertext && hovertext.scrollHeight > hovertext.clientHeight) {
                 event.preventDefault();
                 hovertext.scrollTop += event.deltaY;
