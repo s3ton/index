@@ -248,6 +248,13 @@
                 }
               }
             };
+            // Customize hovertemplate for each trace in composition chart
+            compData.data.forEach(trace => {
+              if (trace.name) {
+                // Assuming trace.name is the coin name and %{y} is the percentage
+                trace.hovertemplate = `<b>%{fullData.name}</b>: %{y:.2f}%<extra></extra>`;
+              }
+            });
             Plotly.newPlot(compositionChartEl, compData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
             console.log('✓ Composition chart rendered');
 
