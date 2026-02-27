@@ -186,16 +186,27 @@
           const perfData = await perfResponse.json();
           if (performanceChartEl && perfData.data && perfData.layout) {
             if (perfData.data.length > 0 && perfData.data[0].y && perfData.data[0].y.length > 0) {
-              const startValue = perfData.data[0].y[0];
-              perfData.data[0].y = perfData.data[0].y.map(value => (value / startValue) - 1);
+              const originalIndexY = [...perfData.data[0].y];
+              const startIndexValue = originalIndexY[0];
+              perfData.data[0].y = originalIndexY.map(value => (value / startIndexValue) - 1);
+              perfData.data[0].customdata = originalIndexY;
+              perfData.data[0].hovertemplate = 'Indice: %{customdata:,.0f}$<extra></extra>';
+
+              if (perfData.data.length > 1 && perfData.data[1].y && perfData.data[1].y.length > 0) {
+                const originalBenchmarkY = [...perfData.data[1].y];
+                const startBenchmarkValue = originalBenchmarkY[0];
+                perfData.data[1].y = originalBenchmarkY.map(value => (value / startBenchmarkValue) - 1);
+                perfData.data[1].customdata = originalBenchmarkY;
+                perfData.data[1].hovertemplate = 'Benchmark: %{customdata:,.0f}$<extra></extra>';
+              }
+
               perfData.layout.yaxis = perfData.layout.yaxis || {};
               perfData.layout.yaxis.tickformat = '.0%';
-              perfData.data[0].hovertemplate = '<b>Return</b>: %{y:.0%}<extra></extra>';
             }
 
             const layoutWithMargins = {
               ...perfData.layout,
-              margin: { l: 60, r: 40, t: 20, b: 60 },
+              margin: { l: 60, r: 40, t: 50, b: 40 },
               plot_bgcolor: "transparent",
               paper_bgcolor: "transparent",
               font: { color: '#475569' },
@@ -217,7 +228,7 @@
           if (compositionChartEl && compData.data && compData.layout) {
             const layoutWithMargins = {
               ...compData.layout,
-              margin: { l: 60, r: 40, t: 20, b: 60 },
+              margin: { l: 60, r: 40, t: 50, b: 40 },
               plot_bgcolor: "transparent",
               paper_bgcolor: "transparent",
               font: { color: '#475569' },
