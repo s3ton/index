@@ -9,6 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
@@ -16,15 +17,30 @@
     .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); }
     .live-dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .chart-card { background: #0f172a; border-radius: 24px; overflow: hidden; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; }
+    .chart-card { background: #0f172a; border-radius: 24px; overflow: visible; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; }
     .chart-header { padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid #334155; flex-shrink: 0; }
-    .chart-container { flex: 1; min-height: 420px; position: relative; }
-    .chart-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; }
-    @media (max-width: 1023px) { .chart-container { min-height: 480px; } }
-    @media (max-width: 640px) { .chart-container { min-height: 420px; } }
+    .chart-container { flex: 1; min-height: 500px; position: relative; padding: 0 1rem 1.5rem 1rem; }
+    .chart-wrapper { position: relative; width: 100%; height: 450px; }
+    @media (max-width: 1023px) { .chart-container { min-height: 550px; } }
+    @media (max-width: 640px) { .chart-container { min-height: 500px; } }
     .error-message { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fecaca; padding: 0.75rem; border-radius: 1rem; text-align: center; }
     .loading-spinner { display: inline-block; width: 1.2rem; height: 1.2rem; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .hovertext {
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .hovertext::-webkit-scrollbar {
+      width: 6px;
+    }
+    .hovertext::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    .hovertext::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body class="bg-[#0a0f1c] text-slate-200 min-h-screen">
@@ -70,6 +86,43 @@
   <!-- Stats Grid -->
   <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
     <!-- dynamic content or loading placeholders -->
+  </div>
+
+  <!-- Charts -->
+  <div class="mb-16">
+    <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+      <div>
+        <h2 class="title-font text-4xl font-semibold tracking-tight">Conio Market Cap Index</h2>
+        <p class="text-slate-400 mt-2">Dynamic cryptocurrency portfolio • Market-cap weighted allocation</p>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-10 mb-16">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="title-font text-2xl font-semibold">Conio Index</h3>
+          <p class="text-slate-400 text-sm mt-1">vs Bitcoin benchmark</p>
+        </div>
+        <div class="chart-container">
+          <div class="chart-wrapper" id="performance-chart"></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="title-font text-2xl font-semibold">Composition Evolution</h3>
+          <p class="text-slate-400 text-sm mt-1">Allocation over time</p>
+        </div>
+        <div class="chart-container">
+          <div class="chart-wrapper" id="composition-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="https://github.com/lorenzo-index/crypto-market-cap-index" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-sm font-medium inline-flex items-center gap-2 hover:underline">
+        View strategy on GitHub <i class="fas fa-external-link-alt ml-1"></i>
+      </a>
+    </div>
   </div>
 
   <!-- Charts -->
@@ -133,6 +186,97 @@
     const ethChangeEl = document.getElementById('eth-change');
     const statsGridEl = document.getElementById('stats-grid');
     const refreshIcon = document.getElementById('refresh-icon');
+    const performanceChartEl = document.getElementById('performance-chart');
+    const compositionChartEl = document.getElementById('composition-chart');
+
+    // ----- Load Strategy Charts from JSON -----
+    async function loadStrategyCharts() {
+      try {
+        // Try to load performance chart data
+        console.log('Attempting to load performance chart from ./code/strategy_performance.json');
+        const perfResponse = await fetch('./code/strategy_performance.json');
+        console.log('Performance response:', perfResponse.status, perfResponse.ok);
+        if (perfResponse.ok) {
+          const perfData = await perfResponse.json();
+          console.log('Performance data loaded:', perfData.data ? 'has data' : 'no data', perfData.layout ? 'has layout' : 'no layout');
+          if (performanceChartEl && perfData.data && perfData.layout) {
+            // Add proper margins to layout
+            const layoutWithMargins = {
+              ...perfData.layout,
+              margin: { l: 60, r: 40, t: 40, b: 80 },
+              hoverlabel: {
+                bgcolor: "#334155",
+                bordercolor: "#475569",
+                font: {
+                  size: 11,
+                  color: "#f1f5f9"
+                }
+              }
+            };
+            Plotly.newPlot(performanceChartEl, perfData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
+            console.log('✓ Performance chart rendered');
+          }
+        } else {
+          console.error('Failed to load performance chart: HTTP', perfResponse.status);
+        }
+      } catch (e) {
+        console.error('Performance chart error:', e.message);
+      }
+
+      try {
+        // Try to load composition chart data
+        console.log('Attempting to load composition chart from ./code/strategy_composition.json');
+        const compResponse = await fetch('./code/strategy_composition.json');
+        console.log('Composition response:', compResponse.status, compResponse.ok);
+        if (compResponse.ok) {
+          const compData = await compResponse.json();
+          console.log('Composition data loaded:', compData.data ? 'has data' : 'no data', compData.layout ? 'has layout' : 'no layout');
+          if (compositionChartEl && compData.data && compData.layout) {
+            // Add proper margins to layout
+            const layoutWithMargins = {
+              ...compData.layout,
+              margin: { l: 60, r: 40, t: 40, b: 80 },
+              hoverlabel: {
+                bgcolor: "#334155",
+                bordercolor: "#475569",
+                font: {
+                  size: 11,
+                  color: "#f1f5f9"
+                }
+              }
+            };
+            Plotly.newPlot(compositionChartEl, compData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
+            console.log('✓ Composition chart rendered');
+
+            // Allow scrolling the tooltip with the mouse wheel while hovering the chart
+            const wheelHandler = (event) => {
+              // Find the tooltip in the document. Plotly might render it outside
+              // the chart container, so we search globally for the visible one.
+              const hovertext = document.querySelector('.hovertext');
+              if (hovertext && hovertext.scrollHeight > hovertext.clientHeight) {
+                event.preventDefault();
+                hovertext.scrollTop += event.deltaY;
+              }
+            };
+
+            compositionChartEl.on('plotly_hover', () => {
+              compositionChartEl.addEventListener('wheel', wheelHandler, { passive: false });
+            });
+            compositionChartEl.on('plotly_unhover', () => {
+              compositionChartEl.removeEventListener('wheel', wheelHandler);
+            });
+          }
+        } else {
+          console.error('Failed to load composition chart: HTTP', compResponse.status);
+        }
+      } catch (e) {
+        console.error('Composition chart error:', e.message);
+      }
+    }
+
+    // Load charts on page load
+    console.log('Page loaded, initializing charts...');
+    loadStrategyCharts();
 
     // ----- Helper Functions -----
     function formatPrice(price) {

@@ -6,6 +6,42 @@ import plotly.graph_objects as go
 import pickle
 from pathlib import Path
 
+# Mapping da ticker a nomi delle cryptocurrency per esteso
+CRYPTO_NAMES = {
+    'BTC-USD': 'Bitcoin',
+    'ETH-USD': 'Ethereum',
+    'XRP-USD': 'XRP',
+    'SOL-USD': 'Solana',
+    'DOGE-USD': 'Dogecoin',
+    'ADA-USD': 'Cardano',
+    'LINK-USD': 'Chainlink',
+    'AVAX-USD': 'Avalanche',
+    'DOT-USD': 'Polkadot',
+    'UNI7083-USD': 'Uniswap',
+    'SKY33038-USD': 'Sky',
+    'NEAR-USD': 'Near',
+    'ATOM-USD': 'Cosmos',
+    'POL28321-USD': 'Polygon',
+    'ALGO-USD': 'Algorand',
+    'APT21794-USD': 'Aptos',
+    'ARB11841-USD': 'Arbitrum',
+    'STX4847-USD': 'Stacks',
+    'INJ-USD': 'Injective',
+    'TIA-USD': 'Celestia',
+    'GRT6719-USD': 'The Graph',
+    'OP-USD': 'Optimism',
+    'SUI20947-USD': 'Sui',
+    'XLM-USD': 'Stellar Lumens',
+    'XPL-USD': 'XPL',
+    'ONDO-USD': 'Ondo',
+    'HBAR-USD': 'Hedera',
+    'FIL-USD': 'Filecoin',
+    'AAVE-USD': 'Aave',
+    'NIGHT39064-USD': 'Nyx',
+    'ETC-USD': 'Ethereum Classic',
+    'LTC-USD': 'Litecoin',
+}
+
 # ==========================================
 # Genitore
 # ==========================================
@@ -512,11 +548,12 @@ class VolMktCapStrategy(BaseCryptoStrategy):
         active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
 
         for ticker in active_assets:
+            crypto_name = CRYPTO_NAMES.get(ticker, ticker)  # Usa il nome per esteso o il ticker se non trovato
             fig.add_trace(go.Scatter(
                 x=self.weights_df.index,
                 y=self.weights_df[ticker],
                 mode='lines',
-                name=ticker,
+                name=crypto_name,
                 stackgroup='one', # Imposta il grafico ad area impilata
                 line=dict(width=0.5)
             ))
