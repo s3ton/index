@@ -37,7 +37,7 @@ CRYPTO_NAMES = {
     'HBAR-USD': 'Hedera',
     'FIL-USD': 'Filecoin',
     'AAVE-USD': 'Aave',
-    'NIGHT39064-USD': 'Nyx',
+    'NIGHT39064-USD': 'Midnight',
     'ETC-USD': 'Ethereum Classic',
     'LTC-USD': 'Litecoin',
 }
@@ -209,11 +209,10 @@ class BaseCryptoStrategy(ABC):
             common_idx = self.index_df.index.intersection(self.benchmark_df.index)
             if not common_idx.empty:
                 btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
-                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
                 
                 fig.add_trace(go.Scatter(
-                    x=btc_normalized.index, 
-                    y=btc_normalized,
+                    x=btc_prices.index, 
+                    y=btc_prices,
                     mode='lines',
                     name=f'{self.benchmark_ticker} (Benchmark)',
                     line=dict(color='#cc8306', width=2)

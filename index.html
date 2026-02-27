@@ -116,11 +116,6 @@
       </div>
     </div>
 
-    <div class="text-center">
-      <a href="https://github.com/lorenzo-index/crypto-market-cap-index" target="_blank" class="text-[#0050ff] hover:text-[#003bc0] text-sm font-bold inline-flex items-center gap-2 hover:underline bg-blue-50 px-5 py-2.5 rounded-full transition-colors">
-        View strategy on GitHub <i class="fas fa-external-link-alt ml-1"></i>
-      </a>
-    </div>
   </div>
 
   <div class="mb-16">
@@ -146,12 +141,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="text-center mt-10">
-      <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubhtml" target="_blank" class="text-[#0050ff] hover:text-[#003bc0] text-sm font-bold inline-flex items-center gap-2 hover:underline bg-blue-50 px-5 py-2.5 rounded-full transition-colors">
-        View full source spreadsheet <i class="fas fa-external-link-alt ml-1"></i>
-      </a>
     </div>
   </div>
 
@@ -185,24 +174,12 @@
         if (perfResponse.ok) {
           const perfData = await perfResponse.json();
           if (performanceChartEl && perfData.data && perfData.layout) {
-            if (perfData.data.length > 0 && perfData.data[0].y && perfData.data[0].y.length > 0) {
-              const originalIndexY = [...perfData.data[0].y];
-              const startIndexValue = originalIndexY[0];
-              perfData.data[0].y = originalIndexY.map(value => (value / startIndexValue) - 1);
-              perfData.data[0].customdata = originalIndexY;
-              perfData.data[0].hovertemplate = 'Indice: %{customdata:,.0f}$<extra></extra>';
-
-              if (perfData.data.length > 1 && perfData.data[1].y && perfData.data[1].y.length > 0) {
-                const originalBenchmarkY = [...perfData.data[1].y];
-                const startBenchmarkValue = originalBenchmarkY[0];
-                perfData.data[1].y = originalBenchmarkY.map(value => (value / startBenchmarkValue) - 1);
-                perfData.data[1].customdata = originalBenchmarkY;
-                perfData.data[1].hovertemplate = 'Benchmark: %{customdata:,.0f}$<extra></extra>';
-              }
-
-              perfData.layout.yaxis = perfData.layout.yaxis || {};
-              perfData.layout.yaxis.tickformat = '.0%';
+            perfData.data[0].hovertemplate = 'Indice: %{y:$,.0f}<extra></extra>';
+            if (perfData.data.length > 1) {
+              perfData.data[1].hovertemplate = 'Benchmark: %{y:$,.0f}<extra></extra>';
             }
+            perfData.layout.yaxis = perfData.layout.yaxis || {};
+            perfData.layout.yaxis.tickformat = '$,.0f';
 
             const layoutWithMargins = {
               ...perfData.layout,
