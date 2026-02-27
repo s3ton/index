@@ -3,141 +3,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CryptoPulse • Bitcoin & Crypto Analytics</title>
-  <meta name="description" content="Real-time Bitcoin, Ethereum & crypto market analytics dashboard with live data."/>
+  <title>Conio • Crypto Analytics</title>
+  <meta name="description" content="Real-time crypto market analytics dashboard with live data."/>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
     .title-font { font-family: 'Space Grotesk', sans-serif; }
-    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); }
+    
     .live-dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .chart-card { background: #0f172a; border-radius: 24px; overflow: visible; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; }
+    
+    /* Conio-style clean white cards with soft shadows */
+    .chart-card { 
+      background: #ffffff; 
+      border-radius: 24px; 
+      overflow: visible; 
+      border: 1px solid #f1f5f9; 
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05); 
+      display: flex; 
+      flex-direction: column; 
+    }
+    
     .chart-container { flex: 1; min-height: 500px; position: relative; padding: 1.5rem; }
     .chart-wrapper { position: relative; width: 100%; height: 100%; }
+    
     @media (max-width: 1023px) { .chart-container { min-height: 550px; padding: 1rem; } }
     @media (max-width: 640px) { .chart-container { min-height: 500px; } }
-    .error-message { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fecaca; padding: 0.75rem; border-radius: 1rem; text-align: center; }
-    .loading-spinner { display: inline-block; width: 1.2rem; height: 1.2rem; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    
+    .error-message { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #b91c1c; padding: 0.75rem; border-radius: 1rem; text-align: center; }
+    .loading-spinner { display: inline-block; width: 1.2rem; height: 1.2rem; border: 2px solid rgba(0, 80, 255, 0.2); border-top-color: #0050ff; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .plotly .hovertext {
-      z-index: 1000; /* Ensure tooltip is on top */
-    }
-    .hovertext {
-      max-height: 280px; /* Slightly reduce max-height */
-      overflow-y: auto;
-    }
-    .hovertext::-webkit-scrollbar {
-      width: 6px;
-    }
-    .hovertext::-webkit-scrollbar-track {
-      background: #1e293b;
-      border-radius: 3px;
-    }
-    .hovertext::-webkit-scrollbar-thumb {
-      background: #475569;
-      border-radius: 3px;
-    }
+    
+    .plotly .hovertext { z-index: 1000; }
+    .hovertext { max-height: 280px; overflow-y: auto; }
+    .hovertext::-webkit-scrollbar { width: 6px; }
+    .hovertext::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+    .hovertext::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
   </style>
 </head>
-<body class="bg-[#0a0f1c] text-slate-200 min-h-screen">
+<body class="bg-[#f8f9fb] text-slate-800 min-h-screen">
 
-<nav class="border-b border-slate-800 bg-black/70 backdrop-blur-md sticky top-0 z-50">
-  <div class="max-w-screen-2xl mx-auto px-6 py-5 flex items-center justify-between">
+<nav class="border-b border-gray-200 bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+  <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center text-3xl font-bold">₿</div>
-      <span class="title-font text-3xl font-semibold tracking-tighter">CryptoPulse</span>
+      <div class="w-10 h-10 bg-[#0050ff] rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md">
+        C
+      </div>
+      <span class="title-font text-2xl font-bold tracking-tight text-[#0a1b39]">Conio <span class="text-[#0050ff]">Analytics</span></span>
     </div>
-    <div class="flex items-center gap-6">
-      <div class="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-1.5 rounded-3xl text-sm font-medium">
+    <div class="flex items-center gap-4 sm:gap-6">
+      <div class="hidden sm:flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full text-sm font-semibold">
         <span class="relative flex h-3 w-3">
-          <span class="live-dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+          <span class="live-dot absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
         </span>
         LIVE DATA
       </div>
       <button onclick="refreshData()" 
-              class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 rounded-3xl text-sm font-medium transition-all">
+              class="flex items-center gap-2 px-6 py-2.5 bg-[#0050ff] hover:bg-[#003bc0] text-white rounded-full text-sm font-semibold transition-all shadow-md shadow-blue-500/30 hover:shadow-lg hover:-translate-y-0.5">
         <i id="refresh-icon" class="fas fa-sync-alt"></i>
-        <span>Refresh</span>
+        <span>Aggiorna</span>
       </button>
     </div>
   </div>
 </nav>
 
 <div class="max-w-screen-2xl mx-auto px-6 py-12">
-  <!-- Price Header -->
-  <div class="mb-12 grid grid-cols-1 lg:grid-cols-2 gap-10">
-    <div>
-      <p class="text-slate-400 text-lg tracking-wide mb-2">BITCOIN PRICE</p>
-      <div id="btc-price" class="title-font text-6xl lg:text-7xl font-bold tracking-tighter text-white">--.--</div>
-      <div id="btc-change" class="text-3xl font-semibold mt-4 flex items-center gap-3"></div>
+  <div class="mb-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-transform hover:-translate-y-1 duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-8 h-8 rounded-full bg-[#f7931a]/10 flex items-center justify-center text-[#f7931a]"><i class="fab fa-bitcoin"></i></div>
+        <p class="text-slate-500 text-sm font-bold tracking-wider uppercase">Bitcoin Price</p>
+      </div>
+      <div id="btc-price" class="title-font text-5xl lg:text-7xl font-extrabold tracking-tight text-[#0a1b39]">--.--</div>
+      <div id="btc-change" class="text-2xl font-semibold mt-4 flex items-center gap-3"></div>
     </div>
-    <div>
-      <p class="text-slate-400 text-lg tracking-wide mb-2">ETHEREUM PRICE</p>
-      <div id="eth-price" class="title-font text-6xl lg:text-7xl font-bold tracking-tighter text-white">--.--</div>
-      <div id="eth-change" class="text-3xl font-semibold mt-4 flex items-center gap-3"></div>
+    <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-transform hover:-translate-y-1 duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-8 h-8 rounded-full bg-[#627eea]/10 flex items-center justify-center text-[#627eea]"><i class="fab fa-ethereum"></i></div>
+        <p class="text-slate-500 text-sm font-bold tracking-wider uppercase">Ethereum Price</p>
+      </div>
+      <div id="eth-price" class="title-font text-5xl lg:text-7xl font-extrabold tracking-tight text-[#0a1b39]">--.--</div>
+      <div id="eth-change" class="text-2xl font-semibold mt-4 flex items-center gap-3"></div>
     </div>
   </div>
 
-  <!-- Stats Grid -->
   <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-    <!-- dynamic content or loading placeholders -->
-  </div>
+    </div>
 
-  <!-- Charts -->
-  <div class="mb-16">
+  <div class="mb-20">
     <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
       <div>
-        <h2 class="title-font text-4xl font-semibold tracking-tight">Conio Market Cap Index</h2>
-        <p class="text-slate-400 mt-2">Dynamic cryptocurrency portfolio • Market-cap weighted allocation</p>
+        <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Conio Market Cap Index</h2>
+        <p class="text-slate-500 mt-2 font-medium">Dynamic cryptocurrency portfolio • Market-cap weighted allocation</p>
       </div>
     </div>
 
-    <div class="grid gap-10 mb-16">
-      <div class="chart-card w-3/4 mx-auto">
+    <div class="grid gap-10 mb-10">
+      <div class="chart-card w-full lg:w-4/5 mx-auto">
         <div class="chart-container">
           <div class="chart-wrapper" id="performance-chart"></div>
         </div>
       </div>
-      <div class="chart-card w-3/4 mx-auto">
+      <div class="chart-card w-full lg:w-4/5 mx-auto">
         <div class="chart-container">
           <div class="chart-wrapper" id="composition-chart"></div>
         </div>
       </div>
     </div>
 
-    <div class="text-center mt-8">
-      <a href="https://github.com/lorenzo-index/crypto-market-cap-index" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-sm font-medium inline-flex items-center gap-2 hover:underline">
+    <div class="text-center">
+      <a href="https://github.com/lorenzo-index/crypto-market-cap-index" target="_blank" class="text-[#0050ff] hover:text-[#003bc0] text-sm font-bold inline-flex items-center gap-2 hover:underline bg-blue-50 px-5 py-2.5 rounded-full transition-colors">
         View strategy on GitHub <i class="fas fa-external-link-alt ml-1"></i>
       </a>
     </div>
   </div>
 
-  <!-- Charts -->
   <div class="mb-16">
     <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
       <div>
-        <h2 class="title-font text-4xl font-semibold tracking-tight">Price History Analytics</h2>
-        <p class="text-slate-400 mt-2">Interactive long-term charts • Public Google Sheets data</p>
+        <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Price History Analytics</h2>
+        <p class="text-slate-500 mt-2 font-medium">Interactive long-term charts • Public Google Sheets data</p>
       </div>
     </div>
 
     <div class="grid lg:grid-cols-2 gap-10">
       <div class="chart-card">
-        <div class="chart-container">
+        <div class="chart-container p-0 overflow-hidden rounded-3xl">
           <div class="chart-wrapper">
             <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
           </div>
         </div>
       </div>
       <div class="chart-card">
-        <div class="chart-container">
+        <div class="chart-container p-0 overflow-hidden rounded-3xl">
           <div class="chart-wrapper">
             <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=1143695036&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
           </div>
@@ -145,16 +149,16 @@
       </div>
     </div>
 
-    <div class="text-center mt-8">
-      <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubhtml" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-sm font-medium inline-flex items-center gap-2 hover:underline">
+    <div class="text-center mt-10">
+      <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubhtml" target="_blank" class="text-[#0050ff] hover:text-[#003bc0] text-sm font-bold inline-flex items-center gap-2 hover:underline bg-blue-50 px-5 py-2.5 rounded-full transition-colors">
         View full source spreadsheet <i class="fas fa-external-link-alt ml-1"></i>
       </a>
     </div>
   </div>
 
-  <footer class="text-center text-slate-500 text-sm py-12 border-t border-slate-800">
-    <p>Data powered by <a href="https://www.coingecko.com" target="_blank" class="hover:text-slate-300">CoinGecko</a> API • Real-time updates every 60 seconds • Not financial advice</p>
-    <p class="mt-2 text-xs">Optimized for mobile & desktop • February 19, 2026</p>
+  <footer class="text-center text-slate-500 text-sm py-12 border-t border-gray-200 mt-12">
+    <p>Data powered by <a href="https://www.coingecko.com" target="_blank" class="font-semibold text-slate-600 hover:text-[#0050ff] transition-colors">CoinGecko</a> API • Real-time updates every 60 seconds • Not financial advice</p>
+    <p class="mt-2 text-xs">Optimized for mobile & desktop • Conio Redesign</p>
   </footer>
 </div>
 
@@ -178,101 +182,66 @@
     // ----- Load Strategy Charts from JSON -----
     async function loadStrategyCharts() {
       try {
-        // Try to load performance chart data
-        console.log('Attempting to load performance chart from ./code/strategy_performance.json');
         const perfResponse = await fetch('./code/strategy_performance.json');
-        console.log('Performance response:', perfResponse.status, perfResponse.ok);
         if (perfResponse.ok) {
           const perfData = await perfResponse.json();
-          console.log('Performance data loaded:', perfData.data ? 'has data' : 'no data', perfData.layout ? 'has layout' : 'no layout');
           if (performanceChartEl && perfData.data && perfData.layout) {
-            // Add proper margins to layout
             const layoutWithMargins = {
               ...perfData.layout,
               margin: { l: 60, r: 40, t: 40, b: 80 },
+              plot_bgcolor: "transparent",
+              paper_bgcolor: "transparent",
+              font: { color: '#475569' },
               hoverlabel: {
-                bgcolor: "#334155",
-                bordercolor: "#475569",
-                font: {
-                  size: 11,
-                  color: "#f1f5f9"
-                }
+                bgcolor: "#ffffff",
+                bordercolor: "#e2e8f0",
+                font: { size: 12, color: "#0f172a" }
               }
             };
             Plotly.newPlot(performanceChartEl, perfData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
-            console.log('✓ Performance chart rendered');
           }
-        } else {
-          console.error('Failed to load performance chart: HTTP', perfResponse.status);
         }
-      } catch (e) {
-        console.error('Performance chart error:', e.message);
-      }
+      } catch (e) { console.error('Performance chart error:', e.message); }
 
       try {
-        // Try to load composition chart data
-        console.log('Attempting to load composition chart from ./code/strategy_composition.json');
         const compResponse = await fetch('./code/strategy_composition.json');
-        console.log('Composition response:', compResponse.status, compResponse.ok);
         if (compResponse.ok) {
           const compData = await compResponse.json();
-          console.log('Composition data loaded:', compData.data ? 'has data' : 'no data', compData.layout ? 'has layout' : 'no layout');
           if (compositionChartEl && compData.data && compData.layout) {
-            // Add proper margins to layout
             const layoutWithMargins = {
               ...compData.layout,
               margin: { l: 60, r: 40, t: 40, b: 80 },
+              plot_bgcolor: "transparent",
+              paper_bgcolor: "transparent",
+              font: { color: '#475569' },
               hoverlabel: {
-                bgcolor: "#334155",
-                bordercolor: "#475569",
-                font: {
-                  size: 11,
-                  color: "#f1f5f9"
-                }
+                bgcolor: "#ffffff",
+                bordercolor: "#e2e8f0",
+                font: { size: 12, color: "#0f172a" }
               }
             };
-            // Customize hovertemplate for each trace in composition chart
             compData.data.forEach(trace => {
               if (trace.name) {
-                // Assuming trace.name is the coin name and %{y} is the percentage
                 trace.hovertemplate = `<b>%{fullData.name}</b>: %{y:.0%}<extra></extra>`;
               }
             });
             Plotly.newPlot(compositionChartEl, compData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
-            console.log('✓ Composition chart rendered');
 
-            // Allow scrolling the tooltip with the mouse wheel while hovering the chart
             const wheelHandler = (event) => {
-              // Find all tooltips in the document. Plotly might render it outside
-              // the chart container, so we search globally for the visible one.
               const hovertexts = document.querySelectorAll('.hovertext');
-              // There might be multiple hovertext elements in the DOM if there are multiple charts,
-              // but only one should be visible at a time. We find the one that is
-              // currently being displayed by checking its clientHeight.
               const hovertext = Array.from(hovertexts).find(ht => ht.clientHeight > 0);
               if (hovertext && hovertext.scrollHeight > hovertext.clientHeight) {
                 event.preventDefault();
                 hovertext.scrollTop += event.deltaY;
               }
             };
-
-            compositionChartEl.on('plotly_hover', () => {
-              compositionChartEl.addEventListener('wheel', wheelHandler, { passive: false });
-            });
-            compositionChartEl.on('plotly_unhover', () => {
-              compositionChartEl.removeEventListener('wheel', wheelHandler);
-            });
+            compositionChartEl.on('plotly_hover', () => compositionChartEl.addEventListener('wheel', wheelHandler, { passive: false }));
+            compositionChartEl.on('plotly_unhover', () => compositionChartEl.removeEventListener('wheel', wheelHandler));
           }
-        } else {
-          console.error('Failed to load composition chart: HTTP', compResponse.status);
         }
-      } catch (e) {
-        console.error('Composition chart error:', e.message);
-      }
+      } catch (e) { console.error('Composition chart error:', e.message); }
     }
 
-    // Load charts on page load
-    console.log('Page loaded, initializing charts...');
     loadStrategyCharts();
 
     // ----- Helper Functions -----
@@ -291,7 +260,6 @@
       return '$' + num.toLocaleString();
     }
 
-    // Fetch with timeout and abort
     async function fetchWithTimeout(url, options = {}) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -306,11 +274,8 @@
       }
     }
 
-    // Save data to sessionStorage as fallback
     function cacheData(key, data) {
-      try {
-        sessionStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
-      } catch (e) {}
+      try { sessionStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() })); } catch (e) {}
     }
 
     function getCachedData(key) {
@@ -318,87 +283,65 @@
         const item = sessionStorage.getItem(key);
         if (!item) return null;
         const { data, timestamp } = JSON.parse(item);
-        // Cache valid for 5 minutes (300000 ms)
         if (Date.now() - timestamp > 300000) return null;
         return data;
-      } catch (e) {
-        return null;
-      }
+      } catch (e) { return null; }
     }
 
-    // Show loading spinners
     function showLoading() {
       btcPriceEl.innerHTML = '<span class="loading-spinner"></span>';
       btcChangeEl.innerHTML = '';
       ethPriceEl.innerHTML = '<span class="loading-spinner"></span>';
       ethChangeEl.innerHTML = '';
-      statsGridEl.innerHTML = `
-        <div class="glass border border-slate-700 rounded-3xl p-8"><div class="loading-spinner mx-auto"></div></div>
-        <div class="glass border border-slate-700 rounded-3xl p-8"><div class="loading-spinner mx-auto"></div></div>
-        <div class="glass border border-slate-700 rounded-3xl p-8"><div class="loading-spinner mx-auto"></div></div>
-        <div class="glass border border-slate-700 rounded-3xl p-8"><div class="loading-spinner mx-auto"></div></div>
-      `;
+      
+      const skeleton = `<div class="bg-white border border-gray-100 shadow-sm rounded-[2rem] p-8 flex justify-center items-center h-32"><div class="loading-spinner"></div></div>`;
+      statsGridEl.innerHTML = skeleton.repeat(4);
     }
 
-    // Display error in stats grid and show retry button
     function showError(message) {
       statsGridEl.innerHTML = `
         <div class="col-span-full error-message p-6">
           <i class="fas fa-exclamation-triangle mr-2"></i>${message}
-          <button onclick="refreshData()" class="ml-4 bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-full text-sm font-medium transition">
+          <button onclick="refreshData()" class="ml-4 bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-full text-sm font-bold transition">
             Retry <i class="fas fa-sync-alt ml-1"></i>
           </button>
         </div>
       `;
-      // Also show placeholders in price areas
       btcPriceEl.textContent = '--.--';
       ethPriceEl.textContent = '--.--';
       btcChangeEl.innerHTML = '';
       ethChangeEl.innerHTML = '';
     }
 
-    // Main data fetching function (with retry)
     async function fetchData(attempt = 0) {
       showLoading();
 
-      // Try to show cached data immediately while fetching new
       const cachedGlobal = getCachedData('global');
       const cachedPrices = getCachedData('prices');
-      if (cachedGlobal && cachedPrices) {
-        updateUI(cachedGlobal, cachedPrices);
-      }
+      if (cachedGlobal && cachedPrices) updateUI(cachedGlobal, cachedPrices);
 
       try {
-        // Use Promise.all with timeouts for parallel requests
         const [globalData, pricesData] = await Promise.all([
           fetchWithTimeout(`${COINGECKO_API}/global`),
           fetchWithTimeout(`${COINGECKO_API}/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true`)
         ]);
 
-        // Validate data
         if (!globalData || !globalData.data) throw new Error('Invalid global data');
         if (!pricesData || !pricesData.bitcoin || !pricesData.ethereum) throw new Error('Invalid price data');
 
-        // Cache fresh data
         cacheData('global', globalData);
         cacheData('prices', pricesData);
 
-        // Update UI
         updateUI(globalData, pricesData);
       } catch (error) {
-        console.error('Fetch attempt failed:', error);
         if (attempt < RETRY_COUNT) {
-          // Retry after 1 second
-            // Inside fetchData() catch block
-        setTimeout(() => fetchData(attempt + 1), 3000); // Wait 3 seconds before retrying instead of 1
+          setTimeout(() => fetchData(attempt + 1), 3000);
         } else {
-          // No more retries – show error and fallback to cache if available
           if (!cachedGlobal || !cachedPrices) {
             showError('Failed to load live data. Please check your connection or try again later.');
           } else {
-            // We already showed cached data, just show a small warning
             statsGridEl.innerHTML += `
-              <div class="col-span-full text-xs text-slate-500 mt-2 text-center">
+              <div class="col-span-full text-xs text-slate-500 mt-2 text-center font-medium">
                 <i class="fas fa-exclamation-circle mr-1"></i>Showing cached data – live update failed.
               </div>
             `;
@@ -409,67 +352,56 @@
       }
     }
 
-    // Update all UI elements
     function updateUI(globalData, pricesData) {
       const g = globalData.data;
       const btc = pricesData.bitcoin;
       const eth = pricesData.ethereum;
 
-      // Bitcoin
       if (btc.usd) {
         btcPriceEl.textContent = '$' + formatPrice(btc.usd);
         const btcChange = btc.usd_24h_change ?? 0;
         const btcUp = btcChange >= 0;
         btcChangeEl.innerHTML = `
-          <span class="${btcUp ? 'text-emerald-400' : 'text-red-400'} flex items-center gap-2">
-            <i class="fas fa-arrow-trend-${btcUp ? 'up' : 'down'} fa-fw"></i>
+          <span class="px-3 py-1 rounded-full text-base font-bold ${btcUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'} flex items-center gap-1">
+            <i class="fas fa-arrow-trend-${btcUp ? 'up' : 'down'}"></i>
             ${btcUp ? '+' : ''}${btcChange.toFixed(2)}%
           </span>
         `;
       }
 
-      // Ethereum
       if (eth.usd) {
         ethPriceEl.textContent = '$' + formatPrice(eth.usd);
         const ethChange = eth.usd_24h_change ?? 0;
         const ethUp = ethChange >= 0;
         ethChangeEl.innerHTML = `
-          <span class="${ethUp ? 'text-emerald-400' : 'text-red-400'} flex items-center gap-2">
-            <i class="fas fa-arrow-trend-${ethUp ? 'up' : 'down'} fa-fw"></i>
+          <span class="px-3 py-1 rounded-full text-base font-bold ${ethUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'} flex items-center gap-1">
+            <i class="fas fa-arrow-trend-${ethUp ? 'up' : 'down'}"></i>
             ${ethUp ? '+' : ''}${ethChange.toFixed(2)}%
           </span>
         `;
       }
 
-      // Stats grid
       const ethDominance = g.market_cap_percentage.eth ? g.market_cap_percentage.eth.toFixed(1) : '—';
-      statsGridEl.innerHTML = `
-        <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
-          <p class="text-slate-400 text-sm">Total Market Cap</p>
-          <p class="text-3xl font-semibold mt-3">${formatLargeNumber(g.total_market_cap.usd)}</p>
+      const stats = [
+        { label: 'Total Market Cap', value: formatLargeNumber(g.total_market_cap.usd) },
+        { label: '24h Global Volume', value: formatLargeNumber(g.total_volume.usd) },
+        { label: 'BTC Dominance', value: g.market_cap_percentage.btc.toFixed(1) + '%' },
+        { label: 'ETH Dominance', value: ethDominance + '%' }
+      ];
+
+      statsGridEl.innerHTML = stats.map(stat => `
+        <div class="bg-white border border-gray-100 rounded-[2rem] p-8 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-blue-100 transition-all">
+          <p class="text-slate-500 text-sm font-bold tracking-wide uppercase">${stat.label}</p>
+          <p class="text-3xl font-extrabold mt-3 text-[#0a1b39]">${stat.value}</p>
         </div>
-        <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
-          <p class="text-slate-400 text-sm">24h Global Volume</p>
-          <p class="text-3xl font-semibold mt-3">${formatLargeNumber(g.total_volume.usd)}</p>
-        </div>
-        <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
-          <p class="text-slate-400 text-sm">BTC Dominance</p>
-          <p class="text-3xl font-semibold mt-3">${g.market_cap_percentage.btc.toFixed(1)}%</p>
-        </div>
-        <div class="glass border border-slate-700 rounded-3xl p-8 hover:border-indigo-500/50 transition-colors">
-          <p class="text-slate-400 text-sm">ETH Dominance</p>
-          <p class="text-3xl font-semibold mt-3">${ethDominance}%</p>
-        </div>
-      `;
+      `).join('');
     }
 
-    // Public refresh function
     window.refreshData = function() {
       refreshIcon.classList.add('fa-spin');
       fetchData();
     };
 
-    // Start periodic updates
     fetchData();
     setInterval(() => fetchData(), 60000);
   })();
