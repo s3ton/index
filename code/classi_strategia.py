@@ -3,14 +3,18 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+import time
 
 # ==========================================
 # Genitore
 # ==========================================
 class BaseCryptoStrategy(ABC):
     """
-    Classe genitore che gestisce il recupero dati, le statistiche e i grafici interattivi.
-    Le classi figlie devono implementare solo la logica di 'run_strategy'.
+    Classe genitore che gestisce il recupero dati e le statistiche.
+    Le classi figlie devono implementare solo la logica di 'run_strategy' e 
+    fornire un proprio metodo `plot_results` per visualizzare i risultati.
     """
     
     def __init__(self, initial_value: float = 10000.0):
@@ -36,7 +40,15 @@ class BaseCryptoStrategy(ABC):
                     print(f"Nessun dato per {ticker_symbol}. Salto.")
                     continue
                     
-                circulating_supply = ticker.info.get('circulatingSupply')
+                # Tentativi per recuperare circulatingSupply (backoff semplice)
+                circulating_supply = None
+                for attempt in range(3):
+                    try:
+                        circulating_supply = ticker.info.get('circulatingSupply')
+                        if circulating_supply:
+                            break
+                    except Exception:
+                        time.sleep(1)
                 if not circulating_supply:
                     print(f"Circulating Supply mancante per {ticker_symbol}. Salto.")
                     continue
@@ -75,75 +87,6 @@ class BaseCryptoStrategy(ABC):
         """Metodo astratto: ogni classe figlia deve definire la propria logica di backtest."""
         pass
 
-    def plot_results(self):
-        """Grafica l'andamento della strategia confrontato con il benchmark (Interattivo)."""
-        if self.index_df is None:
-            raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
-            
-        fig = go.Figure()
-
-        # --- PLOT STRATEGIA ---
-        fig.add_trace(go.Scatter(
-            x=self.index_df.index, 
-            y=self.index_df['Valore Indice'],
-            mode='lines',
-            name='Indice Strategia',
-            line=dict(color='#1f77b4', width=2)
-        ))
-        
-        # --- PLOT BENCHMARK ---
-        if self.benchmark_df is not None:
-            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
-            if not common_idx.empty:
-                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
-                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
-                
-                fig.add_trace(go.Scatter(
-                    x=btc_normalized.index, 
-                    y=btc_normalized,
-                    mode='lines',
-                    name=f'{self.benchmark_ticker} (Benchmark)',
-                    line=dict(color='#cc8306', width=2)
-                ))
-        
-        # --- LINEA CAPITALE INIZIALE ---
-        fig.add_hline(
-            y=self.initial_value, 
-            line_dash="dash", 
-            line_color="red", 
-            annotation_text=f"Capitale Iniziale ({self.initial_value}$)", 
-            annotation_position="bottom right"
-        )
-
-        # --- LINEE DEI RIBILANCIAMENTI ---
-        # Aggiungiamo una linea verticale per ogni data in cui è avvenuto un ribilanciamento
-        if self.rebalance_dates:
-            for date in self.rebalance_dates:
-                fig.add_vline(
-                    x=date, 
-                    line_width=1, 
-                    line_dash="dot", 
-                    line_color="green",
-                    opacity=0.6
-                )
-            # Aggiungo una riga invisibile solo per far comparire la legenda dei ribilanciamenti
-            fig.add_trace(go.Scatter(
-                x=[None], y=[None], mode='lines',
-                line=dict(color='green', dash='dot'),
-                name='Ribilanciamento'
-            ))
-
-        # --- LAYOUT INTERATTIVO ---
-        fig.update_layout(
-            title="Performance Strategia vs BTC-USD",
-            xaxis_title="Data",
-            yaxis_title="Valore del Portafoglio ($)",
-            hovermode="x unified", # Mostra i dati di tutte le curve passando il mouse su un punto
-            template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
-        )
-        
-        fig.show()
 
     def calculate_stats(self):
         """Calcola e restituisce le statistiche della strategia rispetto al benchmark."""
@@ -160,7 +103,31 @@ class BaseCryptoStrategy(ABC):
                 btc_returns = btc_prices.pct_change().dropna()
                 stats[self.benchmark_ticker] = self._compute_metrics(btc_returns)
             
-        return pd.DataFrame(stats).round(4)
+        return pd.DataFrame(stats).round(2)
+    
+    # --------------------------------------------------
+    # utility per formattazione visiva delle statistiche
+    # --------------------------------------------------
+    def print_stats(self):
+        """Stampa a schermo la tabella delle statistiche in modo leggibile.
+
+        Usa ``tabulate`` se disponibile altrimenti si affida a ``DataFrame.to_string``.
+        Restituisce anche il DataFrame per eventuali usi successivi (es. plot).
+        """
+        stats_df = self.calculate_stats()
+        # formattiamo alcuni valori con il simbolo di percentuale per rendere più leggibile
+        stats_to_show = stats_df.copy()
+        for metric in stats_to_show.index:
+            for col in stats_to_show.columns:
+                val = stats_to_show.at[metric, col]
+                if isinstance(val, (int, float)):
+                    if metric.lower().startswith('sharpe'):
+                        stats_to_show.at[metric, col] = f"{val:.2f}"
+                    else:
+                        stats_to_show.at[metric, col] = f"{val:.2f}%"
+
+
+        return stats_df
 
     def _compute_metrics(self, returns: pd.Series) -> dict:
         """Helper interno per il calcolo delle metriche finanziarie su 365 giorni."""
@@ -185,6 +152,8 @@ class BaseCryptoStrategy(ABC):
 # Figlie
 # ==========================================
 
+# RIBALANCIAMENTO PERIODICO TOP X MARKET CAP
+
 class RebalancedMarketCapStrategy(BaseCryptoStrategy):
     
     """
@@ -194,58 +163,95 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
     e rialloca il capitale accumulato fino a quel momento.
     """
     
-    def run_strategy(self, rebalance_freq='Q', **kwargs):
+    def run_strategy(self, rebalance_freq_days: int = 90, **kwargs):
         """
-        rebalance_freq: Frequenza di ribilanciamento. 
-        'M' (Month End) = fine mese, 'Q' (Quarter End) = fine trimestre, 'Y' = fine anno.
+        rebalance_freq_days: Intervallo di ribilanciamento in giorni (int).
+        Es. 30 = ribilanciamento ogni ~30 giorni.
         """
         if not self.data_dict:
             raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
             
-        print(f"\nAvvio backtest: Top 10 Dinamica con ribilanciamento (frequenza: {rebalance_freq})...")
+        print(f"\nAvvio backtest: Top Dinamica con ribilanciamento (ogni {rebalance_freq_days} giorni)...")
         
         df_prices = pd.DataFrame()
         df_mktcap = pd.DataFrame()
         
-        # 1. Allineamento dati e calcolo della Market Cap
+        # 1. Allineamento dati e calcolo della Market Cap (uso nome 'Market Cap' coerente)
         for ticker in self.assets:
             df = self.data_dict[ticker].copy()
-            df['MarketCap'] = df['Prezzo di Chiusura'] * df['Circulating Supply']
+            df['Market Cap'] = df['Prezzo di Chiusura'] * df['Circulating Supply']
             
             df.index = pd.to_datetime(df.index)
             df_prices[ticker] = df['Prezzo di Chiusura']
-            df_mktcap[ticker] = df['MarketCap']
+            df_mktcap[ticker] = df['Market Cap']
             
+        # riempimento e controllo dati
         df_prices.ffill(inplace=True)
         df_mktcap.ffill(inplace=True)
         df_prices.dropna(how='all', inplace=True)
         
+        if df_prices.empty:
+            raise ValueError("Dopo l'allineamento i prezzi sono vuoti. Controlla i dati sorgente.")
+        
         dates = df_prices.index
         first_date = dates[0]
         
-        # 2. Identificazione dei giorni di ribilanciamento
-        # Usiamo resample per trovare l'ultimo giorno disponibile di ogni mese/trimestre
-        rebalance_dates = df_prices.resample(rebalance_freq).last().index
-        # Ci assicuriamo che le date calcolate siano effettivamente nell'indice
-        rebalance_dates = [d for d in rebalance_dates if d in dates]
+        # 2. Identificazione dei giorni di ribilanciamento (usando intervalli in giorni)
+        if not isinstance(rebalance_freq_days, int) or rebalance_freq_days <= 0:
+            raise ValueError(f"Parametro rebalance_freq_days non valido: {rebalance_freq_days}")
+
+        rebalance_dates = []
+        start = first_date
+        end = dates[-1]
+        current_target = start
+
+        # Per ogni target date (start + n * rebalance_freq_days) troviamo la prima data di trading >= target
+        while current_target <= end:
+            idx = dates.searchsorted(current_target)
+            if idx < len(dates):
+                candidate = dates[idx]
+                if not rebalance_dates or candidate != rebalance_dates[-1]:
+                    rebalance_dates.append(candidate)
+            current_target = current_target + pd.Timedelta(days=rebalance_freq_days)
+
+        # salvo le date per il plotting
+        self.rebalance_dates = rebalance_dates
         
-        portfolio_value = self.initial_value
+        portfolio_value = float(self.initial_value)
         shares = {}
-        current_top_10 = []
+        current_top = []
         index_values = []
+        last_top = []
+        last_weights = {}
+        last_top_mktcap = None
+        
+        # DIZIONARIO PER TRACCIARE I PESI GIORNALIERI
+        daily_weights_history = {}
         
         # 3. Loop giornaliero: simulazione day-by-day
         for current_date in dates:
             
             # --- A. AGGIORNAMENTO VALORE PORTAFOGLIO ---
-            if not shares:
-                # Giorno 1: il valore è il capitale iniziale
-                pass 
-            else:
-                # Calcola il valore del ptf in base alle quote possedute e ai prezzi di oggi
-                portfolio_value = sum(shares[ticker] * df_prices.loc[current_date, ticker] for ticker in current_top_10)
+            if shares:
+                # Calcolo robusto: ignoro prezzi NaN e ticker non presenti
+                pv = 0.0
+                for ticker in current_top:
+                    price = df_prices.loc[current_date, ticker]
+                    if pd.isna(price):
+                        continue
+                    pv += shares.get(ticker, 0.0) * price
+                portfolio_value = pv
             
             index_values.append(portfolio_value)
+            
+            # --- SALVATAGGIO PESI GIORNALIERI (basati su shares correnti) ---
+            current_actual_weights = {}
+            for ticker in self.assets:
+                price = df_prices.loc[current_date, ticker] if ticker in df_prices.columns else np.nan
+                price = price if not pd.isna(price) else 0
+                asset_value = shares.get(ticker, 0.0) * price
+                current_actual_weights[ticker] = asset_value / portfolio_value if portfolio_value > 0 else 0
+            daily_weights_history[current_date] = current_actual_weights
             
             # --- B. CONTROLLO RIBILANCIAMENTO ---
             # Ribilanciamo se è il primo giorno assoluto o se è una data di ribilanciamento
@@ -254,32 +260,177 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
                 # Prende la Mkt Cap di TUTTE le crypto in questa specifica data
                 daily_mktcap = df_mktcap.loc[current_date].dropna()
                 
-                # Seleziona le NUOVE Top 10
-                top_10 = daily_mktcap.nlargest(10)
-                current_top_10 = top_10.index.tolist()
+                if daily_mktcap.empty:
+                    # non ci sono market cap validi in questa data => skip
+                    continue
                 
-                total_mktcap = top_10.sum()
+                # Seleziona le NUOVE Top 10
+                top = daily_mktcap.nlargest(5)
+                current_top = top.index.tolist()
+                
+                total_mktcap = top.sum()
                 if total_mktcap == 0:
                     continue # Evita divisioni per zero se i dati sono corrotti
                 
                 # Ricalcola i nuovi pesi
-                weights = (top_10 / total_mktcap).to_dict()
+                weights = (top / total_mktcap).to_dict()
+                
+                # Salvo stato valido per eventuale stampa finale
+                last_top = current_top.copy()
+                last_weights = weights.copy()
+                last_top_mktcap = top.copy()
                 
                 # Vende tutto e ricompra: ricalcola le quote esatte per le nuove Top 10
                 shares = {}
-                for ticker in current_top_10:
-                    allocated_capital = portfolio_value * weights[ticker]
+                for ticker in current_top:
                     price = df_prices.loc[current_date, ticker]
-                    # Assegna le nuove quote (se il prezzo è > 0 per evitare errori)
-                    shares[ticker] = allocated_capital / price if price > 0 else 0
+                    if pd.isna(price) or price <= 0:
+                        shares[ticker] = 0.0
+                        continue
+                    allocated_capital = portfolio_value * weights[ticker]
+                    shares[ticker] = allocated_capital / price
                     
         # 4. Salvataggio della serie storica
         self.index_df = pd.DataFrame({'Date': dates, 'Valore Indice': index_values})
         self.index_df.set_index('Date', inplace=True)
+
+        # SALVATAGGIO STORICO PESI IN UN DATAFRAME
+        self.weights_df = pd.DataFrame.from_dict(daily_weights_history, orient='index')
         
         print(f"Backtest completato. Composizione FINALE del portafoglio al {dates[-1].strftime('%Y-%m-%d')}:")
-        for ticker in current_top_10:
-            print(f"- {ticker}: {weights[ticker]:.2%} (Mkt Cap: {top_10[ticker]:,.0f})")
+        if last_top and last_weights and last_top_mktcap is not None:
+            for ticker in last_top:
+                print(f"- {ticker}: {last_weights[ticker]:.2%} (Mkt Cap: {last_top_mktcap[ticker]:,.0f})")
+        else:
+            print("Nessuna composizione finale valida calcolata.")
+
+    def plot_weights(self):
+        """Grafica l'evoluzione dei pesi giornalieri del portafoglio (area impilata)."""
+        if not hasattr(self, 'weights_df') or self.weights_df is None:
+            raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
+
+        fig = go.Figure()
+        # palette colori chiari
+        colors = px.colors.qualitative.Pastel
+        # seleziona gli asset con peso significativo in almeno un giorno
+        active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
+        for idx, ticker in enumerate(active_assets):
+            fig.add_trace(go.Scatter(
+                x=self.weights_df.index,
+                y=self.weights_df[ticker],
+                mode='lines',
+                name=ticker,
+                stackgroup='one',
+                line=dict(color=colors[idx % len(colors)], width=1)
+            ))
+
+        if hasattr(self, 'rebalance_dates') and self.rebalance_dates:
+            for date in self.rebalance_dates:
+                fig.add_vline(
+                    x=date,
+                    line_width=1,
+                    line_dash="dot",
+                    line_color="green",
+                    opacity=0.6
+                )
+        fig.update_layout(
+            title="Evoluzione dell'Allocazione del Portafoglio nel Tempo",
+            xaxis_title="Data",
+            yaxis_title="Percentuale di Allocazione",
+            yaxis=dict(tickformat=".0%"),
+            hovermode="x unified",
+            template="plotly_white",
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01),
+            font=dict(family="Times New Roman, serif", size=12)
+        )
+        fig.show()
+
+    def plot_results(self):
+        """Plot performance vs benchmark, print stats and display weights for this strategy."""
+        if self.index_df is None:
+            raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
+        # recupero statistiche e le stampo a console in forma leggibile
+        stats_df = self.print_stats()
+
+        # figure performance
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=self.index_df.index,
+            y=self.index_df['Valore Indice'],
+            mode='lines',
+            name='Indice Strategia',
+            line=dict(color='#1f77b4', width=2)
+        ))
+        if self.benchmark_df is not None:
+            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
+            if not common_idx.empty:
+                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
+                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
+                fig.add_trace(go.Scatter(
+                    x=btc_normalized.index,
+                    y=btc_normalized,
+                    mode='lines',
+                    name=f'{self.benchmark_ticker} (Benchmark)',
+                    line=dict(color='#cc8306', width=2)
+                ))
+        fig.add_hline(
+            y=self.initial_value,
+            line_dash="dash",
+            line_color="red",
+            annotation_text=f"Capitale Iniziale ({self.initial_value}$)",
+            annotation_position="bottom right"
+        )
+        if self.rebalance_dates:
+            for date in self.rebalance_dates:
+                fig.add_vline(
+                    x=date,
+                    line_width=1,
+                    line_dash="dot",
+                    line_color="green",
+                    opacity=0.6
+                )
+            fig.add_trace(go.Scatter(
+                x=[None], y=[None], mode='lines',
+                line=dict(color='green', dash='dot'),
+                name='Ribilanciamento'
+            ))
+        fig.update_xaxes(rangeslider_visible=True,
+                         rangeselector=dict(
+                             buttons=list([
+                                 dict(count=6, label="6m", step="month", stepmode="backward"),
+                                 dict(count=1, label="YTD", step="year", stepmode="todate"),
+                                 dict(count=1, label="1y", step="year", stepmode="backward"),
+                                 dict(step="all")
+                             ])
+                         ))
+        fig.update_layout(
+            title=f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+            xaxis_title="Data",
+            yaxis_title="Valore del Portafoglio ($)",
+            hovermode="x unified",
+            template="plotly_white",
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+            font=dict(family="Times New Roman, serif", size=12)
+        )
+        fig.show()
+
+        # figure statistiche separate
+        fig_stats = go.Figure(go.Table(
+            header=dict(values=["Metriche"] + list(stats_df.columns),
+                        fill_color='paleturquoise', align='left'),
+            cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
+                       fill_color='lavender', align='left')
+        ))
+        fig_stats.update_layout(title_text="Statistiche della Strategia")
+        fig_stats.show()
+
+        # grafico pesi
+        try:
+            self.plot_weights()
+        except Exception:
+            pass
+
+# STRATEGIA TOP X MARKET CAP, RIBILANCIAMENTO VOLUME/MARKET CAP 
 
 class VolMktCapStrategy(BaseCryptoStrategy):
     """
@@ -287,13 +438,12 @@ class VolMktCapStrategy(BaseCryptoStrategy):
     e pondera il portafoglio in base al rapporto Volume/MarketCap.
     """
     
-    def run_strategy(self, rebalance_freq_days: int = 90, top_n: int = 5):
+    def run_strategy(self, rebalance_freq_days: int = 180, top_n: int = 5):
         if not self.data_dict:
             raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
             
         print(f"\nAvvio backtest con ribilanciamento ogni {rebalance_freq_days} giorni.")
-        print(f"Selezione dinamica: Top {top_n} asset per Market Cap (esclusi asset con dati incompleti).")
-        
+
         df_prices = pd.DataFrame()
         df_vol_mktcap = pd.DataFrame()
         df_mktcap = pd.DataFrame()
@@ -429,19 +579,18 @@ class VolMktCapStrategy(BaseCryptoStrategy):
             raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
 
         fig = go.Figure()
-
+        colors = px.colors.qualitative.Pastel
         # Filtriamo gli asset che sono stati in portafoglio almeno una volta (peso > 0)
-        # Questo evita di avere 50 monete nella legenda se ne hai usate solo 8 nella Top 5 nel tempo
         active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
 
-        for ticker in active_assets:
+        for idx, ticker in enumerate(active_assets):
             fig.add_trace(go.Scatter(
                 x=self.weights_df.index,
                 y=self.weights_df[ticker],
                 mode='lines',
                 name=ticker,
                 stackgroup='one', # Imposta il grafico ad area impilata
-                line=dict(width=0.5)
+                line=dict(color=colors[idx % len(colors)], width=1)
             ))
 
         # Aggiungiamo le linee verticali per le date di ribilanciamento
@@ -451,20 +600,343 @@ class VolMktCapStrategy(BaseCryptoStrategy):
                     x=date, 
                     line_width=1, 
                     line_dash="dot", 
-                    line_color="black",
-                    opacity=0.5
+                    line_color="green",
+                    opacity=0.6
                 )
 
         fig.update_layout(
-            title="Evoluzione dell'Allocazione del Portafoglio nel Tempo",
+            title="Evoluzione dell'Allocazione del Portafoglio nel Tempo (Top 10 Market Cap)",
             xaxis_title="Data",
             yaxis_title="Percentuale di Allocazione",
             yaxis=dict(tickformat=".0%"), # Formatta l'asse Y come percentuale (es. 100%)
             hovermode="x unified",
             template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01) # Legenda esterna a destra
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01), # Legenda esterna a destra
+            font=dict(family="Times New Roman, serif", size=12)
         )
 
         fig.show()
 
-        
+    def plot_results(self):
+        """Plot performance vs benchmark, print metrics and show weights for VolMktCapStrategy."""
+        if self.index_df is None:
+            raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
+        # stampo e recupero le statistiche in modo leggibile
+        stats_df = self.print_stats()
+
+        # performance figure
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=self.index_df.index,
+            y=self.index_df['Valore Indice'],
+            mode='lines',
+            name='Indice Strategia',
+            line=dict(color='#1f77b4', width=2)
+        ))
+        if self.benchmark_df is not None:
+            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
+            if not common_idx.empty:
+                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
+                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
+                fig.add_trace(go.Scatter(
+                    x=btc_normalized.index,
+                    y=btc_normalized,
+                    mode='lines',
+                    name=f'{self.benchmark_ticker} (Benchmark)',
+                    line=dict(color='#cc8306', width=2)
+                ))
+        fig.add_hline(
+            y=self.initial_value,
+            line_dash="dash",
+            line_color="red",
+            annotation_text=f"Capitale Iniziale ({self.initial_value}$)",
+            annotation_position="bottom right"
+        )
+        if self.rebalance_dates:
+            for date in self.rebalance_dates:
+                fig.add_vline(
+                    x=date,
+                    line_width=1,
+                    line_dash="dot",
+                    line_color="green",
+                    opacity=0.6
+                )
+            fig.add_trace(go.Scatter(
+                x=[None], y=[None], mode='lines',
+                line=dict(color='green', dash='dot'),
+                name='Ribilanciamento'
+            ))
+        fig.update_xaxes(rangeslider_visible=True,
+                         rangeselector=dict(
+                             buttons=list([
+                                 dict(count=6, label="6m", step="month", stepmode="backward"),
+                                 dict(count=1, label="YTD", step="year", stepmode="todate"),
+                                 dict(count=1, label="1y", step="year", stepmode="backward"),
+                                 dict(step="all")
+                             ])
+                         ))
+        fig.update_layout(
+            title=f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+            xaxis_title="Data",
+            yaxis_title="Valore del Portafoglio ($)",
+            hovermode="x unified",
+            template="plotly_white",
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+            font=dict(family="Times New Roman, serif", size=12)
+        )
+        fig.show()
+
+        # stat table figure
+        fig_stats = go.Figure(go.Table(
+            header=dict(values=["Metriche"] + list(stats_df.columns),
+                        fill_color='paleturquoise', align='left'),
+            cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
+                       fill_color='lavender', align='left')
+        ))
+        fig_stats.update_layout(title_text="Statistiche della Strategia")
+        fig_stats.show()
+
+        try:
+            self.plot_weights()
+        except Exception:
+            pass
+
+# STRATEGIA TOP X MARKET CAP, RIBILANCIAMENTO SOGLIA MINIMA MKT CAP
+
+class MarketCapThresholdStrategy(BaseCryptoStrategy):
+    """
+    Strategia figlia che utilizza l'intera lista di asset fornita
+    e ribilancia periodicamente il portafoglio sulla base
+    delle capitalizzazioni di mercato (Market Cap).
+    Solo gli asset con una Market Cap superiore a una soglia
+    definita (default 1 miliardo) vengono inclusi nel paniere.
+    """
+
+    def run_strategy(self, rebalance_freq_days: int = 30, min_mktcap: float = 1_000_000_000):
+        if not self.data_dict:
+            raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
+
+        print(f"\nAvvio backtest: ribilanciamento ogni {rebalance_freq_days} giorni, soglia MktCap {min_mktcap:,}.")
+
+        df_prices = pd.DataFrame()
+        df_mktcap = pd.DataFrame()
+
+        # raccolgo prezzi e market cap per ogni asset
+        for ticker in self.assets:
+            df = self.data_dict[ticker].copy()
+            df['Market Cap'] = df['Prezzo di Chiusura'] * df['Circulating Supply']
+            df.index = pd.to_datetime(df.index)
+
+            df_prices[ticker] = df['Prezzo di Chiusura']
+            df_mktcap[ticker] = df['Market Cap']
+
+        df_prices.ffill(inplace=True)
+        df_mktcap.ffill(inplace=True)
+        df_prices.dropna(how='all', inplace=True)
+
+        dates = df_prices.index
+        if dates.empty:
+            raise ValueError("Dopo l'allineamento i prezzi sono vuoti.")
+
+        # generazione delle date di ribilanciamento
+        rebalance_dates = []
+        start = dates[0]
+        end = dates[-1]
+        current_target = start
+        while current_target <= end:
+            idx = dates.searchsorted(current_target)
+            if idx < len(dates):
+                candidate = dates[idx]
+                if not rebalance_dates or candidate != rebalance_dates[-1]:
+                    rebalance_dates.append(candidate)
+            current_target += pd.Timedelta(days=rebalance_freq_days)
+        self.rebalance_dates = rebalance_dates
+
+        portfolio_value = float(self.initial_value)
+        shares = {}
+        index_values = []
+        last_weights = {}
+        last_basket = None
+        daily_weights_history = {}
+
+        first_date = dates[0]
+        current_basket = []
+
+        for current_date in dates:
+            if shares:
+                pv = 0.0
+                for ticker in current_basket:
+                    price = df_prices.loc[current_date, ticker]
+                    if pd.isna(price):
+                        continue
+                    pv += shares.get(ticker, 0.0) * price
+                portfolio_value = pv
+
+            index_values.append(portfolio_value)
+
+            current_actual_weights = {}
+            for ticker in self.assets:
+                price = df_prices.loc[current_date, ticker] if ticker in df_prices.columns else np.nan
+                price = price if not pd.isna(price) else 0
+                asset_value = shares.get(ticker, 0.0) * price
+                current_actual_weights[ticker] = asset_value / portfolio_value if portfolio_value > 0 else 0
+            daily_weights_history[current_date] = current_actual_weights
+
+            if current_date == first_date or current_date in rebalance_dates:
+                daily_mktcap = df_mktcap.loc[current_date].dropna()
+                valid = daily_mktcap[daily_mktcap > min_mktcap]
+                if valid.empty:
+                    current_basket = []
+                    shares = {}
+                    continue
+
+                current_basket = valid.index.tolist()
+                total_mktcap = valid.sum()
+                weights = (valid / total_mktcap).to_dict()
+
+                last_weights = weights.copy()
+                last_basket = valid.copy()
+
+                shares = {}
+                for ticker in current_basket:
+                    price = df_prices.loc[current_date, ticker]
+                    if pd.isna(price) or price <= 0:
+                        shares[ticker] = 0.0
+                        continue
+                    alloc = portfolio_value * weights[ticker]
+                    shares[ticker] = alloc / price
+
+        self.index_df = pd.DataFrame({'Date': dates, 'Valore Indice': index_values})
+        self.index_df.set_index('Date', inplace=True)
+        self.weights_df = pd.DataFrame.from_dict(daily_weights_history, orient='index')
+
+        print(f"Backtest completato. Composizione finale al {dates[-1].strftime('%Y-%m-%d')}:" )
+        if last_basket is not None and last_weights:
+            for ticker in last_weights:
+                print(f"- {ticker}: {last_weights[ticker]:.2%} (Mkt Cap: {last_basket[ticker]:,.0f})")
+        else:
+            print("Nessuna composizione valida calculata.")
+
+    def plot_weights(self):
+        """Grafica l'evoluzione dei pesi giornalieri del portafoglio (area impilata)."""
+        if not hasattr(self, 'weights_df') or self.weights_df is None:
+            raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
+
+        fig = go.Figure()
+        colors = px.colors.qualitative.Pastel
+        active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
+        for idx, ticker in enumerate(active_assets):
+            fig.add_trace(go.Scatter(
+                x=self.weights_df.index,
+                y=self.weights_df[ticker],
+                mode='lines',
+                name=ticker,
+                stackgroup='one',
+                line=dict(color=colors[idx % len(colors)], width=1)
+            ))
+
+        if hasattr(self, 'rebalance_dates') and self.rebalance_dates:
+            for date in self.rebalance_dates:
+                fig.add_vline(
+                    x=date,
+                    line_width=1,
+                    line_dash="dot",
+                    line_color="green",
+                    opacity=0.6
+                )
+        fig.update_layout(
+            title="Evoluzione dell'Allocazione del Portafoglio nel Tempo",
+            xaxis_title="Data",
+            yaxis_title="Percentuale di Allocazione",
+            yaxis=dict(tickformat=".0%"),
+            hovermode="x unified",
+            template="plotly_white",
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01),
+            font=dict(family="Times New Roman, serif", size=12)
+        )
+        fig.show()
+
+    def plot_results(self):
+        """Plot performance vs benchmark, display statistics and weights for MarketCapThresholdStrategy."""
+        if self.index_df is None:
+            raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
+        # stampo statistiche formattate
+        stats_df = self.print_stats()
+
+        # grafico performance separato
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=self.index_df.index,
+            y=self.index_df['Valore Indice'],
+            mode='lines',
+            name='Indice Strategia',
+            line=dict(color='#1f77b4', width=2)
+        ))
+        if self.benchmark_df is not None:
+            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
+            if not common_idx.empty:
+                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
+                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
+                fig.add_trace(go.Scatter(
+                    x=btc_normalized.index,
+                    y=btc_normalized,
+                    mode='lines',
+                    name=f'{self.benchmark_ticker} (Benchmark)',
+                    line=dict(color='#cc8306', width=2)
+                ))
+        fig.add_hline(
+            y=self.initial_value,
+            line_dash="dash",
+            line_color="red",
+            annotation_text=f"Capitale Iniziale ({self.initial_value}$)",
+            annotation_position="bottom right"
+        )
+        if self.rebalance_dates:
+            for date in self.rebalance_dates:
+                fig.add_vline(
+                    x=date,
+                    line_width=1,
+                    line_dash="dot",
+                    line_color="green",
+                    opacity=0.6
+                )
+            fig.add_trace(go.Scatter(
+                x=[None], y=[None], mode='lines',
+                line=dict(color='green', dash='dot'),
+                name='Ribilanciamento'
+            ))
+        fig.update_xaxes(rangeslider_visible=True,
+                         rangeselector=dict(
+                             buttons=list([
+                                 dict(count=6, label="6m", step="month", stepmode="backward"),
+                                 dict(count=1, label="YTD", step="year", stepmode="todate"),
+                                 dict(count=1, label="1y", step="year", stepmode="backward"),
+                                 dict(step="all")
+                             ])
+                         ))
+        fig.update_layout(
+            title=f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+            xaxis_title="Data",
+            yaxis_title="Valore del Portafoglio ($)",
+            hovermode="x unified",
+            template="plotly_white",
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+            font=dict(family="Times New Roman, serif", size=12)
+        )
+        fig.show()
+
+        # separato: tabella statistiche
+        fig_stats = go.Figure(go.Table(
+            header=dict(values=["Metriche"] + list(stats_df.columns),
+                        fill_color='paleturquoise', align='left'),
+            cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
+                       fill_color='lavender', align='left')
+        ))
+        fig_stats.update_layout(title_text="Statistiche della Strategia")
+        fig_stats.show()
+
+        try:
+            self.plot_weights()
+        except Exception:
+            pass
+
