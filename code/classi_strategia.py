@@ -304,7 +304,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
         else:
             print("Nessuna composizione finale valida calcolata.")
 
-    def plot_weights(self):
+    def plot_weights(self, title: str = None):
         """Grafica l'evoluzione dei pesi giornalieri del portafoglio (area impilata)."""
         if not hasattr(self, 'weights_df') or self.weights_df is None:
             raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
@@ -334,7 +334,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
                     opacity=0.6
                 )
         fig.update_layout(
-            title="Evoluzione dell'Allocazione del Portafoglio nel Tempo",
+            title= title if title is not None else "Evoluzione dell'Allocazione del Portafoglio nel Tempo",
             xaxis_title="Data",
             yaxis_title="Percentuale di Allocazione",
             yaxis=dict(tickformat=".0%"),
@@ -345,7 +345,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
         )
         fig.show()
 
-    def plot_results(self):
+    def plot_results(self, title: str = None):
         """Plot performance vs benchmark, print stats and display weights for this strategy."""
         if self.index_df is None:
             raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
@@ -404,7 +404,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
                              ])
                          ))
         fig.update_layout(
-            title=f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+            title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
             xaxis_title="Data",
             yaxis_title="Valore del Portafoglio ($)",
             hovermode="x unified",
@@ -421,12 +421,14 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
             cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
                        fill_color='lavender', align='left')
         ))
-        fig_stats.update_layout(title_text="Statistiche della Strategia")
+        stats_title = (f"Statistiche della Strategia - {title}") if title else "Statistiche della Strategia"
+        fig_stats.update_layout(title_text=stats_title)
         fig_stats.show()
 
         # grafico pesi
         try:
-            self.plot_weights()
+            weights_title = (f"{title} - Pesi") if title else None
+            self.plot_weights(weights_title)
         except Exception:
             pass
 
@@ -573,7 +575,7 @@ class VolMktCapStrategy(BaseCryptoStrategy):
         
         print("Backtest completato con successo su tutto il periodo storico disponibile.")
 
-    def plot_weights(self):
+    def plot_weights(self, title: str = None):
         """Grafica l'evoluzione dei pesi del portafoglio nel tempo (Stacked Area Chart)."""
         if not hasattr(self, 'weights_df') or self.weights_df is None:
             raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
@@ -605,7 +607,7 @@ class VolMktCapStrategy(BaseCryptoStrategy):
                 )
 
         fig.update_layout(
-            title="Evoluzione dell'Allocazione del Portafoglio nel Tempo (Top 10 Market Cap)",
+            title= title if title is not None else "Evoluzione dell'Allocazione del Portafoglio nel Tempo (Top 10 Market Cap)",
             xaxis_title="Data",
             yaxis_title="Percentuale di Allocazione",
             yaxis=dict(tickformat=".0%"), # Formatta l'asse Y come percentuale (es. 100%)
@@ -617,7 +619,7 @@ class VolMktCapStrategy(BaseCryptoStrategy):
 
         fig.show()
 
-    def plot_results(self):
+    def plot_results(self, title: str = None):
         """Plot performance vs benchmark, print metrics and show weights for VolMktCapStrategy."""
         if self.index_df is None:
             raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
@@ -676,7 +678,7 @@ class VolMktCapStrategy(BaseCryptoStrategy):
                              ])
                          ))
         fig.update_layout(
-            title=f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+            title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
             xaxis_title="Data",
             yaxis_title="Valore del Portafoglio ($)",
             hovermode="x unified",
@@ -693,11 +695,13 @@ class VolMktCapStrategy(BaseCryptoStrategy):
             cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
                        fill_color='lavender', align='left')
         ))
-        fig_stats.update_layout(title_text="Statistiche della Strategia")
+        stats_title = (f"Statistiche della Strategia - {title}") if title else "Statistiche della Strategia"
+        fig_stats.update_layout(title_text=stats_title)
         fig_stats.show()
 
         try:
-            self.plot_weights()
+            weights_title = (f"{title} - Pesi") if title else None
+            self.plot_weights(weights_title)
         except Exception:
             pass
 
@@ -817,7 +821,7 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
         else:
             print("Nessuna composizione valida calculata.")
 
-    def plot_weights(self):
+    def plot_weights(self, title: str = None):
         """Grafica l'evoluzione dei pesi giornalieri del portafoglio (area impilata)."""
         if not hasattr(self, 'weights_df') or self.weights_df is None:
             raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
@@ -845,7 +849,7 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
                     opacity=0.6
                 )
         fig.update_layout(
-            title="Evoluzione dell'Allocazione del Portafoglio nel Tempo",
+            title= title if title is not None else "Evoluzione dell'Allocazione del Portafoglio nel Tempo",
             xaxis_title="Data",
             yaxis_title="Percentuale di Allocazione",
             yaxis=dict(tickformat=".0%"),
@@ -856,7 +860,7 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
         )
         fig.show()
 
-    def plot_results(self):
+    def plot_results(self, title: str = None):
         """Plot performance vs benchmark, display statistics and weights for MarketCapThresholdStrategy."""
         if self.index_df is None:
             raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
@@ -915,7 +919,7 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
                              ])
                          ))
         fig.update_layout(
-            title=f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+            title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
             xaxis_title="Data",
             yaxis_title="Valore del Portafoglio ($)",
             hovermode="x unified",
@@ -932,11 +936,13 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
             cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
                        fill_color='lavender', align='left')
         ))
-        fig_stats.update_layout(title_text="Statistiche della Strategia")
+        stats_title = (f"Statistiche della Strategia - {title}") if title else "Statistiche della Strategia"
+        fig_stats.update_layout(title_text=stats_title)
         fig_stats.show()
 
         try:
-            self.plot_weights()
+            weights_title = (f"{title} - Pesi") if title else None
+            self.plot_weights(weights_title)
         except Exception:
             pass
 
