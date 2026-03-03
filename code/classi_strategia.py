@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
 import yfinance as yf
+import os
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -25,6 +26,151 @@ class BaseCryptoStrategy(ABC):
         self.benchmark_df = None  
         self.benchmark_ticker = 'BTC-USD' 
         self.rebalance_dates = [] # <-- Nuovo attributo per tracciare le date di ribilanciamento
+
+    # ------------------------------------------------------------------
+    # Grafici comuni e funzioni di esportazione
+    # ------------------------------------------------------------------
+    def _generate_performance_fig(self, title: str = None) -> go.Figure:
+        """Costruisce la figura delle performance (senza mostrarla)."""
+        if self.index_df is None:
+            raise ValueError("Strategia non calcolata. Esegui run_strategy() prima.")
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=self.index_df.index,
+            y=self.index_df['Valore Indice'],
+            mode='lines',
+            name='Indice Strategia',
+            line=dict(color='#1f77b4', width=2)
+        ))
+        if self.benchmark_df is not None:
+            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
+            if not common_idx.empty:
+                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
+                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
+                fig.add_trace(go.Scatter(
+                    x=btc_normalized.index,
+                    y=btc_normalized,
+                    mode='lines',
+                    name=f'{self.benchmark_ticker} (Benchmark)',
+                    line=dict(color='#cc8306', width=2)
+                ))
+        fig.add_hline(
+            y=self.initial_value,
+            line_dash="dash",
+            line_color="red",
+            annotation_text=f"Capitale Iniziale ({self.initial_value}$)",
+            annotation_position="bottom right"
+        )
+        if self.rebalance_dates:
+            for date in self.rebalance_dates:
+                fig.add_vline(
+                    x=date,
+                    line_width=1,
+                    line_dash="dot",
+                    line_color="green",
+                    opacity=0.6
+                )
+            fig.add_trace(go.Scatter(
+                x=[None], y=[None], mode='lines',
+                line=dict(color='green', dash='dot'),
+                name='Ribilanciamento'
+            ))
+        fig.update_xaxes(rangeslider_visible=True,
+                         rangeselector=dict(
+                             buttons=list([
+                                 dict(count=6, label="6m", step="month", stepmode="backward"),
+                                 dict(count=1, label="YTD", step="year", stepmode="todate"),
+                                 dict(count=1, label="1y", step="year", stepmode="backward"),
+                                 dict(step="all")
+                             ])
+                         ))
+        fig.update_layout(
+            title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+            xaxis_title="Data",
+            yaxis_title="Valore del Portafoglio ($)",
+            hovermode="x unified",
+            template="plotly_white",
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+            font=dict(family="Times New Roman, serif", size=12)
+        )
+        return fig
+
+    def _generate_stats_fig(self, stats_df: pd.DataFrame, title: str = None) -> go.Figure:
+        """Costruisce la tabella delle statistiche come figura Plotly."""
+        fig_stats = go.Figure(go.Table(
+            header=dict(values=["Metriche"] + list(stats_df.columns),
+                        fill_color='paleturquoise', align='left'),
+            cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
+                       fill_color='lavender', align='left')
+        ))
+        stats_title = (f"Statistiche della Strategia - {title}") if title else "Statistiche della Strategia"
+        fig_stats.update_layout(title_text=stats_title)
+        return fig_stats
+
+    def _generate_weights_fig(self, title: str = None) -> go.Figure:
+        """Costruisce il grafico dei pesi (stacked area) senza mostrarlo."""
+        if not hasattr(self, 'weights_df') or self.weights_df is None:
+            raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
+
+        fig = go.Figure()
+        colors = px.colors.qualitative.Pastel
+        active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
+        for idx, ticker in enumerate(active_assets):
+            fig.add_trace(go.Scatter(
+                x=self.weights_df.index,
+                y=self.weights_df[ticker],
+                mode='lines',
+                name=ticker,
+                stackgroup='one',
+                line=dict(color=colors[idx % len(colors)], width=1)
+            ))
+        if hasattr(self, 'rebalance_dates') and self.rebalance_dates:
+            for date in self.rebalance_dates:
+                fig.add_vline(
+                    x=date,
+                    line_width=1,
+                    line_dash="dot",
+                    line_color="green",
+                    opacity=0.6
+                )
+        fig.update_layout(
+            title= title if title is not None else "Evoluzione dell'Allocazione del Portafoglio nel Tempo",
+            xaxis_title="Data",
+            yaxis_title="Percentuale di Allocazione",
+            yaxis=dict(tickformat=".0%"),
+            hovermode="x unified",
+            template="plotly_white",
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01),
+            font=dict(family="Times New Roman, serif", size=12)
+        )
+        return fig
+
+    def save_charts_json(self, output_dir: str, title: str = None):
+        """Genera tutti i grafici correlati alla strategia e li salva come file JSON.
+
+        I file creati sono:
+            performance.json, stats.json e weights.json
+        """
+        if self.index_df is None:
+            raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di salvare i grafici.")
+
+        os.makedirs(output_dir, exist_ok=True)
+        stats_df = self.print_stats()
+
+        perf_fig = self._generate_performance_fig(title)
+        perf_fig.write_json(os.path.join(output_dir, "performance.json"))
+
+        stats_fig = self._generate_stats_fig(stats_df, title)
+        stats_fig.write_json(os.path.join(output_dir, "stats.json"))
+
+        try:
+            weights_title = (f"{title} - Pesi") if title else None
+            weights_fig = self._generate_weights_fig(weights_title)
+            weights_fig.write_json(os.path.join(output_dir, "weights.json"))
+        except ValueError:
+            # se non ci sono pesi calcolati, saltiamo
+            pass
 
     def import_data(self, assets: list, timeframe: str = "1y"):
         """Scarica e prepara i dati base (Prezzo, Volume, Circulating Supply) per la lista di asset."""
@@ -116,7 +262,8 @@ class BaseCryptoStrategy(ABC):
         """
         stats_df = self.calculate_stats()
         # formattiamo alcuni valori con il simbolo di percentuale per rendere più leggibile
-        stats_to_show = stats_df.copy()
+        # lavoriamo su una copia di tipo object per evitare errori di conversione
+        stats_to_show = stats_df.copy().astype(object)
         for metric in stats_to_show.index:
             for col in stats_to_show.columns:
                 val = stats_to_show.at[metric, col]
@@ -126,6 +273,12 @@ class BaseCryptoStrategy(ABC):
                     else:
                         stats_to_show.at[metric, col] = f"{val:.2f}%"
 
+        # Dopo la formattazione possiamo stampare la tabella formattata in console
+        try:
+            from tabulate import tabulate
+            print(tabulate(stats_to_show, headers="keys", tablefmt="github"))
+        except ImportError:
+            print(stats_to_show.to_string())
 
         return stats_df
 
@@ -304,133 +457,71 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
         else:
             print("Nessuna composizione finale valida calcolata.")
 
-    def plot_weights(self, title: str = None):
-        """Grafica l'evoluzione dei pesi giornalieri del portafoglio (area impilata)."""
-        if not hasattr(self, 'weights_df') or self.weights_df is None:
-            raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
+    def plot_weights(self, title: str = None, save_json_dir: str = None, return_fig: bool = False):
+        """Mostra o salva il grafico dei pesi.
 
-        fig = go.Figure()
-        # palette colori chiari
-        colors = px.colors.qualitative.Pastel
-        # seleziona gli asset con peso significativo in almeno un giorno
-        active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
-        for idx, ticker in enumerate(active_assets):
-            fig.add_trace(go.Scatter(
-                x=self.weights_df.index,
-                y=self.weights_df[ticker],
-                mode='lines',
-                name=ticker,
-                stackgroup='one',
-                line=dict(color=colors[idx % len(colors)], width=1)
-            ))
+        Parameters
+        ----------
+        title : str, optional
+            Titolo da applicare alla figura.
+        save_json_dir : str, optional
+            Se fornita, la directory in cui salvare il grafico in formato JSON
+            (file chiamato ``weights.json``).
+        return_fig : bool, default False
+            Se ``True`` restituisce l'oggetto ``go.Figure`` invece di chiamare
+            ``fig.show()``.
+        """
+        fig = self._generate_weights_fig(title)
 
-        if hasattr(self, 'rebalance_dates') and self.rebalance_dates:
-            for date in self.rebalance_dates:
-                fig.add_vline(
-                    x=date,
-                    line_width=1,
-                    line_dash="dot",
-                    line_color="green",
-                    opacity=0.6
-                )
-        fig.update_layout(
-            title= title if title is not None else "Evoluzione dell'Allocazione del Portafoglio nel Tempo",
-            xaxis_title="Data",
-            yaxis_title="Percentuale di Allocazione",
-            yaxis=dict(tickformat=".0%"),
-            hovermode="x unified",
-            template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01),
-            font=dict(family="Times New Roman, serif", size=12)
-        )
+        if save_json_dir:
+            os.makedirs(save_json_dir, exist_ok=True)
+            fig.write_json(os.path.join(save_json_dir, "weights.json"))
+
+        if return_fig:
+            return fig
+
         fig.show()
 
-    def plot_results(self, title: str = None):
-        """Plot performance vs benchmark, print stats and display weights for this strategy."""
+    def plot_results(self, title: str = None, save_json_dir: str = None,
+                     return_fig: bool = False):
+        """Mostra o salva i grafici delle performance, delle statistiche e dei pesi.
+
+        Parameters
+        ----------
+        title : str, optional
+            Titolo da applicare ai grafici.
+        save_json_dir : str, optional
+            Se fornita, directory in cui salvare tutti i grafici in formato JSON.
+        return_fig : bool, default False
+            Se ``True`` restituisce una tupla ``(perf_fig, stats_fig, weights_fig)``
+            anziché mostrare i grafici.
+        """
         if self.index_df is None:
             raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
-        # recupero statistiche e le stampo a console in forma leggibile
         stats_df = self.print_stats()
 
-        # figure performance
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=self.index_df.index,
-            y=self.index_df['Valore Indice'],
-            mode='lines',
-            name='Indice Strategia',
-            line=dict(color='#1f77b4', width=2)
-        ))
-        if self.benchmark_df is not None:
-            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
-            if not common_idx.empty:
-                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
-                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
-                fig.add_trace(go.Scatter(
-                    x=btc_normalized.index,
-                    y=btc_normalized,
-                    mode='lines',
-                    name=f'{self.benchmark_ticker} (Benchmark)',
-                    line=dict(color='#cc8306', width=2)
-                ))
-        fig.add_hline(
-            y=self.initial_value,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"Capitale Iniziale ({self.initial_value}$)",
-            annotation_position="bottom right"
-        )
-        if self.rebalance_dates:
-            for date in self.rebalance_dates:
-                fig.add_vline(
-                    x=date,
-                    line_width=1,
-                    line_dash="dot",
-                    line_color="green",
-                    opacity=0.6
-                )
-            fig.add_trace(go.Scatter(
-                x=[None], y=[None], mode='lines',
-                line=dict(color='green', dash='dot'),
-                name='Ribilanciamento'
-            ))
-        fig.update_xaxes(rangeslider_visible=True,
-                         rangeselector=dict(
-                             buttons=list([
-                                 dict(count=6, label="6m", step="month", stepmode="backward"),
-                                 dict(count=1, label="YTD", step="year", stepmode="todate"),
-                                 dict(count=1, label="1y", step="year", stepmode="backward"),
-                                 dict(step="all")
-                             ])
-                         ))
-        fig.update_layout(
-            title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
-            xaxis_title="Data",
-            yaxis_title="Valore del Portafoglio ($)",
-            hovermode="x unified",
-            template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
-            font=dict(family="Times New Roman, serif", size=12)
-        )
-        fig.show()
+        perf_fig = self._generate_performance_fig(title)
+        stats_fig = self._generate_stats_fig(stats_df, title)
 
-        # figure statistiche separate
-        fig_stats = go.Figure(go.Table(
-            header=dict(values=["Metriche"] + list(stats_df.columns),
-                        fill_color='paleturquoise', align='left'),
-            cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
-                       fill_color='lavender', align='left')
-        ))
-        stats_title = (f"Statistiche della Strategia - {title}") if title else "Statistiche della Strategia"
-        fig_stats.update_layout(title_text=stats_title)
-        fig_stats.show()
+        if save_json_dir:
+            os.makedirs(save_json_dir, exist_ok=True)
+            perf_fig.write_json(os.path.join(save_json_dir, "performance.json"))
+            stats_fig.write_json(os.path.join(save_json_dir, "stats.json"))
 
-        # grafico pesi
+        perf_fig.show()
+        stats_fig.show()
+
+        weights_fig = None
         try:
             weights_title = (f"{title} - Pesi") if title else None
-            self.plot_weights(weights_title)
+            weights_fig = self.plot_weights(weights_title,
+                                           save_json_dir=save_json_dir,
+                                           return_fig=True)
         except Exception:
             pass
+
+        if return_fig:
+            return perf_fig, stats_fig, weights_fig
 
 # STRATEGIA TOP X MARKET CAP, RIBILANCIAMENTO VOLUME/MARKET CAP 
 
@@ -575,129 +666,48 @@ class VolMktCapStrategy(BaseCryptoStrategy):
         
         print("Backtest completato con successo su tutto il periodo storico disponibile.")
 
-    def plot_weights(self, title: str = None):
-        """Grafica l'evoluzione dei pesi del portafoglio nel tempo (Stacked Area Chart)."""
-        if not hasattr(self, 'weights_df') or self.weights_df is None:
-            raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
+    def plot_weights(self, title: str = None, save_json_dir: str = None, return_fig: bool = False):
+        """Mostra o salva il grafico dei pesi per VolMktCapStrategy."""
+        fig = self._generate_weights_fig(title)
 
-        fig = go.Figure()
-        colors = px.colors.qualitative.Pastel
-        # Filtriamo gli asset che sono stati in portafoglio almeno una volta (peso > 0)
-        active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
+        if save_json_dir:
+            os.makedirs(save_json_dir, exist_ok=True)
+            fig.write_json(os.path.join(save_json_dir, "weights.json"))
 
-        for idx, ticker in enumerate(active_assets):
-            fig.add_trace(go.Scatter(
-                x=self.weights_df.index,
-                y=self.weights_df[ticker],
-                mode='lines',
-                name=ticker,
-                stackgroup='one', # Imposta il grafico ad area impilata
-                line=dict(color=colors[idx % len(colors)], width=1)
-            ))
-
-        # Aggiungiamo le linee verticali per le date di ribilanciamento
-        if hasattr(self, 'rebalance_dates') and self.rebalance_dates:
-            for date in self.rebalance_dates:
-                fig.add_vline(
-                    x=date, 
-                    line_width=1, 
-                    line_dash="dot", 
-                    line_color="green",
-                    opacity=0.6
-                )
-
-        fig.update_layout(
-            title= title if title is not None else "Evoluzione dell'Allocazione del Portafoglio nel Tempo (Top 10 Market Cap)",
-            xaxis_title="Data",
-            yaxis_title="Percentuale di Allocazione",
-            yaxis=dict(tickformat=".0%"), # Formatta l'asse Y come percentuale (es. 100%)
-            hovermode="x unified",
-            template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01), # Legenda esterna a destra
-            font=dict(family="Times New Roman, serif", size=12)
-        )
+        if return_fig:
+            return fig
 
         fig.show()
 
-    def plot_results(self, title: str = None):
-        """Plot performance vs benchmark, print metrics and show weights for VolMktCapStrategy."""
+    def plot_results(self, title: str = None, save_json_dir: str = None,
+                     return_fig: bool = False):
+        """Mostra o salva i grafici relativi alla strategia VolMktCap."""
         if self.index_df is None:
             raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
-        # stampo e recupero le statistiche in modo leggibile
         stats_df = self.print_stats()
 
-        # performance figure
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=self.index_df.index,
-            y=self.index_df['Valore Indice'],
-            mode='lines',
-            name='Indice Strategia',
-            line=dict(color='#1f77b4', width=2)
-        ))
-        if self.benchmark_df is not None:
-            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
-            if not common_idx.empty:
-                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
-                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
-                fig.add_trace(go.Scatter(
-                    x=btc_normalized.index,
-                    y=btc_normalized,
-                    mode='lines',
-                    name=f'{self.benchmark_ticker} (Benchmark)',
-                    line=dict(color='#cc8306', width=2)
-                ))
-        fig.add_hline(
-            y=self.initial_value,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"Capitale Iniziale ({self.initial_value}$)",
-            annotation_position="bottom right"
-        )
-        if self.rebalance_dates:
-            for date in self.rebalance_dates:
-                fig.add_vline(
-                    x=date,
-                    line_width=1,
-                    line_dash="dot",
-                    line_color="green",
-                    opacity=0.6
-                )
-            fig.add_trace(go.Scatter(
-                x=[None], y=[None], mode='lines',
-                line=dict(color='green', dash='dot'),
-                name='Ribilanciamento'
-            ))
-        fig.update_xaxes(rangeslider_visible=True,
-                         rangeselector=dict(
-                             buttons=list([
-                                 dict(count=6, label="6m", step="month", stepmode="backward"),
-                                 dict(count=1, label="YTD", step="year", stepmode="todate"),
-                                 dict(count=1, label="1y", step="year", stepmode="backward"),
-                                 dict(step="all")
-                             ])
-                         ))
-        fig.update_layout(
-            title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
-            xaxis_title="Data",
-            yaxis_title="Valore del Portafoglio ($)",
-            hovermode="x unified",
-            template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
-            font=dict(family="Times New Roman, serif", size=12)
-        )
-        fig.show()
+        perf_fig = self._generate_performance_fig(title)
+        stats_fig = self._generate_stats_fig(stats_df, title)
 
-        # stat table figure
-        fig_stats = go.Figure(go.Table(
-            header=dict(values=["Metriche"] + list(stats_df.columns),
-                        fill_color='paleturquoise', align='left'),
-            cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
-                       fill_color='lavender', align='left')
-        ))
-        stats_title = (f"Statistiche della Strategia - {title}") if title else "Statistiche della Strategia"
-        fig_stats.update_layout(title_text=stats_title)
-        fig_stats.show()
+        if save_json_dir:
+            os.makedirs(save_json_dir, exist_ok=True)
+            perf_fig.write_json(os.path.join(save_json_dir, "performance.json"))
+            stats_fig.write_json(os.path.join(save_json_dir, "stats.json"))
+
+        perf_fig.show()
+        stats_fig.show()
+
+        weights_fig = None
+        try:
+            weights_title = (f"{title} - Pesi") if title else None
+            weights_fig = self.plot_weights(weights_title,
+                                           save_json_dir=save_json_dir,
+                                           return_fig=True)
+        except Exception:
+            pass
+
+        if return_fig:
+            return perf_fig, stats_fig, weights_fig
 
         try:
             weights_title = (f"{title} - Pesi") if title else None
@@ -821,124 +831,48 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
         else:
             print("Nessuna composizione valida calculata.")
 
-    def plot_weights(self, title: str = None):
-        """Grafica l'evoluzione dei pesi giornalieri del portafoglio (area impilata)."""
-        if not hasattr(self, 'weights_df') or self.weights_df is None:
-            raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
+    def plot_weights(self, title: str = None, save_json_dir: str = None, return_fig: bool = False):
+        """Mostra o salva il grafico dei pesi per MarketCapThresholdStrategy."""
+        fig = self._generate_weights_fig(title)
 
-        fig = go.Figure()
-        colors = px.colors.qualitative.Pastel
-        active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
-        for idx, ticker in enumerate(active_assets):
-            fig.add_trace(go.Scatter(
-                x=self.weights_df.index,
-                y=self.weights_df[ticker],
-                mode='lines',
-                name=ticker,
-                stackgroup='one',
-                line=dict(color=colors[idx % len(colors)], width=1)
-            ))
+        if save_json_dir:
+            os.makedirs(save_json_dir, exist_ok=True)
+            fig.write_json(os.path.join(save_json_dir, "weights.json"))
 
-        if hasattr(self, 'rebalance_dates') and self.rebalance_dates:
-            for date in self.rebalance_dates:
-                fig.add_vline(
-                    x=date,
-                    line_width=1,
-                    line_dash="dot",
-                    line_color="green",
-                    opacity=0.6
-                )
-        fig.update_layout(
-            title= title if title is not None else "Evoluzione dell'Allocazione del Portafoglio nel Tempo",
-            xaxis_title="Data",
-            yaxis_title="Percentuale di Allocazione",
-            yaxis=dict(tickformat=".0%"),
-            hovermode="x unified",
-            template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01),
-            font=dict(family="Times New Roman, serif", size=12)
-        )
+        if return_fig:
+            return fig
+
         fig.show()
 
-    def plot_results(self, title: str = None):
-        """Plot performance vs benchmark, display statistics and weights for MarketCapThresholdStrategy."""
+    def plot_results(self, title: str = None, save_json_dir: str = None,
+                     return_fig: bool = False):
+        """Mostra o salva i grafici per MarketCapThresholdStrategy."""
         if self.index_df is None:
             raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
-        # stampo statistiche formattate
         stats_df = self.print_stats()
 
-        # grafico performance separato
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=self.index_df.index,
-            y=self.index_df['Valore Indice'],
-            mode='lines',
-            name='Indice Strategia',
-            line=dict(color='#1f77b4', width=2)
-        ))
-        if self.benchmark_df is not None:
-            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
-            if not common_idx.empty:
-                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
-                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
-                fig.add_trace(go.Scatter(
-                    x=btc_normalized.index,
-                    y=btc_normalized,
-                    mode='lines',
-                    name=f'{self.benchmark_ticker} (Benchmark)',
-                    line=dict(color='#cc8306', width=2)
-                ))
-        fig.add_hline(
-            y=self.initial_value,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"Capitale Iniziale ({self.initial_value}$)",
-            annotation_position="bottom right"
-        )
-        if self.rebalance_dates:
-            for date in self.rebalance_dates:
-                fig.add_vline(
-                    x=date,
-                    line_width=1,
-                    line_dash="dot",
-                    line_color="green",
-                    opacity=0.6
-                )
-            fig.add_trace(go.Scatter(
-                x=[None], y=[None], mode='lines',
-                line=dict(color='green', dash='dot'),
-                name='Ribilanciamento'
-            ))
-        fig.update_xaxes(rangeslider_visible=True,
-                         rangeselector=dict(
-                             buttons=list([
-                                 dict(count=6, label="6m", step="month", stepmode="backward"),
-                                 dict(count=1, label="YTD", step="year", stepmode="todate"),
-                                 dict(count=1, label="1y", step="year", stepmode="backward"),
-                                 dict(step="all")
-                             ])
-                         ))
-        fig.update_layout(
-            title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
-            xaxis_title="Data",
-            yaxis_title="Valore del Portafoglio ($)",
-            hovermode="x unified",
-            template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
-            font=dict(family="Times New Roman, serif", size=12)
-        )
-        fig.show()
+        perf_fig = self._generate_performance_fig(title)
+        stats_fig = self._generate_stats_fig(stats_df, title)
 
-        # separato: tabella statistiche
-        fig_stats = go.Figure(go.Table(
-            header=dict(values=["Metriche"] + list(stats_df.columns),
-                        fill_color='paleturquoise', align='left'),
-            cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
-                       fill_color='lavender', align='left')
-        ))
-        stats_title = (f"Statistiche della Strategia - {title}") if title else "Statistiche della Strategia"
-        fig_stats.update_layout(title_text=stats_title)
-        fig_stats.show()
+        if save_json_dir:
+            os.makedirs(save_json_dir, exist_ok=True)
+            perf_fig.write_json(os.path.join(save_json_dir, "performance.json"))
+            stats_fig.write_json(os.path.join(save_json_dir, "stats.json"))
+
+        perf_fig.show()
+        stats_fig.show()
+
+        weights_fig = None
+        try:
+            weights_title = (f"{title} - Pesi") if title else None
+            weights_fig = self.plot_weights(weights_title,
+                                           save_json_dir=save_json_dir,
+                                           return_fig=True)
+        except Exception:
+            pass
+
+        if return_fig:
+            return perf_fig, stats_fig, weights_fig
 
         try:
             weights_title = (f"{title} - Pesi") if title else None
@@ -946,3 +880,180 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
         except Exception:
             pass
 
+
+# STRATEGIA EQUAL WEIGHT CON RIBILANCIAMENTO MENSILE
+
+class EqualWeightThresholdStrategy(BaseCryptoStrategy):
+    """
+    Strategia figlia che utilizza l'intera lista di asset fornita
+    e ribilancia periodicamente il portafoglio.
+    Solo gli asset con una Market Cap superiore a una soglia
+    definita (default 1 miliardo) vengono inclusi nel paniere.
+    
+    A differenza della strategia basata sulla Market Cap, qui
+    l'allocazione è EQUAL WEIGHT: il capitale viene diviso in
+    parti uguali tra tutti gli asset validi al momento del ribilanciamento.
+    """
+
+    def run_strategy(self, rebalance_freq_days: int = 30, min_mktcap: float = 100_000_000):
+        if not self.data_dict:
+            raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
+
+        print(f"\nAvvio backtest: ribilanciamento ogni {rebalance_freq_days} giorni, soglia MktCap {min_mktcap:,}. Metodo: Equal Weight.")
+
+        df_prices = pd.DataFrame()
+        df_mktcap = pd.DataFrame()
+
+        # Raccolgo prezzi e calcolo la market cap per ogni asset (serve per il filtro)
+        for ticker in self.assets:
+            df = self.data_dict[ticker].copy()
+            df['Market Cap'] = df['Prezzo di Chiusura'] * df['Circulating Supply']
+            df.index = pd.to_datetime(df.index)
+
+            df_prices[ticker] = df['Prezzo di Chiusura']
+            df_mktcap[ticker] = df['Market Cap']
+
+        df_prices.ffill(inplace=True)
+        df_mktcap.ffill(inplace=True)
+        df_prices.dropna(how='all', inplace=True)
+
+        dates = df_prices.index
+        if dates.empty:
+            raise ValueError("Dopo l'allineamento i prezzi sono vuoti.")
+
+        # Generazione delle date di ribilanciamento
+        rebalance_dates = []
+        start = dates[0]
+        end = dates[-1]
+        current_target = start
+        while current_target <= end:
+            idx = dates.searchsorted(current_target)
+            if idx < len(dates):
+                candidate = dates[idx]
+                if not rebalance_dates or candidate != rebalance_dates[-1]:
+                    rebalance_dates.append(candidate)
+            current_target += pd.Timedelta(days=rebalance_freq_days)
+        self.rebalance_dates = rebalance_dates
+
+        portfolio_value = float(self.initial_value)
+        shares = {}
+        index_values = []
+        last_weights = {}
+        last_basket = None
+        daily_weights_history = {}
+
+        first_date = dates[0]
+        current_basket = []
+
+        for current_date in dates:
+            # Aggiornamento del valore del portafoglio basato sulle quote attuali
+            if shares:
+                pv = 0.0
+                for ticker in current_basket:
+                    price = df_prices.loc[current_date, ticker]
+                    if pd.isna(price):
+                        continue
+                    pv += shares.get(ticker, 0.0) * price
+                portfolio_value = pv
+
+            index_values.append(portfolio_value)
+
+            # Salvataggio pesi giornalieri effettivi (fluttuano con i prezzi)
+            current_actual_weights = {}
+            for ticker in self.assets:
+                price = df_prices.loc[current_date, ticker] if ticker in df_prices.columns else np.nan
+                price = price if not pd.isna(price) else 0
+                asset_value = shares.get(ticker, 0.0) * price
+                current_actual_weights[ticker] = asset_value / portfolio_value if portfolio_value > 0 else 0
+            daily_weights_history[current_date] = current_actual_weights
+
+            # Ribilanciamento
+            if current_date == first_date or current_date in rebalance_dates:
+                daily_mktcap = df_mktcap.loc[current_date].dropna()
+                valid = daily_mktcap[daily_mktcap > min_mktcap]
+                
+                if valid.empty:
+                    current_basket = []
+                    shares = {}
+                    continue
+
+                current_basket = valid.index.tolist()
+                
+                # --- MODIFICA CHIAVE: EQUAL WEIGHT ---
+                # Contiamo quanti asset hanno superato la soglia e diamo a ciascuno lo stesso peso
+                num_assets = len(current_basket)
+                equal_weight = 1.0 / num_assets
+                weights = {ticker: equal_weight for ticker in current_basket}
+                # -------------------------------------
+
+                last_weights = weights.copy()
+                last_basket = valid.copy()
+
+                # Ricalcolo quote (shares) per il nuovo paniere
+                shares = {}
+                for ticker in current_basket:
+                    price = df_prices.loc[current_date, ticker]
+                    if pd.isna(price) or price <= 0:
+                        shares[ticker] = 0.0
+                        continue
+                    alloc = portfolio_value * weights[ticker]
+                    shares[ticker] = alloc / price
+
+        # Salvataggio risultati nella classe
+        self.index_df = pd.DataFrame({'Date': dates, 'Valore Indice': index_values})
+        self.index_df.set_index('Date', inplace=True)
+        self.weights_df = pd.DataFrame.from_dict(daily_weights_history, orient='index')
+
+        print(f"Backtest completato. Composizione finale al {dates[-1].strftime('%Y-%m-%d')}:" )
+        if last_basket is not None and last_weights:
+            for ticker in last_weights:
+                print(f"- {ticker}: {last_weights[ticker]:.2%} (Mkt Cap reale: {last_basket[ticker]:,.0f})")
+        else:
+            print("Nessuna composizione valida calcolata.")
+
+
+    def plot_weights(self, title: str = None, save_json_dir: str = None, return_fig: bool = False):
+        """Mostra o salva il grafico dei pesi per EqualWeightThresholdStrategy."""
+        fig = self._generate_weights_fig(title)
+
+        if save_json_dir:
+            os.makedirs(save_json_dir, exist_ok=True)
+            fig.write_json(os.path.join(save_json_dir, "weights.json"))
+
+        if return_fig:
+            return fig
+
+        fig.show()
+
+    def plot_results(self, title: str = None, save_json_dir: str = None, return_fig: bool = False):
+        """Mostra o salva i grafici per EqualWeightThresholdStrategy."""
+        if self.index_df is None:
+            raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
+        stats_df = self.print_stats()
+
+        perf_fig = self._generate_performance_fig(title)
+        stats_fig = self._generate_stats_fig(stats_df, title)
+
+        if save_json_dir:
+            os.makedirs(save_json_dir, exist_ok=True)
+            perf_fig.write_json(os.path.join(save_json_dir, "performance.json"))
+            stats_fig.write_json(os.path.join(save_json_dir, "stats.json"))
+
+        perf_fig.show()
+        stats_fig.show()
+
+        weights_fig = None
+        try:
+            weights_title = (f"{title} - Pesi") if title else None
+            weights_fig = self.plot_weights(weights_title, save_json_dir=save_json_dir, return_fig=True)
+        except Exception:
+            pass
+
+        if return_fig:
+            return perf_fig, stats_fig, weights_fig
+
+        try:
+            weights_title = (f"{title} - Pesi") if title else None
+            self.plot_weights(weights_title)
+        except Exception:
+            pass
