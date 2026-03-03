@@ -18,8 +18,8 @@ class BaseCryptoStrategy(ABC):
     fornire un proprio metodo `plot_results` per visualizzare i risultati.
     """
     
-    def __init__(self, initial_value: float = 10000.0):
-        self.initial_value = initial_value
+    def __init__(self, portfolio_value = None):
+        self.portfolio_value = portfolio_value
         self.data_dict = {}
         self.assets = []
         self.index_df = None
@@ -31,70 +31,80 @@ class BaseCryptoStrategy(ABC):
     # Grafici comuni e funzioni di esportazione
     # ------------------------------------------------------------------
     def _generate_performance_fig(self, title: str = None) -> go.Figure:
-        """Costruisce la figura delle performance (senza mostrarla)."""
-        if self.index_df is None:
-            raise ValueError("Strategia non calcolata. Esegui run_strategy() prima.")
+            """Costruisce la figura delle performance (senza mostrarla)."""
+            if self.index_df is None:
+                raise ValueError("Strategia non calcolata. Esegui run_strategy() prima.")
 
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=self.index_df.index,
-            y=self.index_df['Valore Indice'],
-            mode='lines',
-            name='Indice Strategia',
-            line=dict(color='#1f77b4', width=2)
-        ))
-        if self.benchmark_df is not None:
-            common_idx = self.index_df.index.intersection(self.benchmark_df.index)
-            if not common_idx.empty:
-                btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
-                btc_normalized = (btc_prices / btc_prices.iloc[0]) * self.initial_value
-                fig.add_trace(go.Scatter(
-                    x=btc_normalized.index,
-                    y=btc_normalized,
-                    mode='lines',
-                    name=f'{self.benchmark_ticker} (Benchmark)',
-                    line=dict(color='#cc8306', width=2)
-                ))
-        fig.add_hline(
-            y=self.initial_value,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"Capitale Iniziale ({self.initial_value}$)",
-            annotation_position="bottom right"
-        )
-        if self.rebalance_dates:
-            for date in self.rebalance_dates:
-                fig.add_vline(
-                    x=date,
-                    line_width=1,
-                    line_dash="dot",
-                    line_color="green",
-                    opacity=0.6
-                )
+            fig = go.Figure()
             fig.add_trace(go.Scatter(
-                x=[None], y=[None], mode='lines',
-                line=dict(color='green', dash='dot'),
-                name='Ribilanciamento'
+                x=self.index_df.index,
+                y=self.index_df['Valore Indice'],
+                mode='lines',
+                name='Indice Strategia',
+                line=dict(color='#1f77b4', width=2)
             ))
-        fig.update_xaxes(rangeslider_visible=True,
-                         rangeselector=dict(
-                             buttons=list([
-                                 dict(count=6, label="6m", step="month", stepmode="backward"),
-                                 dict(count=1, label="YTD", step="year", stepmode="todate"),
-                                 dict(count=1, label="1y", step="year", stepmode="backward"),
-                                 dict(step="all")
-                             ])
-                         ))
-        fig.update_layout(
-            title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
-            xaxis_title="Data",
-            yaxis_title="Valore del Portafoglio ($)",
-            hovermode="x unified",
-            template="plotly_white",
-            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
-            font=dict(family="Times New Roman, serif", size=12)
-        )
-        return fig
+            if self.benchmark_df is not None:
+                common_idx = self.index_df.index.intersection(self.benchmark_df.index)
+                if not common_idx.empty:
+                    btc_prices = self.benchmark_df['Prezzo di Chiusura'].loc[common_idx]
+                    btc_normalized = btc_prices
+                    fig.add_trace(go.Scatter(
+                        x=btc_normalized.index,
+                        y=btc_normalized,
+                        mode='lines',
+                        name=f'{self.benchmark_ticker} (Benchmark)',
+                        line=dict(color='#cc8306', width=2)
+                    ))
+            
+            # --- MODIFICA GRAFICA LINEA INIZIALE ---
+            fig.add_hline(
+                y=self.portfolio_value,
+                line_dash="dash",
+                line_color="red",
+                annotation_text=f"Capitale Iniziale ({self.portfolio_value:,.0f} $)",
+                annotation_position="bottom right"
+            )
+            
+            if self.rebalance_dates:
+                for date in self.rebalance_dates:
+                    fig.add_vline(
+                        x=date,
+                        line_width=1,
+                        line_dash="dot",
+                        line_color="green",
+                        opacity=0.6
+                    )
+                fig.add_trace(go.Scatter(
+                    x=[None], y=[None], mode='lines',
+                    line=dict(color='green', dash='dot'),
+                    name='Ribilanciamento'
+                ))
+                
+            fig.update_xaxes(rangeslider_visible=True,
+                            rangeselector=dict(
+                                buttons=list([
+                                    dict(count=6, label="6m", step="month", stepmode="backward"),
+                                    dict(count=1, label="YTD", step="year", stepmode="todate"),
+                                    dict(count=1, label="1y", step="year", stepmode="backward"),
+                                    dict(step="all")
+                                ])
+                            ))
+                            
+            fig.update_layout(
+                title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+                xaxis_title="Data",
+                # --- MODIFICA FORMATO PREZZI (NO "K", NO DECIMALI) ---
+                yaxis=dict(
+                    title="Valore del Portafoglio ($)",
+                    tickformat=",.0f",    # Formato asse Y (numero intero)
+                    hoverformat=",.0f"    # Formato tooltip hover (numero intero)
+                ),
+                hovermode="x unified",
+                template="plotly_white",
+                legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+                font=dict(family="Times New Roman, serif", size=12)
+            )
+            return fig
 
     def _generate_stats_fig(self, stats_df: pd.DataFrame, title: str = None) -> go.Figure:
         """Costruisce la tabella delle statistiche come figura Plotly."""
@@ -308,15 +318,15 @@ class BaseCryptoStrategy(ABC):
 # RIBALANCIAMENTO PERIODICO TOP X MARKET CAP
 
 class RebalancedMarketCapStrategy(BaseCryptoStrategy):
-    
     """
     Strategia figlia che seleziona dinamicamente le 10 crypto più capitalizzate.
     Effettua un ribilanciamento periodico (es. mensile): rivaluta l'intero universo
     di asset, estrae le nuove Top 10, ricalcola i pesi in base alla Mkt Cap 
     e rialloca il capitale accumulato fino a quel momento.
+    Il valore iniziale del portafoglio è pari al prezzo di BTC nel giorno di partenza.
     """
     
-    def run_strategy(self, rebalance_freq_days: int = 90, **kwargs):
+    def run_strategy(self, rebalance_freq_days: int = 90, btc_ticker: str = 'BTC-USD', **kwargs):
         """
         rebalance_freq_days: Intervallo di ribilanciamento in giorni (int).
         Es. 30 = ribilanciamento ogni ~30 giorni.
@@ -370,7 +380,34 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
         # salvo le date per il plotting
         self.rebalance_dates = rebalance_dates
         
-        portfolio_value = float(self.initial_value)
+        # --- MODIFICA CHIAVE: Valore iniziale = Prezzo di BTC indipendente ---
+        if btc_ticker in df_prices.columns:
+            btc_initial_price = df_prices.loc[first_date, btc_ticker]
+        else:
+            print(f"Recupero il prezzo storico di {btc_ticker} per impostare il capitale iniziale...")
+            try:
+                yf_ticker = btc_ticker if "-" in btc_ticker else f"{btc_ticker}-USD"
+                ticker_obj = yf.Ticker(yf_ticker)
+                
+                # Aggiungiamo qualche giorno di margine per assicurarci di pescare il dato
+                end_date = first_date + pd.Timedelta(days=3)
+                btc_data = ticker_obj.history(start=first_date, end=end_date)
+                
+                if btc_data.empty:
+                    raise ValueError(f"Dati non trovati su yfinance per {yf_ticker} nella data {first_date}.")
+                
+                btc_initial_price = float(btc_data['Close'].iloc[0])
+            except Exception as e:
+                raise ValueError(f"Impossibile recuperare il prezzo di {btc_ticker} al {first_date}: {e}")
+                
+        if pd.isna(btc_initial_price) or btc_initial_price <= 0:
+            raise ValueError(f"Il prezzo di {btc_ticker} il primo giorno ({first_date.strftime('%Y-%m-%d')}) non è valido: {btc_initial_price}")
+            
+        portfolio_value = float(btc_initial_price)
+        self.portfolio_value = portfolio_value
+        print(f"Valore iniziale del portafoglio impostato al prezzo di {btc_ticker} in data {first_date.strftime('%Y-%m-%d')}: {portfolio_value:.2f} USD")
+        # ---------------------------------------------------------------------
+
         shares = {}
         current_top = []
         index_values = []
@@ -417,7 +454,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
                     # non ci sono market cap validi in questa data => skip
                     continue
                 
-                # Seleziona le NUOVE Top 10
+                # Seleziona le NUOVE Top 10 (il tuo codice originale prendeva le top 5, lascio intatto)
                 top = daily_mktcap.nlargest(5)
                 current_top = top.index.tolist()
                 
@@ -433,7 +470,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
                 last_weights = weights.copy()
                 last_top_mktcap = top.copy()
                 
-                # Vende tutto e ricompra: ricalcola le quote esatte per le nuove Top 10
+                # Vende tutto e ricompra: ricalcola le quote esatte per le nuove Top
                 shares = {}
                 for ticker in current_top:
                     price = df_prices.loc[current_date, ticker]
@@ -458,19 +495,6 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
             print("Nessuna composizione finale valida calcolata.")
 
     def plot_weights(self, title: str = None, save_json_dir: str = None, return_fig: bool = False):
-        """Mostra o salva il grafico dei pesi.
-
-        Parameters
-        ----------
-        title : str, optional
-            Titolo da applicare alla figura.
-        save_json_dir : str, optional
-            Se fornita, la directory in cui salvare il grafico in formato JSON
-            (file chiamato ``weights.json``).
-        return_fig : bool, default False
-            Se ``True`` restituisce l'oggetto ``go.Figure`` invece di chiamare
-            ``fig.show()``.
-        """
         fig = self._generate_weights_fig(title)
 
         if save_json_dir:
@@ -482,20 +506,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
 
         fig.show()
 
-    def plot_results(self, title: str = None, save_json_dir: str = None,
-                     return_fig: bool = False):
-        """Mostra o salva i grafici delle performance, delle statistiche e dei pesi.
-
-        Parameters
-        ----------
-        title : str, optional
-            Titolo da applicare ai grafici.
-        save_json_dir : str, optional
-            Se fornita, directory in cui salvare tutti i grafici in formato JSON.
-        return_fig : bool, default False
-            Se ``True`` restituisce una tupla ``(perf_fig, stats_fig, weights_fig)``
-            anziché mostrare i grafici.
-        """
+    def plot_results(self, title: str = None, save_json_dir: str = None, return_fig: bool = False):
         if self.index_df is None:
             raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
         stats_df = self.print_stats()
@@ -514,24 +525,22 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
         weights_fig = None
         try:
             weights_title = (f"{title} - Pesi") if title else None
-            weights_fig = self.plot_weights(weights_title,
-                                           save_json_dir=save_json_dir,
-                                           return_fig=True)
+            weights_fig = self.plot_weights(weights_title, save_json_dir=save_json_dir, return_fig=True)
         except Exception:
             pass
 
         if return_fig:
             return perf_fig, stats_fig, weights_fig
-
 # STRATEGIA TOP X MARKET CAP, RIBILANCIAMENTO VOLUME/MARKET CAP 
 
 class VolMktCapStrategy(BaseCryptoStrategy):
     """
     Strategia figlia che seleziona i Top N asset per Market Cap tra quelli con dati sufficienti,
     e pondera il portafoglio in base al rapporto Volume/MarketCap.
+    Il valore iniziale del portafoglio è pari al prezzo di BTC al termine del periodo di warm-up.
     """
     
-    def run_strategy(self, rebalance_freq_days: int = 180, top_n: int = 5):
+    def run_strategy(self, rebalance_freq_days: int = 180, top_n: int = 5, btc_ticker: str = 'BTC-USD'):
         if not self.data_dict:
             raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
             
@@ -594,7 +603,34 @@ class VolMktCapStrategy(BaseCryptoStrategy):
             
         backtest_dates = dates[rebalance_freq_days:]
         first_trading_date = backtest_dates[0]
-        portfolio_value = self.initial_value
+        
+        # --- MODIFICA: Valore iniziale = Prezzo di BTC indipendente DOPO il warm-up ---
+        if btc_ticker in df_prices.columns:
+            btc_initial_price = df_prices.loc[first_trading_date, btc_ticker]
+        else:
+            print(f"Recupero il prezzo storico di {btc_ticker} al termine del warm-up per impostare il capitale iniziale...")
+            try:
+                yf_ticker = btc_ticker if "-" in btc_ticker else f"{btc_ticker}-USD"
+                ticker_obj = yf.Ticker(yf_ticker)
+                
+                # Aggiungiamo qualche giorno di margine per assicurarci di pescare il dato
+                end_date = first_trading_date + pd.Timedelta(days=3)
+                btc_data = ticker_obj.history(start=first_trading_date, end=end_date)
+                
+                if btc_data.empty:
+                    raise ValueError(f"Dati non trovati su yfinance per {yf_ticker} nella data {first_trading_date}.")
+                
+                btc_initial_price = float(btc_data['Close'].iloc[0])
+            except Exception as e:
+                raise ValueError(f"Impossibile recuperare il prezzo di {btc_ticker} al {first_trading_date}: {e}")
+                
+        if pd.isna(btc_initial_price) or btc_initial_price <= 0:
+            raise ValueError(f"Il prezzo di {btc_ticker} nel primo giorno di trading ({first_trading_date.strftime('%Y-%m-%d')}) non è valido: {btc_initial_price}")
+            
+        portfolio_value = float(btc_initial_price)
+        self.portfolio_value = portfolio_value
+        print(f"Valore iniziale del portafoglio impostato al prezzo di {btc_ticker} in data {first_trading_date.strftime('%Y-%m-%d')}: {portfolio_value:.2f} USD")
+        # ------------------------------------------------------------------------------
         
         shares = {ticker: 0.0 for ticker in self.assets}
         for ticker in top_assets:
@@ -679,8 +715,7 @@ class VolMktCapStrategy(BaseCryptoStrategy):
 
         fig.show()
 
-    def plot_results(self, title: str = None, save_json_dir: str = None,
-                     return_fig: bool = False):
+    def plot_results(self, title: str = None, save_json_dir: str = None, return_fig: bool = False):
         """Mostra o salva i grafici relativi alla strategia VolMktCap."""
         if self.index_df is None:
             raise ValueError("Strategia non calcolata. Esegui run_strategy() prima di plottare.")
@@ -700,9 +735,7 @@ class VolMktCapStrategy(BaseCryptoStrategy):
         weights_fig = None
         try:
             weights_title = (f"{title} - Pesi") if title else None
-            weights_fig = self.plot_weights(weights_title,
-                                           save_json_dir=save_json_dir,
-                                           return_fig=True)
+            weights_fig = self.plot_weights(weights_title, save_json_dir=save_json_dir, return_fig=True)
         except Exception:
             pass
 
@@ -717,6 +750,7 @@ class VolMktCapStrategy(BaseCryptoStrategy):
 
 # STRATEGIA TOP X MARKET CAP, RIBILANCIAMENTO SOGLIA MINIMA MKT CAP
 
+
 class MarketCapThresholdStrategy(BaseCryptoStrategy):
     """
     Strategia figlia che utilizza l'intera lista di asset fornita
@@ -724,9 +758,10 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
     delle capitalizzazioni di mercato (Market Cap).
     Solo gli asset con una Market Cap superiore a una soglia
     definita (default 1 miliardo) vengono inclusi nel paniere.
+    Il valore iniziale del portafoglio è pari al prezzo di BTC nel giorno di partenza.
     """
 
-    def run_strategy(self, rebalance_freq_days: int = 30, min_mktcap: float = 1_000_000_000):
+    def run_strategy(self, rebalance_freq_days: int = 30, min_mktcap: float = 1_000_000_000, btc_ticker: str = 'BTC-USD'):
         if not self.data_dict:
             raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
 
@@ -766,14 +801,43 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
             current_target += pd.Timedelta(days=rebalance_freq_days)
         self.rebalance_dates = rebalance_dates
 
-        portfolio_value = float(self.initial_value)
+        first_date = dates[0]
+
+        # --- MODIFICA: Valore iniziale = Prezzo di BTC indipendente ---
+        if btc_ticker in df_prices.columns:
+            btc_initial_price = df_prices.loc[first_date, btc_ticker]
+        else:
+            print(f"Recupero il prezzo storico di {btc_ticker} per impostare il capitale iniziale...")
+            try:
+                # Usa yfinance per scaricare il prezzo del giorno di partenza
+                yf_ticker = btc_ticker if "-" in btc_ticker else f"{btc_ticker}-USD"
+                ticker_obj = yf.Ticker(yf_ticker)
+                
+                # Aggiungiamo qualche giorno di margine per assicurarci di pescare il dato
+                end_date = first_date + pd.Timedelta(days=3)
+                btc_data = ticker_obj.history(start=first_date, end=end_date)
+                
+                if btc_data.empty:
+                    raise ValueError(f"Dati non trovati su yfinance per {yf_ticker} nella data {first_date}.")
+                
+                btc_initial_price = float(btc_data['Close'].iloc[0])
+            except Exception as e:
+                raise ValueError(f"Impossibile recuperare il prezzo di {btc_ticker} al {first_date}: {e}")
+                
+        if pd.isna(btc_initial_price) or btc_initial_price <= 0:
+            raise ValueError(f"Il prezzo di {btc_ticker} il primo giorno ({first_date.strftime('%Y-%m-%d')}) non è valido: {btc_initial_price}")
+            
+        portfolio_value = float(btc_initial_price)
+        self.portfolio_value = portfolio_value
+        print(f"Valore iniziale del portafoglio impostato al prezzo di {btc_ticker} in data {first_date.strftime('%Y-%m-%d')}: {portfolio_value:.2f} USD")
+        # --------------------------------------------------------------
+
         shares = {}
         index_values = []
         last_weights = {}
         last_basket = None
         daily_weights_history = {}
 
-        first_date = dates[0]
         current_basket = []
 
         for current_date in dates:
@@ -880,7 +944,6 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
         except Exception:
             pass
 
-
 # STRATEGIA EQUAL WEIGHT CON RIBILANCIAMENTO MENSILE
 
 class EqualWeightThresholdStrategy(BaseCryptoStrategy):
@@ -893,9 +956,10 @@ class EqualWeightThresholdStrategy(BaseCryptoStrategy):
     A differenza della strategia basata sulla Market Cap, qui
     l'allocazione è EQUAL WEIGHT: il capitale viene diviso in
     parti uguali tra tutti gli asset validi al momento del ribilanciamento.
+    Il valore iniziale del portafoglio è pari al prezzo di BTC nel giorno di partenza.
     """
 
-    def run_strategy(self, rebalance_freq_days: int = 30, min_mktcap: float = 100_000_000):
+    def run_strategy(self, rebalance_freq_days: int = 30, min_mktcap: float = 100_000_000, btc_ticker: str = 'BTC-USD'):
         if not self.data_dict:
             raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
 
@@ -935,14 +999,28 @@ class EqualWeightThresholdStrategy(BaseCryptoStrategy):
             current_target += pd.Timedelta(days=rebalance_freq_days)
         self.rebalance_dates = rebalance_dates
 
-        portfolio_value = float(self.initial_value)
+        first_date = dates[0]
+
+        # --- MODIFICA CHIAVE: Valore iniziale = Prezzo di BTC ---
+        if btc_ticker not in df_prices.columns:
+            raise ValueError(f"Ticker '{btc_ticker}' non trovato nei dati. Impossibile determinare il valore iniziale.")
+            
+        btc_initial_price = df_prices.loc[first_date, btc_ticker]
+        
+        if pd.isna(btc_initial_price) or btc_initial_price <= 0:
+            raise ValueError(f"Il prezzo di {btc_ticker} il primo giorno ({first_date.strftime('%Y-%m-%d')}) non è valido: {btc_initial_price}")
+            
+        portfolio_value = float(btc_initial_price)
+        self.portfolio_value = portfolio_value
+        print(f"Valore iniziale del portafoglio impostato al prezzo di {btc_ticker} in data {first_date.strftime('%Y-%m-%d')}: {portfolio_value:.2f}")
+        # --------------------------------------------------------
+
         shares = {}
         index_values = []
         last_weights = {}
         last_basket = None
         daily_weights_history = {}
 
-        first_date = dates[0]
         current_basket = []
 
         for current_date in dates:
@@ -979,12 +1057,12 @@ class EqualWeightThresholdStrategy(BaseCryptoStrategy):
 
                 current_basket = valid.index.tolist()
                 
-                # --- MODIFICA CHIAVE: EQUAL WEIGHT ---
+                # --- EQUAL WEIGHT ---
                 # Contiamo quanti asset hanno superato la soglia e diamo a ciascuno lo stesso peso
                 num_assets = len(current_basket)
                 equal_weight = 1.0 / num_assets
                 weights = {ticker: equal_weight for ticker in current_basket}
-                # -------------------------------------
+                # --------------------
 
                 last_weights = weights.copy()
                 last_basket = valid.copy()
