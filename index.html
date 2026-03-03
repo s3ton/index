@@ -87,6 +87,7 @@
     <div class="tab-container">
       <button class="tab-btn active" data-tab="performance">Market Cap Index Performance</button>
       <button class="tab-btn" data-tab="composition">Portfolio Composition</button>
+      <button class="tab-btn" data-tab="techMarketCap">Tech MarketCap TH</button>
     </div>
 
     <div class="mb-10">
@@ -125,6 +126,20 @@
         <div class="chart-card w-full lg:w-5/6 mx-auto">
           <div class="chart-container">
             <div class="chart-wrapper" id="composition-chart"></div>
+          </div>
+        </div>
+      </div>
+      <div id="techMarketCap" class="tab-content">
+        <div class="grid lg:grid-cols-2 gap-10">
+          <div class="chart-card">
+            <div class="chart-container">
+              <div class="chart-wrapper" id="tech-performance-chart"></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-container">
+              <div class="chart-wrapper" id="tech-weights-chart"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -167,6 +182,8 @@
     // ----- DOM Elements -----
     const performanceChartEl = document.getElementById('performance-chart');
     const compositionChartEl = document.getElementById('composition-chart');
+    const techPerformanceChartEl = document.getElementById('tech-performance-chart');
+    const techWeightsChartEl = document.getElementById('tech-weights-chart');
 
     // ----- Load Strategy Charts from JSON -----
     async function loadStrategyCharts() {
@@ -236,6 +253,50 @@
           }
         }
       } catch (e) { console.error('Composition chart error:', e.message); }
+
+      try {
+        const techPerfResponse = await fetch('./charts/tech_MarketCap_TH/performance.json');
+        if (techPerfResponse.ok) {
+          const techPerfData = await techPerfResponse.json();
+          if (techPerformanceChartEl && techPerfData.data && techPerfData.layout) {
+            const layoutWithMargins = {
+              ...techPerfData.layout,
+              margin: { l: 60, r: 40, t: 50, b: 40 },
+              plot_bgcolor: "transparent",
+              paper_bgcolor: "transparent",
+              font: { color: '#475569' },
+              hoverlabel: {
+                bgcolor: "#ffffff",
+                bordercolor: "#e2e8f0",
+                font: { size: 12, color: "#0f172a" }
+              }
+            };
+            Plotly.newPlot(techPerformanceChartEl, techPerfData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
+          }
+        }
+      } catch (e) { console.error('Tech performance chart error:', e.message); }
+
+      try {
+        const techWeightsResponse = await fetch('./charts/tech_MarketCap_TH/weights.json');
+        if (techWeightsResponse.ok) {
+          const techWeightsData = await techWeightsResponse.json();
+          if (techWeightsChartEl && techWeightsData.data && techWeightsData.layout) {
+            const layoutWithMargins = {
+              ...techWeightsData.layout,
+              margin: { l: 60, r: 40, t: 50, b: 40 },
+              plot_bgcolor: "transparent",
+              paper_bgcolor: "transparent",
+              font: { color: '#475569' },
+              hoverlabel: {
+                bgcolor: "#ffffff",
+                bordercolor: "#e2e8f0",
+                font: { size: 12, color: "#0f172a" }
+              }
+            };
+            Plotly.newPlot(techWeightsChartEl, techWeightsData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
+          }
+        }
+      } catch (e) { console.error('Tech weights chart error:', e.message); }
     }
 
     loadStrategyCharts();
@@ -260,6 +321,10 @@
           setTimeout(() => {
             if (tabName === 'performance' && performanceChartEl) Plotly.Plots.resize(performanceChartEl);
             if (tabName === 'composition' && compositionChartEl) Plotly.Plots.resize(compositionChartEl);
+            if (tabName === 'techMarketCap') {
+                if (techPerformanceChartEl) Plotly.Plots.resize(techPerformanceChartEl);
+                if (techWeightsChartEl) Plotly.Plots.resize(techWeightsChartEl);
+            }
           }, 0);
         }
       });
