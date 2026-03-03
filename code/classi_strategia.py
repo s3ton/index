@@ -326,7 +326,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
     Il valore iniziale del portafoglio è pari al prezzo di BTC nel giorno di partenza.
     """
     
-    def run_strategy(self, rebalance_freq_days: int = 90, btc_ticker: str = 'BTC-USD', **kwargs):
+    def run_strategy(self, rebalance_freq_days: int = 180, btc_ticker: str = 'BTC-USD', **kwargs):
         """
         rebalance_freq_days: Intervallo di ribilanciamento in giorni (int).
         Es. 30 = ribilanciamento ogni ~30 giorni.
@@ -761,7 +761,7 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
     Il valore iniziale del portafoglio è pari al prezzo di BTC nel giorno di partenza.
     """
 
-    def run_strategy(self, rebalance_freq_days: int = 30, min_mktcap: float = 1_000_000_000, btc_ticker: str = 'BTC-USD'):
+    def run_strategy(self, rebalance_freq_days: int = 180, min_mktcap: float = 1_000_000_000, btc_ticker: str = 'BTC-USD'):
         if not self.data_dict:
             raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
 
@@ -959,7 +959,7 @@ class EqualWeightThresholdStrategy(BaseCryptoStrategy):
     Il valore iniziale del portafoglio è pari al prezzo di BTC nel giorno di partenza.
     """
 
-    def run_strategy(self, rebalance_freq_days: int = 30, min_mktcap: float = 100_000_000, btc_ticker: str = 'BTC-USD'):
+    def run_strategy(self, rebalance_freq_days: int = 180, min_mktcap: float = 1_000_000_000, btc_ticker: str = 'BTC-USD'):
         if not self.data_dict:
             raise ValueError("Nessun dato disponibile. Esegui import_data() per primo.")
 
