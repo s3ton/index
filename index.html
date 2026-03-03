@@ -25,11 +25,11 @@
       display: grid;
     }
     
-    .chart-container { min-height: 500px; position: relative; padding: 1.5rem; }
+    .chart-container { min-height: 605px; position: relative; padding: 1.5rem; }
     .chart-wrapper { position: relative; width: 100%; height: 100%; }
     
-    @media (max-width: 1023px) { .chart-container { min-height: 550px; padding: 1rem; } }
-    @media (max-width: 640px) { .chart-container { min-height: 500px; } }
+    @media (max-width: 1023px) { .chart-container { min-height: 666px; padding: 1rem; } }
+    @media (max-width: 640px) { .chart-container { min-height: 605px; } }
     
     .plotly .hovertext { z-index: 1000; }
     .hovertext { max-height: 280px; overflow-y: auto; }
@@ -91,14 +91,14 @@
 
     <div class="mb-10">
       <div id="performance" class="tab-content active">
-        <div class="chart-card w-full lg:w-3/4 mx-auto">
+        <div class="chart-card w-full lg:w-5/6 mx-auto">
           <div class="chart-container">
             <div class="chart-wrapper" id="performance-chart"></div>
           </div>
         </div>
       </div>
       <div id="composition" class="tab-content">
-        <div class="chart-card w-full lg:w-3/4 mx-auto">
+        <div class="chart-card w-full lg:w-5/6 mx-auto">
           <div class="chart-container">
             <div class="chart-wrapper" id="composition-chart"></div>
           </div>
