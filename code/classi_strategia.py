@@ -30,6 +30,9 @@ class BaseCryptoStrategy(ABC):
     # ------------------------------------------------------------------
     # Grafici comuni e funzioni di esportazione
     # ------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # Grafici comuni e funzioni di esportazione
+    # ------------------------------------------------------------------
     def _generate_performance_fig(self, title: str = None) -> go.Figure:
             """Costruisce la figura delle performance (senza mostrarla)."""
             if self.index_df is None:
@@ -91,9 +94,8 @@ class BaseCryptoStrategy(ABC):
                             ))
                             
             fig.update_layout(
-                title= title if title is not None else f"Performance {self.__class__.__name__} vs {self.benchmark_ticker}",
+                # TITOLO RIMOSSO QUI
                 xaxis_title="Data",
-                # --- MODIFICA FORMATO PREZZI (NO "K", NO DECIMALI) ---
                 yaxis=dict(
                     title="Valore del Portafoglio ($)",
                     tickformat=",.0f",    # Formato asse Y (numero intero)
@@ -102,9 +104,62 @@ class BaseCryptoStrategy(ABC):
                 hovermode="x unified",
                 template="plotly_white",
                 legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
-                font=dict(family="Times New Roman, serif", size=12)
+                font=dict(family="Times New Roman, serif", size=12),
+                margin=dict(t=40) # Aggiunge un po' di margine superiore ora che non c'è il titolo
             )
             return fig
+
+    def _generate_stats_fig(self, stats_df: pd.DataFrame, title: str = None) -> go.Figure:
+        """Costruisce la tabella delle statistiche come figura Plotly."""
+        fig_stats = go.Figure(go.Table(
+            header=dict(values=["Metriche"] + list(stats_df.columns),
+                        fill_color='paleturquoise', align='left'),
+            cells=dict(values=[stats_df.index] + [stats_df[col] for col in stats_df.columns],
+                       fill_color='lavender', align='left')
+        ))
+        
+        # TITOLO RIMOSSO QUI
+        fig_stats.update_layout(margin=dict(t=10, b=10)) 
+        return fig_stats
+
+    def _generate_weights_fig(self, title: str = None) -> go.Figure:
+        """Costruisce il grafico dei pesi (stacked area) senza mostrarlo."""
+        if not hasattr(self, 'weights_df') or self.weights_df is None:
+            raise ValueError("Pesi non calcolati. Esegui run_strategy() prima di plottare i pesi.")
+
+        fig = go.Figure()
+        colors = px.colors.qualitative.Pastel
+        active_assets = self.weights_df.columns[(self.weights_df > 0.001).any()]
+        for idx, ticker in enumerate(active_assets):
+            fig.add_trace(go.Scatter(
+                x=self.weights_df.index,
+                y=self.weights_df[ticker],
+                mode='lines',
+                name=ticker,
+                stackgroup='one',
+                line=dict(color=colors[idx % len(colors)], width=1)
+            ))
+        if hasattr(self, 'rebalance_dates') and self.rebalance_dates:
+            for date in self.rebalance_dates:
+                fig.add_vline(
+                    x=date,
+                    line_width=1,
+                    line_dash="dot",
+                    line_color="green",
+                    opacity=0.6
+                )
+        fig.update_layout(
+            # TITOLO RIMOSSO QUI
+            xaxis_title="Data",
+            yaxis_title="Percentuale di Allocazione",
+            yaxis=dict(tickformat=".0%"),
+            hovermode="x unified",
+            template="plotly_white",
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=1.01),
+            font=dict(family="Times New Roman, serif", size=12),
+            margin=dict(t=40) # Aggiunge margine superiore
+        )
+        return fig
 
     def _generate_stats_fig(self, stats_df: pd.DataFrame, title: str = None) -> go.Figure:
         """Costruisce la tabella delle statistiche come figura Plotly."""
