@@ -38,7 +38,7 @@
     .hovertext::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     
     /* Tab Styling */
-    .tab-container { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
+    .tab-container { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; overflow-x: auto;}
     .tab-btn { 
       padding: 1rem 1.5rem; 
       font-size: 1rem; 
@@ -50,11 +50,42 @@
       transition: all 0.3s ease; 
       border-bottom: 3px solid transparent; 
       margin-bottom: -2px;
+      white-space: nowrap;
     }
     .tab-btn:hover { color: #0050ff; }
     .tab-btn.active { color: #0050ff; border-bottom-color: #0050ff; }
     .tab-content { display: none; }
     .tab-content.active { display: grid; }
+
+    /* Layout per affiancare i grafici */
+    .charts-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .chart-wrapper {
+      flex: 1 1 48%; /* Occupa quasi metà schermo su PC */
+      min-width: 300px; /* Su schermi piccoli, va a capo automaticamente */
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+    }
+
+    /* Stile per il riquadro della descrizione */
+    .strategy-description {
+      background-color: #f8fafc;
+      border-radius: 6px;
+      margin-top: 20px;
+      color: #334155;
+    }
+
+    .strategy-description h3 {
+      margin-top: 0;
+      color: #0f172a;
+    }
   </style>
 </head>
 <body class="bg-[#f8f9fb] text-slate-800 min-h-screen">
@@ -67,80 +98,134 @@
       </div>
       <span class="title-font text-2xl font-bold tracking-tight text-[#0a1b39]">Conio <span class="text-[#0050ff]">Analytics</span></span>
     </div>
-    <div class="flex items-center gap-4 sm:gap-6">
-
-    </div>
   </div>
 </nav>
 
 <div class="max-w-screen-2xl mx-auto px-6 py-12">
 
-
   <div class="mb-20">
     <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
       <div>
-        <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Conio Market Cap Index</h2>
-        <p class="text-slate-500 mt-2 font-medium">Dynamic cryptocurrency portfolio • Market-cap weighted allocation</p>
+        <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Conio Index</h2>
+        <p class="text-slate-500 mt-2 font-medium">Dynamic cryptocurrency portfolio</p>
       </div>
     </div>
 
     <div class="tab-container">
-      <button class="tab-btn active" data-tab="performance">Market Cap Index Performance</button>
-      <button class="tab-btn" data-tab="composition">Portfolio Composition</button>
-      <button class="tab-btn" data-tab="techMarketCap">Tech MarketCap TH</button>
+      <button class="tab-btn active" data-tab="mainStrategy">Top 5 Market Cap Index</button>
+      <button class="tab-btn" data-tab="techMarketCap">Tech Index</button>
+      <button class="tab-btn" data-tab="extraStrategy1">Defi Index</button>
+      <button class="tab-btn" data-tab="extraStrategy2">Payments Index</button>
     </div>
 
-    <div class="mb-10">
-      <div id="performance" class="tab-content active">
-        <div class="chart-card w-full lg:w-5/6 mx-auto">
-          <div class="chart-container">
-            <div class="chart-wrapper" id="performance-chart"></div>
-          </div>
+    <div id="mainStrategy" class="tab-content active">
+      <div class="charts-row">
+        <div class="chart-wrapper">
+          <h3>Performance dell'Indice</h3>
+          <div id="performance-chart"></div>
         </div>
-        <div class="mt-12 text-slate-600 font-medium space-y-8 text-base leading-relaxed max-w-screen-lg mx-auto">
-          <div>
-            <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
-            <p>
-              L'indice Conio Market Cap seleziona dinamicamente le principali criptovalute per capitalizzazione di mercato da un universo predefinito di asset. Il portafoglio viene ribilanciato trimestralmente per adeguarsi alle fluttuazioni del mercato: alla fine di ogni trimestre, l'intero paniere di asset viene rivalutato, vengono selezionate le nuove criptovalute principali e i pesi vengono ricalcolati in base alla loro capitalizzazione di mercato. Questo meccanismo assicura che l'indice rifletta sempre i leader di mercato.
-            </p>
-          </div>
-    
-          <div>
-            <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Spiegazione dei Grafici</h3>
-            <ul class="list-disc list-inside space-y-2">
-              <li><strong class="text-slate-800">Market Cap Index Performance:</strong> Mostra l'andamento del valore del portafoglio nel tempo, partendo da un capitale iniziale e confrontandolo con il benchmark (BTC-USD). Le linee verticali indicano le date in cui è avvenuto il ribilanciamento trimestrale.</li>
-              <li><strong class="text-slate-800">Portfolio Composition:</strong> Illustra l'evoluzione della composizione del portafoglio. Ogni area colorata rappresenta la percentuale di capitale allocata a una specifica criptovaluta, mostrando come i pesi cambiano dopo ogni ribilanciamento.</li>
-            </ul>
-          </div>
-    
-          <div>
-            <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Universo di Asset</h3>
-            <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
-              <span>Bitcoin</span><span>Ethereum</span><span>XRP</span><span>Solana</span><span>Dogecoin</span><span>Cardano</span><span>Chainlink</span><span>Avalanche</span><span>Polkadot</span><span>Uniswap</span><span>Sky</span><span>Near</span><span>Cosmos</span><span>Polygon</span><span>Algorand</span><span>Aptos</span><span>Arbitrum</span><span>Stacks</span><span>Injective</span><span>Celestia</span><span>The Graph</span><span>Optimism</span><span>Sui</span><span>Stellar Lumens</span><span>XPL</span><span>Ondo</span><span>Hedera</span><span>Filecoin</span><span>Aave</span><span>Midnight</span><span>Ethereum Classic</span><span>Litecoin</span>
-            </div>
-          </div>
+        <div class="chart-wrapper">
+          <h3>Composizione</h3>
+          <div id="composition-chart"></div>
         </div>
       </div>
-      <div id="composition" class="tab-content">
-        <div class="chart-card w-full lg:w-5/6 mx-auto">
-          <div class="chart-container">
-            <div class="chart-wrapper" id="composition-chart"></div>
-          </div>
+      
+<div class="strategy-description">
+    <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
+    <p class="mb-6 text-sm leading-relaxed">
+      Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato per tracciare le 5 criptovalute a maggiore capitalizzazione all'interno del nostro universo di asset idonei. All'interno dell'indice, ogni criptovaluta è pesata in modo proporzionale alla propria capitalizzazione di mercato, offrendo un'esposizione che riflette fedelmente le reali gerarchie del settore. Per garantire che l'indice rimanga sempre rappresentativo, il portafoglio subisce un ribilanciamento automatico ogni sei mesi, durante il quale vengono ricalcolati i pesi e aggiornati gli asset in base all'attuale top 5. Infine, per rendere l'analisi delle performance più intuitiva, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC). Quest'ultimo viene inoltre utilizzato come benchmark di riferimento nei grafici, permettendo di confrontare visivamente e in modo immediato l'andamento della strategia rispetto al leader di mercato.
+    </p>
+  </div>
+
+      <div class="mt-8 mb-16">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Universo degli Asset</h3>
+        <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+          <span>Bitcoin</span><span>Ethereum</span><span>XRP</span><span>Solana</span><span>Dogecoin</span><span>Cardano</span><span>Chainlink</span><span>Avalanche</span><span>Polkadot</span><span>Uniswap</span><span>Sky</span><span>Near</span><span>Cosmos</span><span>Polygon</span><span>Algorand</span><span>Aptos</span><span>Arbitrum</span><span>Stacks</span><span>Injective</span><span>Celestia</span><span>The Graph</span><span>Optimism</span><span>Sui</span><span>Stellar Lumens</span><span>XPL</span><span>Ondo</span><span>Hedera</span><span>Filecoin</span><span>Aave</span><span>Midnight</span><span>Ethereum Classic</span><span>Litecoin</span>
         </div>
       </div>
-      <div id="techMarketCap" class="tab-content">
-        <div class="grid lg:grid-cols-2 gap-10">
-          <div class="chart-card">
-            <div class="chart-container">
-              <div class="chart-wrapper" id="tech-performance-chart"></div>
-            </div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-container">
-              <div class="chart-wrapper" id="tech-weights-chart"></div>
-            </div>
-          </div>
+    </div>
+
+    <div id="techMarketCap" class="tab-content">
+      <div class="charts-row">
+        <div class="chart-wrapper">
+          <h3>Performance dell'Indice</h3>
+          <div id="tech-performance-chart"></div>
+        </div>
+        <div class="chart-wrapper">
+          <h3>Composizione</h3>
+          <div id="tech-weights-chart"></div>
+        </div>
+      </div>
+      
+<div class="strategy-description">
+    <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Tech</h3>
+    <p class="mb-6 text-sm leading-relaxed">
+      Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset che supportano infrastrutture e soluzioni tecnologiche avanzate. Per essere incluso nell'indice, ogni progetto deve soddisfare un criterio di capitalizzazione di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati proprio in base alla loro capitalizzazione, offrendo un'esposizione proporzionale al loro peso reale nel mercato. Per mantenere la strategia aggiornata e in linea con le soglie richieste, l'indice prevede un ribilanciamento automatico ogni sei mesi, durante il quale i pesi vengono ricalcolati e i componenti rivisti. Come per la strategia principale, il valore di partenza dell'indice è stato equiparato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare le performance di questo comparto tecnologico rispetto al leader generale del mercato.
+    </p>
+  </div>
+
+      <div class="mt-8 mb-16">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Tech Asset</h3>
+        <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+          <span>Ethereum</span><span>Solana</span><span>Cardano</span><span>Avalanche</span><span>Polkadot</span><span>Near</span><span>Cosmos</span><span>Algorand</span><span>Aptos</span><span>Celestia</span><span>Sui</span><span>Hedera</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="extraStrategy1" class="tab-content">
+      <div class="charts-row">
+        <div class="chart-wrapper">
+          <h3>Performance dell'Indice</h3>
+          <div id="extra1-performance-chart"></div>
+        </div>
+        <div class="chart-wrapper">
+          <h3>Composizione</h3>
+          <div id="extra1-composition-chart"></div>
+        </div>
+      </div>
+      
+<div class="strategy-description">
+    <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
+    <p class="mb-6 text-sm leading-relaxed">
+      Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategia prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategie, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
+    </p>
+  </div>
+
+      <div class="mt-8 mb-16">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Defi</h3>
+        <p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+          <span>Chainlink</span><span>Uniswap</span><span>Sky</span><span>Injective</span><span>Ondo</span><span>Aave</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="extraStrategy2" class="tab-content">
+      <div class="charts-row">
+        <div class="chart-wrapper">
+          <h3>Performance dell'Indice</h3>
+          <div id="extra2-performance-chart"></div>
+        </div>
+        <div class="chart-wrapper">
+          <h3>Composizione</h3>
+          <div id="extra2-weights-chart"></div>
+        </div>
+      </div>
+      
+<div class="strategy-description">
+    <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Payments</h3>
+    <p class="mb-6 text-sm leading-relaxed">
+      Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset progettate per innovare e migliorare l'efficienza dei sistemi di pagamento. Per garantire solidità e rilevanza, l'inclusione nell'indice è subordinata al superamento di una rigorosa soglia d'ingresso: ogni progetto deve raggiungere una capitalizzazione di mercato di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati in base alla loro capitalizzazione, offrendo così un'esposizione proporzionale alla loro effettiva adozione e grandezza nel settore. Per mantenere la composizione sempre aggiornata e fedele alle evoluzioni del mercato, la strategia prevede un ribilanciamento automatico con cadenza semestrale, momento in cui i pesi vengono ricalcolati e i componenti verificati. Infine, per rendere l'analisi delle performance il più intuitiva possibile, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare l'andamento del comparto pagamenti con il leader indiscusso del mercato.
+    </p>
+  </div>
+
+      <div class="mt-8 mb-16">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Payments</h3>
+        <p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+          <span>Bitcoin</span><span>XRP</span><span>Stellar</span><span>Plasma</span>
         </div>
       </div>
     </div>
@@ -157,14 +242,14 @@
 
     <div class="grid lg:grid-cols-2 gap-10">
       <div class="chart-card">
-        <div class="chart-container p-0 overflow-hidden rounded-3xl">
+        <div class="chart-container p-0 overflow-hidden rounded-3xl" style="min-height: 410px;">
           <div class="chart-wrapper">
             <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
           </div>
         </div>
       </div>
       <div class="chart-card">
-        <div class="chart-container p-0 overflow-hidden rounded-3xl">
+        <div class="chart-container p-0 overflow-hidden rounded-3xl" style="min-height: 410px;">
           <div class="chart-wrapper">
             <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=1143695036&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
           </div>
@@ -178,158 +263,217 @@
 </div>
 
 <script>
-  (function() {
-    // ----- DOM Elements -----
-    const performanceChartEl = document.getElementById('performance-chart');
-    const compositionChartEl = document.getElementById('composition-chart');
-    const techPerformanceChartEl = document.getElementById('tech-performance-chart');
-    const techWeightsChartEl = document.getElementById('tech-weights-chart');
+(function() {
+  // ----- DOM Elements -----
+  const performanceChartEl = document.getElementById('performance-chart');
+  const compositionChartEl = document.getElementById('composition-chart');
+  
+  const techPerformanceChartEl = document.getElementById('tech-performance-chart');
+  const techWeightsChartEl = document.getElementById('tech-weights-chart');
+  
+  const extra1PerfChartEl = document.getElementById('extra1-performance-chart');
+  const extra1CompChartEl = document.getElementById('extra1-composition-chart');
+  
+  const extra2PerfChartEl = document.getElementById('extra2-performance-chart');
+  const extra2WeightsChartEl = document.getElementById('extra2-weights-chart');
 
-    // ----- Load Strategy Charts from JSON -----
-    async function loadStrategyCharts() {
-      try {
-        const perfResponse = await fetch('./code/strategy_performance.json');
-        if (perfResponse.ok) {
-          const perfData = await perfResponse.json();
-          if (performanceChartEl && perfData.data && perfData.layout) {
-            perfData.data[0].hovertemplate = 'Indice: %{y:$,.0f}<extra></extra>';
-            if (perfData.data.length > 1) {
-              perfData.data[1].hovertemplate = 'Benchmark: %{y:$,.0f}<extra></extra>';
-            }
-            perfData.layout.yaxis = perfData.layout.yaxis || {};
-            perfData.layout.yaxis.tickformat = '$,.0f';
-
-            const layoutWithMargins = {
-              ...perfData.layout,
-              margin: { l: 60, r: 40, t: 50, b: 40 },
-              plot_bgcolor: "transparent",
-              paper_bgcolor: "transparent",
-              font: { color: '#475569' },
-              hoverlabel: {
-                bgcolor: "#ffffff",
-                bordercolor: "#e2e8f0",
-                font: { size: 12, color: "#0f172a" }
-              }
-            };
-            Plotly.newPlot(performanceChartEl, perfData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
-          }
-        }
-      } catch (e) { console.error('Performance chart error:', e.message); }
-
-      try {
-        const compResponse = await fetch('./code/strategy_composition.json');
-        if (compResponse.ok) {
-          const compData = await compResponse.json();
-          if (compositionChartEl && compData.data && compData.layout) {
-            const layoutWithMargins = {
-              ...compData.layout,
-              margin: { l: 60, r: 40, t: 50, b: 40 },
-              plot_bgcolor: "transparent",
-              paper_bgcolor: "transparent",
-              font: { color: '#475569' },
-              hoverlabel: {
-                bgcolor: "#ffffff",
-                bordercolor: "#e2e8f0",
-                font: { size: 12, color: "#0f172a" }
-              }
-            };
-            compData.data.forEach(trace => {
-              if (trace.name) {
-                trace.hovertemplate = `<b>%{fullData.name}</b>: %{y:.0%}<extra></extra>`;
-              }
-            });
-            Plotly.newPlot(compositionChartEl, compData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
-
-            const wheelHandler = (event) => {
-              const hovertexts = document.querySelectorAll('.hovertext');
-              const hovertext = Array.from(hovertexts).find(ht => ht.clientHeight > 0);
-              if (hovertext && hovertext.scrollHeight > hovertext.clientHeight) {
-                event.preventDefault();
-                hovertext.scrollTop += event.deltaY;
-              }
-            };
-            compositionChartEl.on('plotly_hover', () => compositionChartEl.addEventListener('wheel', wheelHandler, { passive: false }));
-            compositionChartEl.on('plotly_unhover', () => compositionChartEl.removeEventListener('wheel', wheelHandler));
-          }
-        }
-      } catch (e) { console.error('Composition chart error:', e.message); }
-
-      try {
-        const techPerfResponse = await fetch('./charts/tech_MarketCap_TH/performance.json');
-        if (techPerfResponse.ok) {
-          const techPerfData = await techPerfResponse.json();
-          if (techPerformanceChartEl && techPerfData.data && techPerfData.layout) {
-            const layoutWithMargins = {
-              ...techPerfData.layout,
-              margin: { l: 60, r: 40, t: 50, b: 40 },
-              plot_bgcolor: "transparent",
-              paper_bgcolor: "transparent",
-              font: { color: '#475569' },
-              hoverlabel: {
-                bgcolor: "#ffffff",
-                bordercolor: "#e2e8f0",
-                font: { size: 12, color: "#0f172a" }
-              }
-            };
-            Plotly.newPlot(techPerformanceChartEl, techPerfData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
-          }
-        }
-      } catch (e) { console.error('Tech performance chart error:', e.message); }
-
-      try {
-        const techWeightsResponse = await fetch('./charts/tech_MarketCap_TH/weights.json');
-        if (techWeightsResponse.ok) {
-          const techWeightsData = await techWeightsResponse.json();
-          if (techWeightsChartEl && techWeightsData.data && techWeightsData.layout) {
-            const layoutWithMargins = {
-              ...techWeightsData.layout,
-              margin: { l: 60, r: 40, t: 50, b: 40 },
-              plot_bgcolor: "transparent",
-              paper_bgcolor: "transparent",
-              font: { color: '#475569' },
-              hoverlabel: {
-                bgcolor: "#ffffff",
-                bordercolor: "#e2e8f0",
-                font: { size: 12, color: "#0f172a" }
-              }
-            };
-            Plotly.newPlot(techWeightsChartEl, techWeightsData.data, layoutWithMargins, { responsive: true, displayModeBar: true });
-          }
-        }
-      } catch (e) { console.error('Tech weights chart error:', e.message); }
+  // ----- Utility: Decodifica robusta per bdata -----
+  function decodePlotlyBdata(traceData) {
+    if (!traceData || typeof traceData !== 'object' || !traceData.bdata) return traceData;
+    try {
+      const b64 = traceData.bdata.replace(/[^A-Za-z0-9+/=]/g, "");
+      const binaryString = window.atob(b64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+      const dataView = new DataView(bytes.buffer);
+      const arr = [];
+      const isLittleEndian = true;
+      if (traceData.dtype === 'f8' || traceData.dtype === '<f8') {
+        const maxLen = len - (len % 8); 
+        for (let i = 0; i < maxLen; i += 8) arr.push(dataView.getFloat64(i, isLittleEndian));
+      } else if (traceData.dtype === 'f4' || traceData.dtype === '<f4') {
+        const maxLen = len - (len % 4);
+        for (let i = 0; i < maxLen; i += 4) arr.push(dataView.getFloat32(i, isLittleEndian));
+      } else if (traceData.dtype === 'i4' || traceData.dtype === '<i4') {
+        const maxLen = len - (len % 4);
+        for (let i = 0; i < maxLen; i += 4) arr.push(dataView.getInt32(i, isLittleEndian));
+      } else {
+        return traceData; 
+      }
+      return arr;
+    } catch (e) {
+      console.error("Avviso: Impossibile decodificare i dati bdata.", e);
+      return traceData; 
     }
+  }
 
-    loadStrategyCharts();
-
-
-
-    // ----- Tab Switching Functionality -----
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const tabName = this.getAttribute('data-tab');
-        
-        // Remove active class from all buttons and contents
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        
-        // Add active class to clicked button and corresponding content
-        this.classList.add('active');
-        const tabContent = document.getElementById(tabName);
-        if (tabContent) {
-          tabContent.classList.add('active');
-          // Trigger Plotly resize to ensure chart renders properly
-          setTimeout(() => {
-            if (tabName === 'performance' && performanceChartEl) Plotly.Plots.resize(performanceChartEl);
-            if (tabName === 'composition' && compositionChartEl) Plotly.Plots.resize(compositionChartEl);
-            if (tabName === 'techMarketCap') {
-                if (techPerformanceChartEl) Plotly.Plots.resize(techPerformanceChartEl);
-                if (techWeightsChartEl) Plotly.Plots.resize(techWeightsChartEl);
-            }
-          }, 0);
-        }
-      });
+  function processTraces(dataArray) {
+    if (!Array.isArray(dataArray)) return;
+    dataArray.forEach(trace => {
+      if (trace.x) trace.x = decodePlotlyBdata(trace.x);
+      if (trace.y) trace.y = decodePlotlyBdata(trace.y);
+      if (trace.customdata) trace.customdata = decodePlotlyBdata(trace.customdata);
     });
-  })();
+  }
+
+  // Helper per configurazione layout comune
+  function getLayoutWithMargins(layout) {
+    return {
+      ...layout,
+      margin: { l: 60, r: 40, t: 50, b: 40 },
+      plot_bgcolor: "transparent",
+      paper_bgcolor: "transparent",
+      font: { color: '#475569' },
+      hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, color: "#0f172a" } }
+    };
+  }
+
+  // ----- Load Strategy Charts from JSON -----
+  async function loadStrategyCharts() {
+    
+    // 1. Performance Chart (Market Cap Index)
+    try {
+      const perfResponse = await fetch('./charts/top5mktcap/performance.json');
+      if (perfResponse.ok) {
+        const perfData = await perfResponse.json();
+        if (performanceChartEl && perfData.data && perfData.layout) {
+          processTraces(perfData.data); 
+          if (perfData.data.length > 0 && perfData.data[0]) perfData.data[0].hovertemplate = 'Indice: %{y:$,.0f}<extra></extra>';
+          if (perfData.data.length > 1 && perfData.data[1]) perfData.data[1].hovertemplate = 'Benchmark: %{y:$,.0f}<extra></extra>';
+          if (!perfData.layout.yaxis) perfData.layout.yaxis = {};
+          perfData.layout.yaxis.tickformat = '$,.0f';
+
+          Plotly.newPlot(performanceChartEl, perfData.data, getLayoutWithMargins(perfData.layout), { responsive: true, displayModeBar: true });
+        }
+      }
+    } catch (e) { console.error('Performance chart error:', e); }
+
+    // 2. Composition Chart (Market Cap Index)
+    try {
+      const compResponse = await fetch('./charts/top5mktcap/weights.json');
+      if (compResponse.ok) {
+        const compData = await compResponse.json();
+        if (compositionChartEl && compData.data && compData.layout) {
+          processTraces(compData.data);
+          compData.data.forEach(trace => {
+            if (trace.name) trace.hovertemplate = `<b>%{fullData.name}</b>: %{y:.0%}<extra></extra>`;
+          });
+          Plotly.newPlot(compositionChartEl, compData.data, getLayoutWithMargins(compData.layout), { responsive: true, displayModeBar: true });
+        }
+      }
+    } catch (e) { console.error('Composition chart error:', e); }
+
+    // 3. Tech Performance Chart
+    try {
+      const techPerfResponse = await fetch('./charts/TechMktCap_TH/performance.json');
+      if (techPerfResponse.ok) {
+        const techPerfData = await techPerfResponse.json();
+        if (techPerformanceChartEl && techPerfData.data && techPerfData.layout) {
+          processTraces(techPerfData.data);
+          techPerfData.data.forEach(trace => {
+            if (trace.name && trace.name !== "Ribilanciamento") {
+               trace.hovertemplate = '<b>%{fullData.name}</b>: %{y:$,.0f}<extra></extra>';
+            }
+          });
+          Plotly.newPlot(techPerformanceChartEl, techPerfData.data, getLayoutWithMargins(techPerfData.layout), { responsive: true, displayModeBar: true });
+        }
+      }
+    } catch (e) { console.error('Tech performance chart error:', e); }
+
+    // 4. Tech Weights Chart
+    try {
+      const techWeightsResponse = await fetch('./charts/TechMktCap_TH/weights.json');
+      if (techWeightsResponse.ok) {
+        const techWeightsData = await techWeightsResponse.json();
+        if (techWeightsChartEl && techWeightsData.data && techWeightsData.layout) {
+          processTraces(techWeightsData.data);
+          Plotly.newPlot(techWeightsChartEl, techWeightsData.data, getLayoutWithMargins(techWeightsData.layout), { responsive: true, displayModeBar: true });
+        }
+      }
+    } catch (e) { console.error('Tech weights chart error:', e); }
+
+    // ==========================================
+    // EXTRA TABS: NUOVA STRATEGIA 1
+    // ==========================================
+    try {
+      // TODO: SOSTITUISCI QUESTI PERCORSI CON I TUOI FILE JSON PER LA STRATEGIA 1
+      const extra1PerfRes = await fetch('./charts/DefiMktCap_TH/performance.json'); 
+      const extra1CompRes = await fetch('./charts/DefiMktCap_TH/weights.json');
+      
+      if (extra1PerfRes.ok) {
+        const data = await extra1PerfRes.json();
+        processTraces(data.data);
+        if(extra1PerfChartEl) Plotly.newPlot(extra1PerfChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
+      }
+      if (extra1CompRes.ok) {
+        const data = await extra1CompRes.json();
+        processTraces(data.data);
+        if(extra1CompChartEl) Plotly.newPlot(extra1CompChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
+      }
+    } catch (e) { console.error('Extra 1 chart error:', e); }
+
+    // ==========================================
+    // EXTRA TABS: NUOVA STRATEGIA 2
+    // ==========================================
+    try {
+      // TODO: SOSTITUISCI QUESTI PERCORSI CON I TUOI FILE JSON PER LA STRATEGIA 2
+      const extra2PerfRes = await fetch('./charts/PagamentiMktCap_TH/performance.json');
+      const extra2WeightsRes = await fetch('./charts/PagamentiMktCap_TH/weights.json');
+
+      if (extra2PerfRes.ok) {
+        const data = await extra2PerfRes.json();
+        processTraces(data.data);
+        if(extra2PerfChartEl) Plotly.newPlot(extra2PerfChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
+      }
+      if (extra2WeightsRes.ok) {
+        const data = await extra2WeightsRes.json();
+        processTraces(data.data);
+        if(extra2WeightsChartEl) Plotly.newPlot(extra2WeightsChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
+      }
+    } catch (e) { console.error('Extra 2 chart error:', e); }
+
+  }
+
+  // Eseguiamo il caricamento iniziale dei grafici
+  loadStrategyCharts();
+
+  // ----- Tab Switching Functionality -----
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tabName = this.getAttribute('data-tab');
+      
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      this.classList.add('active');
+      const tabContent = document.getElementById(tabName);
+      if (tabContent) {
+        tabContent.classList.add('active');
+        
+        // Trigger resize per assicurare che i grafici si adattino al div reso visibile
+        setTimeout(() => {
+          if (tabName === 'mainStrategy') {
+              if (performanceChartEl) Plotly.Plots.resize(performanceChartEl);
+              if (compositionChartEl) Plotly.Plots.resize(compositionChartEl);
+          }
+          if (tabName === 'techMarketCap') {
+              if (techPerformanceChartEl) Plotly.Plots.resize(techPerformanceChartEl);
+              if (techWeightsChartEl) Plotly.Plots.resize(techWeightsChartEl);
+          }
+          if (tabName === 'extraStrategy1') {
+              if (extra1PerfChartEl) Plotly.Plots.resize(extra1PerfChartEl);
+              if (extra1CompChartEl) Plotly.Plots.resize(extra1CompChartEl);
+          }
+          if (tabName === 'extraStrategy2') {
+              if (extra2PerfChartEl) Plotly.Plots.resize(extra2PerfChartEl);
+              if (extra2WeightsChartEl) Plotly.Plots.resize(extra2WeightsChartEl);
+          }
+        }, 50); // Piccolo delay aggiunto per permettere al CSS di applicare 'display: grid'
+      }
+    });
+  });
+})();
 </script>
 </body>
 </html>
