@@ -116,15 +116,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
           <div>
             <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="main-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
           <div>
             <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="main-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
           <div>
             <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="main-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
         </div>
       </div>
@@ -165,15 +165,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
           <div>
             <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="tech-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
           <div>
             <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="tech-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
           <div>
             <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="tech-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
         </div>
       </div>
@@ -214,15 +214,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
           <div>
             <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="extra1-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
           <div>
             <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="extra1-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
           <div>
             <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="extra1-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
         </div>
       </div>
@@ -263,15 +263,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
           <div>
             <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="extra2-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
           <div>
             <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="extra2-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
           <div>
             <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+            <p id="extra2-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
           </div>
         </div>
       </div>
@@ -405,6 +405,60 @@
     };
   }
 
+  // ----- Load Metrics from JSON -----
+  async function loadMetrics() {
+    // Helper to update metric elements
+    function updateMetric(id, value, prefix = '', suffix = '', color = true) {
+      const el = document.getElementById(id);
+      if (el) {
+        if (typeof value === 'number' && !isNaN(value)) {
+          let valueStr = value.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+          el.textContent = `${prefix}${valueStr}${suffix}`;
+          if (color) {
+            if (value > 0) {
+              el.classList.remove('text-red-500', 'text-slate-800');
+              el.classList.add('text-green-500');
+              el.textContent = `+${el.textContent}`;
+            } else if (value < 0) {
+              el.classList.remove('text-green-500', 'text-slate-800');
+              el.classList.add('text-red-500');
+            } else {
+              el.classList.remove('text-green-500', 'text-red-500');
+              el.classList.add('text-slate-800');
+            }
+          }
+        } else {
+          el.textContent = '--';
+          el.classList.remove('text-green-500', 'text-red-500');
+          el.classList.add('text-slate-800');
+        }
+      }
+    }
+
+    // Fetch and update for each strategy
+    async function fetchAndUpdate(strategy, path) {
+      try {
+        const response = await fetch(path);
+        if (response.ok) {
+          const metrics = await response.json();
+          // Usa le chiavi corrette dai file metrics.json e converte le percentuali
+          updateMetric(`${strategy}-current-value`, metrics.ultimo_valore_indice, '$', '', false);
+          updateMetric(`${strategy}-change-24h`, metrics.variazione_24h_pct * 100, '', '%');
+          updateMetric(`${strategy}-change-ytd`, metrics.variazione_ytd_pct * 100, '', '%');
+        } else {
+            console.error(`Could not fetch ${path}. Status: ${response.status}`);
+        }
+      } catch (e) {
+        console.error(`Error loading metrics for ${strategy}:`, e);
+      }
+    }
+
+    fetchAndUpdate('main', './charts/top5mktcap/metrics.json');
+    fetchAndUpdate('tech', './charts/TechMktCap_TH/metrics.json');
+    fetchAndUpdate('extra1', './charts/DefiMktCap_TH/metrics.json');
+    fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json');
+  }
+
   // ----- Load Strategy Charts from JSON -----
   async function loadStrategyCharts() {
     
@@ -513,6 +567,7 @@
 
   // Eseguiamo il caricamento iniziale dei grafici
   loadStrategyCharts();
+  loadMetrics();
 
   // ----- Tab Switching Functionality -----
   document.querySelectorAll('.tab-btn').forEach(btn => {
