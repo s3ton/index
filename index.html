@@ -57,28 +57,20 @@
     .tab-content { display: none; }
     .tab-content.active { display: grid; }
 
-    /* Layout per affiancare i grafici */
-    .charts-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
     .chart-wrapper {
-      flex: 1 1 48%; /* Occupa quasi metà schermo su PC */
       min-width: 300px; /* Su schermi piccoli, va a capo automaticamente */
       background: #ffffff;
       border-radius: 8px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       padding: 15px;
+      width: 100%;
     }
 
     /* Stile per il riquadro della descrizione */
     .strategy-description {
       background-color: #f8fafc;
       border-radius: 6px;
-      margin-top: 20px;
+      padding: 1.5rem; /* 24px */
       color: #334155;
     }
 
@@ -119,25 +111,46 @@
     </div>
 
     <div id="mainStrategy" class="tab-content active">
-      <div class="charts-row">
-        <div class="chart-wrapper">
-          <h3>Performance dell'Indice</h3>
-          <div id="performance-chart"></div>
-        </div>
-        <div class="chart-wrapper">
-          <h3>Composizione</h3>
-          <div id="composition-chart"></div>
+      <div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+          <div>
+            <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
         </div>
       </div>
-      
-<div class="strategy-description">
-    <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
-    <p class="mb-6 text-sm leading-relaxed">
-      Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato per tracciare le 5 criptovalute a maggiore capitalizzazione all'interno del nostro universo di asset idonei. All'interno dell'indice, ogni criptovaluta è pesata in modo proporzionale alla propria capitalizzazione di mercato, offrendo un'esposizione che riflette fedelmente le reali gerarchie del settore. Per garantire che l'indice rimanga sempre rappresentativo, il portafoglio subisce un ribilanciamento automatico ogni sei mesi, durante il quale vengono ricalcolati i pesi e aggiornati gli asset in base all'attuale top 5. Infine, per rendere l'analisi delle performance più intuitiva, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC). Quest'ultimo viene inoltre utilizzato come benchmark di riferimento nei grafici, permettendo di confrontare visivamente e in modo immediato l'andamento della strategia rispetto al leader di mercato.
-    </p>
-  </div>
 
-      <div class="mt-8 mb-16">
+      <!-- A: Performance Chart -->
+      <div class="chart-wrapper mb-8">
+        <h3 class="font-bold mb-4">Performance dell'Indice</h3>
+        <div id="performance-chart"></div>
+      </div>
+
+      <!-- C: Strategy Description -->
+      <div class="strategy-description mb-8">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
+        <p class="text-sm leading-relaxed">
+          Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato per tracciare le 5 criptovalute a maggiore capitalizzazione all'interno del nostro universo di asset idonei. All'interno dell'indice, ogni criptovaluta è pesata in modo proporzionale alla propria capitalizzazione di mercato, offrendo un'esposizione che riflette fedelmente le reali gerarchie del settore. Per garantire che l'indice rimanga sempre rappresentativo, il portafoglio subisce un ribilanciamento automatico ogni sei mesi, durante il quale vengono ricalcolati i pesi e aggiornati gli asset in base all'attuale top 5. Infine, per rendere l'analisi delle performance più intuitiva, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC). Quest'ultimo viene inoltre utilizzato come benchmark di riferimento nei grafici, permettendo di confrontare visivamente e in modo immediato l'andamento della strategia rispetto al leader di mercato.
+        </p>
+      </div>
+
+      <!-- B: Composition Chart -->
+      <div class="chart-wrapper mb-8">
+        <h3 class="font-bold mb-4">Composizione</h3>
+        <div id="composition-chart"></div>
+      </div>
+
+      <!-- D: Asset Universe -->
+      <div class="mb-16">
         <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Universo degli Asset</h3>
         <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
@@ -147,25 +160,46 @@
     </div>
 
     <div id="techMarketCap" class="tab-content">
-      <div class="charts-row">
-        <div class="chart-wrapper">
-          <h3>Performance dell'Indice</h3>
-          <div id="tech-performance-chart"></div>
-        </div>
-        <div class="chart-wrapper">
-          <h3>Composizione</h3>
-          <div id="tech-weights-chart"></div>
+      <div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+          <div>
+            <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
         </div>
       </div>
-      
-<div class="strategy-description">
-    <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Tech</h3>
-    <p class="mb-6 text-sm leading-relaxed">
-      Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset che supportano infrastrutture e soluzioni tecnologiche avanzate. Per essere incluso nell'indice, ogni progetto deve soddisfare un criterio di capitalizzazione di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati proprio in base alla loro capitalizzazione, offrendo un'esposizione proporzionale al loro peso reale nel mercato. Per mantenere la strategia aggiornata e in linea con le soglie richieste, l'indice prevede un ribilanciamento automatico ogni sei mesi, durante il quale i pesi vengono ricalcolati e i componenti rivisti. Il valore di partenza dell'indice è stato equiparato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare le performance di questo comparto tecnologico rispetto al leader generale del mercato.
-    </p>
-  </div>
 
-      <div class="mt-8 mb-16">
+      <!-- A: Performance Chart -->
+      <div class="chart-wrapper mb-8">
+        <h3 class="font-bold mb-4">Performance dell'Indice</h3>
+        <div id="tech-performance-chart"></div>
+      </div>
+
+      <!-- C: Strategy Description -->
+      <div class="strategy-description mb-12">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Tech</h3>
+        <p class="text-sm leading-relaxed">
+          Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset che supportano infrastrutture e soluzioni tecnologiche avanzate. Per essere incluso nell'indice, ogni progetto deve soddisfare un criterio di capitalizzazione di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati proprio in base alla loro capitalizzazione, offrendo un'esposizione proporzionale al loro peso reale nel mercato. Per mantenere la strategia aggiornata e in linea con le soglie richieste, l'indice prevede un ribilanciamento automatico ogni sei mesi, durante il quale i pesi vengono ricalcolati e i componenti rivisti. Il valore di partenza dell'indice è stato equiparato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare le performance di questo comparto tecnologico rispetto al leader generale del mercato.
+        </p>
+      </div>
+
+      <!-- B: Composition Chart -->
+      <div class="chart-wrapper mb-8">
+        <h3 class="font-bold mb-4">Composizione</h3>
+        <div id="tech-weights-chart"></div>
+      </div>
+
+      <!-- D: Asset Universe -->
+      <div class="mb-16">
         <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Tech Asset</h3>
         <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
@@ -175,25 +209,46 @@
     </div>
 
     <div id="extraStrategy1" class="tab-content">
-      <div class="charts-row">
-        <div class="chart-wrapper">
-          <h3>Performance dell'Indice</h3>
-          <div id="extra1-performance-chart"></div>
-        </div>
-        <div class="chart-wrapper">
-          <h3>Composizione</h3>
-          <div id="extra1-composition-chart"></div>
+      <div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+          <div>
+            <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
         </div>
       </div>
-      
-<div class="strategy-description">
-    <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
-    <p class="mb-6 text-sm leading-relaxed">
-      Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategia prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategie, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
-    </p>
-  </div>
 
-      <div class="mt-8 mb-16">
+      <!-- A: Performance Chart -->
+      <div class="chart-wrapper mb-8">
+        <h3 class="font-bold mb-4">Performance dell'Indice</h3>
+        <div id="extra1-performance-chart"></div>
+      </div>
+
+      <!-- C: Strategy Description -->
+      <div class="strategy-description mb-8">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
+        <p class="text-sm leading-relaxed">
+          Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategia prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategie, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
+        </p>
+      </div>
+
+      <!-- B: Composition Chart -->
+      <div class="chart-wrapper mb-8">
+        <h3 class="font-bold mb-4">Composizione</h3>
+        <div id="extra1-composition-chart"></div>
+      </div>
+
+      <!-- D: Asset Universe -->
+      <div class="mb-16">
         <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Defi</h3>
         <p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
@@ -203,25 +258,46 @@
     </div>
 
     <div id="extraStrategy2" class="tab-content">
-      <div class="charts-row">
-        <div class="chart-wrapper">
-          <h3>Performance dell'Indice</h3>
-          <div id="extra2-performance-chart"></div>
-        </div>
-        <div class="chart-wrapper">
-          <h3>Composizione</h3>
-          <div id="extra2-weights-chart"></div>
+      <div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+          <div>
+            <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
+            <p class="text-2xl font-bold text-slate-800 mt-1">--</p>
+          </div>
         </div>
       </div>
-      
-<div class="strategy-description">
-    <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Payments</h3>
-    <p class="mb-6 text-sm leading-relaxed">
-      Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset progettate per innovare e migliorare l'efficienza dei sistemi di pagamento. Per garantire solidità e rilevanza, l'inclusione nell'indice è subordinata al superamento di una rigorosa soglia d'ingresso: ogni progetto deve raggiungere una capitalizzazione di mercato di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati in base alla loro capitalizzazione, offrendo così un'esposizione proporzionale alla loro effettiva adozione e grandezza nel settore. Per mantenere la composizione sempre aggiornata e fedele alle evoluzioni del mercato, la strategia prevede un ribilanciamento automatico con cadenza semestrale, momento in cui i pesi vengono ricalcolati e i componenti verificati. Infine, per rendere l'analisi delle performance il più intuitiva possibile, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare l'andamento del comparto pagamenti con il leader indiscusso del mercato.
-    </p>
-  </div>
 
-      <div class="mt-8 mb-16">
+      <!-- A: Performance Chart -->
+      <div class="chart-wrapper mb-8">
+        <h3 class="font-bold mb-4">Performance dell'Indice</h3>
+        <div id="extra2-performance-chart"></div>
+      </div>
+
+      <!-- C: Strategy Description -->
+      <div class="strategy-description mb-8">
+        <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Payments</h3>
+        <p class="text-sm leading-relaxed">
+          Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset progettate per innovare e migliorare l'efficienza dei sistemi di pagamento. Per garantire solidità e rilevanza, l'inclusione nell'indice è subordinata al superamento di una rigorosa soglia d'ingresso: ogni progetto deve raggiungere una capitalizzazione di mercato di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati in base alla loro capitalizzazione, offrendo così un'esposizione proporzionale alla loro effettiva adozione e grandezza nel settore. Per mantenere la composizione sempre aggiornata e fedele alle evoluzioni del mercato, la strategia prevede un ribilanciamento automatico con cadenza semestrale, momento in cui i pesi vengono ricalcolati e i componenti verificati. Infine, per rendere l'analisi delle performance il più intuitiva possibile, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare l'andamento del comparto pagamenti con il leader indiscusso del mercato.
+        </p>
+      </div>
+
+      <!-- B: Composition Chart -->
+      <div class="chart-wrapper mb-8">
+        <h3 class="font-bold mb-4">Composizione</h3>
+        <div id="extra2-weights-chart"></div>
+      </div>
+
+      <!-- D: Asset Universe -->
+      <div class="mb-16">
         <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Payments</h3>
         <p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
@@ -233,7 +309,7 @@
   </div>
 
   <div class="mb-16">
-    <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+    <div class="flex items-center justify-between mb-8 flex-wrap gap-2">
       <div>
         <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Price History Analytics</h2>
         <p class="text-slate-500 mt-2 font-medium">Interactive long-term charts • Public Google Sheets data</p>
