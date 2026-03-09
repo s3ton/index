@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import os
-import json # <-- Aggiunto import
+import json 
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -26,7 +26,9 @@ class BaseCryptoStrategy(ABC):
         self.index_df = None
         self.benchmark_df = None  
         self.benchmark_ticker = 'BTC-USD' 
-        self.rebalance_dates = [] # <-- Nuovo attributo per tracciare le date di ribilanciamento
+        self.rebalance_dates = [] 
+        self.weights_df = None
+        self.mktcap_df = None # <-- Nuovo attributo per salvare la market cap calcolata
 
     # ------------------------------------------------------------------
     # Metodo per salvare le metriche aggiuntive
@@ -69,12 +71,22 @@ class BaseCryptoStrategy(ABC):
             last_row = self.weights_df.iloc[-1]
             last_weights = {str(ticker): float(weight) for ticker, weight in last_row.items() if weight > 0.0001}
 
+        # 6. Ultima Market Cap (Novità)
+        last_mktcap = {}
+        if hasattr(self, 'mktcap_df') and self.mktcap_df is not None and not self.mktcap_df.empty:
+            if last_date in self.mktcap_df.index:
+                row_mktcap = self.mktcap_df.loc[last_date]
+                for ticker in last_weights.keys():
+                    val = row_mktcap.get(ticker, 0.0)
+                    last_mktcap[str(ticker)] = float(val) if not pd.isna(val) else 0.0
+
         metrics = {
             "ultimo_valore_indice": float(last_val),
             "variazione_24h_pct": float(var_24h),
             "variazione_7g_pct": float(var_7d),
             "variazione_ytd_pct": float(var_ytd),
-            "ultima_allocazione_pesi": last_weights
+            "ultima_allocazione_pesi": last_weights,
+            "capitalizzazione_mercato": last_mktcap # <-- Aggiunto al JSON
         }
 
         os.makedirs(save_dir, exist_ok=True)
@@ -110,7 +122,6 @@ class BaseCryptoStrategy(ABC):
                         line=dict(color='#cc8306', width=2)
                     ))
             
-            # --- MODIFICA GRAFICA LINEA INIZIALE ---
             fig.add_hline(
                 y=self.portfolio_value,
                 line_dash="dash",
@@ -148,8 +159,8 @@ class BaseCryptoStrategy(ABC):
                 xaxis_title="Data",
                 yaxis=dict(
                     title="Valore del Portafoglio ($)",
-                    tickformat=",.0f",    # Formato asse Y (numero intero)
-                    hoverformat=",.0f"    # Formato tooltip hover (numero intero)
+                    tickformat=",.0f",    
+                    hoverformat=",.0f"    
                 ),
                 hovermode="x unified",
                 template="plotly_white",
@@ -483,6 +494,7 @@ class RebalancedMarketCapStrategy(BaseCryptoStrategy):
         self.index_df = pd.DataFrame({'Date': dates, 'Valore Indice': index_values})
         self.index_df.set_index('Date', inplace=True)
         self.weights_df = pd.DataFrame.from_dict(daily_weights_history, orient='index')
+        self.mktcap_df = df_mktcap # <-- Salvo il dataframe della Market Cap
         
         print(f"Backtest completato. Composizione FINALE del portafoglio al {dates[-1].strftime('%Y-%m-%d')}:")
         if last_top and last_weights and last_top_mktcap is not None:
@@ -680,6 +692,7 @@ class VolMktCapStrategy(BaseCryptoStrategy):
         self.index_df = pd.DataFrame({'Date': backtest_dates, 'Valore Indice': index_values})
         self.index_df.set_index('Date', inplace=True)
         self.weights_df = pd.DataFrame.from_dict(daily_weights_history, orient='index')
+        self.mktcap_df = df_mktcap # <-- Salvo il dataframe della Market Cap
         
         print("Backtest completato con successo su tutto il periodo storico disponibile.")
 
@@ -845,6 +858,7 @@ class MarketCapThresholdStrategy(BaseCryptoStrategy):
         self.index_df = pd.DataFrame({'Date': dates, 'Valore Indice': index_values})
         self.index_df.set_index('Date', inplace=True)
         self.weights_df = pd.DataFrame.from_dict(daily_weights_history, orient='index')
+        self.mktcap_df = df_mktcap # <-- Salvo il dataframe della Market Cap
 
         print(f"Backtest completato. Composizione finale al {dates[-1].strftime('%Y-%m-%d')}:" )
         if last_basket is not None and last_weights:
@@ -1005,6 +1019,7 @@ class EqualWeightThresholdStrategy(BaseCryptoStrategy):
         self.index_df = pd.DataFrame({'Date': dates, 'Valore Indice': index_values})
         self.index_df.set_index('Date', inplace=True)
         self.weights_df = pd.DataFrame.from_dict(daily_weights_history, orient='index')
+        self.mktcap_df = df_mktcap # <-- Salvo il dataframe della Market Cap
 
         print(f"Backtest completato. Composizione finale al {dates[-1].strftime('%Y-%m-%d')}:" )
         if last_basket is not None and last_weights:
