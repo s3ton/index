@@ -58,7 +58,7 @@
     .tab-content.active { display: grid; }
 
     .chart-wrapper {
-      min-width: 300px; /* Su schermi piccoli, va a capo automaticamente */
+      min-width: 300px;
       background: #ffffff;
       border-radius: 8px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -70,7 +70,7 @@
     .strategy-description {
       background-color: #f8fafc;
       border-radius: 6px;
-      padding: 1.5rem; /* 24px */
+      padding: 1.5rem; 
       color: #334155;
     }
 
@@ -328,6 +328,23 @@
 
 <script>
 (function() {
+  // ----- Variabile Globale per i nomi -----
+  let cryptoNamesMap = {};
+
+  // ----- Caricamento dizionario dei nomi -----
+  async function loadCryptoNames() {
+    try {
+      const response = await fetch('./charts/crypto_name.json');
+      if (response.ok) {
+        cryptoNamesMap = await response.json();
+      } else {
+        console.warn('Impossibile caricare il file crypto_name.json. Verranno usati i ticker come fallback.');
+      }
+    } catch (e) {
+      console.error('Errore nel caricamento dei nomi crypto:', e);
+    }
+  }
+
   // ----- DOM Elements -----
   const performanceChartEl = document.getElementById('performance-chart');
   const compositionChartEl = document.getElementById('composition-chart');
@@ -381,7 +398,6 @@
     });
   }
 
-  // Helper per configurazione layout comune
   function getLayoutWithMargins(layout) {
     return {
       ...layout,
@@ -393,7 +409,7 @@
     };
   }
 
-  // --- Utility per costruire la tabella delle allocazioni (ESTETICA MIGLIORATA) ---
+  // --- Utility per costruire la tabella delle allocazioni ---
   function buildAllocationTable(containerId, allocationObj, mcapObj = null) {
     const container = document.getElementById(containerId);
     if (!container || !allocationObj) return;
@@ -404,46 +420,44 @@
           <table class="min-w-full text-sm text-left">
             <thead class="bg-slate-50 border-b border-slate-200">
               <tr>
+                <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ticker</th>
                 <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Asset</th>
                 <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Market Cap</th>
                 <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Allocazione</th>
-                <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Visualizzazione</th>
+                <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider"></th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
     `;
 
-    // Ordina gli asset in modo decrescente in base al peso
     const sortedAssets = Object.entries(allocationObj).sort((a, b) => b[1] - a[1]);
 
     for (const [asset, weight] of sortedAssets) {
-      // Pulisce il nome del ticker (es. da "UNI7083-USD" a "UNI")
-      const cleanName = asset.split('-')[0].replace(/\d+$/, '');
+      // Estrae il Ticker "pulito"
+      const tickerName = asset.split('-')[0].replace(/\d+$/, '');
+      
+      // Cerca il nome completo nel JSON appena scaricato (o usa il ticker come fallback)
+      const fullName = cryptoNamesMap[asset] || tickerName;
+
       const weightPct = (weight * 100).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
       
-      // Gestione Market Cap (Se presente nel JSON usa quello, altrimenti usa un placeholder estetico)
       let mcapDisplay = "";
       if (mcapObj && mcapObj[asset]) {
-          // Supponendo che il dato JSON sia in dollari veri, lo trasformiamo in miliardi (Billion)
           mcapDisplay = '$ ' + (mcapObj[asset] / 1e9).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' B';
       } else {
-          // Placeholder visivo fittizio per vedere il layout
           const mockMcap = (Math.random() * 40 + 2).toFixed(2);
           mcapDisplay = `$ ${mockMcap} B`;
       }
 
-      // Calcola la larghezza della barra progresso (max 100%)
       const barWidth = Math.min((weight * 100), 100).toFixed(2) + '%';
 
       html += `
         <tr class="hover:bg-slate-50/80 transition-colors group">
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-[#0a1b39]">
-                ${cleanName.substring(0, 1)}
-              </div>
-              <span class="font-semibold text-[#0a1b39]">${cleanName}</span>
-            </div>
+          <td class="px-6 py-4 whitespace-nowrap font-bold text-slate-600">
+            ${tickerName}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap font-semibold text-[#0a1b39]">
+            ${fullName}
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-slate-600">
             ${mcapDisplay}
@@ -508,7 +522,6 @@
           updateMetric(`${strategy}-change-24h`, metrics.variazione_24h_pct * 100, '', '%');
           updateMetric(`${strategy}-change-ytd`, metrics.variazione_ytd_pct * 100, '', '%');
 
-          // Passa anche la market cap se esiste nel JSON, altrimenti passa undefined/null
           if (metrics.ultima_allocazione_pesi) {
             buildAllocationTable(allocationContainerId, metrics.ultima_allocazione_pesi, metrics.capitalizzazione_mercato);
           }
@@ -629,8 +642,18 @@
 
   }
 
-  loadStrategyCharts();
-  loadMetrics();
+  // ----- Funzione di inizializzazione principale -----
+  async function initDashboard() {
+    // 1. Aspettiamo di avere i nomi delle crypto
+    await loadCryptoNames();
+    
+    // 2. Carichiamo tutto il resto
+    loadStrategyCharts();
+    loadMetrics();
+  }
+
+  // Esecuzione
+  initDashboard();
 
   // ----- Tab Switching Functionality -----
   document.querySelectorAll('.tab-btn').forEach(btn => {
