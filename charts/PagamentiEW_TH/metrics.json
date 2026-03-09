@@ -1,11 +1,16 @@
 {
-    "ultimo_valore_indice": 81175.66685757917,
-    "variazione_24h_pct": -0.015841188714638577,
-    "variazione_7g_pct": 0.01517633962824294,
-    "variazione_ytd_pct": -0.2279983164470757,
+    "ultimo_valore_indice": 82329.5390668824,
+    "variazione_24h_pct": 0.01178108846920134,
+    "variazione_7g_pct": -0.02970518143780021,
+    "variazione_ytd_pct": -0.2506739911065339,
     "ultima_allocazione_pesi": {
-        "BTC-USD": 0.33899391436778775,
-        "XRP-USD": 0.3298872937093252,
-        "XLM-USD": 0.3311187919228871
+        "BTC-USD": 0.34117952707636096,
+        "XRP-USD": 0.33289570512246963,
+        "XLM-USD": 0.32592476780116936
+    },
+    "capitalizzazione_mercato": {
+        "BTC-USD": 1353175983792.9844,
+        "XRP-USD": 82541017155.78711,
+        "XLM-USD": 4917807984.914581
     }
 }
