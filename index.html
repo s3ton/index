@@ -15,7 +15,6 @@
     body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; }
     .title-font { font-family: 'Space Grotesk', sans-serif; }
     
-    /* Conio-style clean white cards with soft shadows */
     .chart-card { 
       background: #ffffff; 
       border-radius: 24px; 
@@ -37,7 +36,6 @@
     .hovertext::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
     .hovertext::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     
-    /* Tab Styling */
     .tab-container { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; overflow-x: auto;}
     .tab-btn { 
       padding: 1rem 1.5rem; 
@@ -66,7 +64,6 @@
       width: 100%;
     }
 
-    /* Stile per il riquadro della descrizione */
     .strategy-description {
       background-color: #f8fafc;
       border-radius: 6px;
@@ -338,6 +335,19 @@
         </div>
       </div>
     </div>
+
+    <div class="mb-10 mt-16">
+      <div class="flex items-center justify-between mb-8 flex-wrap gap-2">
+        <div>
+          <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Market Analytics</h2>
+          <p class="text-slate-500 mt-2 font-medium">Interactive long-term charts</p>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-10" id="market-analytics-charts-container">
+        </div>
+    </div>
+
   </div>
 
   <footer class="text-center text-slate-500 text-sm py-12 border-t border-gray-200 mt-12">
@@ -347,19 +357,15 @@
 
 <script>
 (function() {
-  // ----- Navigazione Sidebar -----
   const sidebar = document.getElementById('sidebar');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
 
-  // Toggle mobile menu
   mobileMenuBtn.addEventListener('click', () => {
     sidebar.classList.toggle('-translate-x-full');
   });
 
-  // Gestione click bottoni sidebar
   document.querySelectorAll('.sidebar-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-      // 1. Aggiorna stili bottoni
       document.querySelectorAll('.sidebar-btn').forEach(b => {
         b.classList.remove('text-[#0050ff]', 'bg-blue-50', 'active');
         b.classList.add('text-slate-600', 'hover:bg-slate-50');
@@ -367,7 +373,6 @@
       this.classList.remove('text-slate-600', 'hover:bg-slate-50');
       this.classList.add('text-[#0050ff]', 'bg-blue-50', 'active');
 
-      // 2. Mostra/nascondi le pagine
       const pageId = this.getAttribute('data-page');
       document.querySelectorAll('.page-content').forEach(page => {
         page.classList.add('hidden');
@@ -376,22 +381,18 @@
       document.getElementById(pageId).classList.remove('hidden');
       document.getElementById(pageId).classList.add('block');
 
-      // 3. Chiude la sidebar su mobile dopo aver cliccato
       if (window.innerWidth < 768) {
         sidebar.classList.add('-translate-x-full');
       }
 
-      // 4. Trigger resize event per Plotly se torniamo a "Settori"
       if(pageId === 'page-settori') {
          setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
       }
     });
   });
 
-  // ----- Variabile Globale per i nomi -----
   let cryptoNamesMap = {};
 
-  // ----- Caricamento dizionario dei nomi -----
   async function loadCryptoNames() {
     try {
       const response = await fetch('./charts/crypto_name.json');
@@ -405,20 +406,15 @@
     }
   }
 
-  // ----- DOM Elements -----
   const performanceChartEl = document.getElementById('performance-chart');
   const compositionChartEl = document.getElementById('composition-chart');
-  
   const techPerformanceChartEl = document.getElementById('tech-performance-chart');
   const techWeightsChartEl = document.getElementById('tech-weights-chart');
-  
   const extra1PerfChartEl = document.getElementById('extra1-performance-chart');
   const extra1CompChartEl = document.getElementById('extra1-composition-chart');
-  
   const extra2PerfChartEl = document.getElementById('extra2-performance-chart');
   const extra2WeightsChartEl = document.getElementById('extra2-weights-chart');
 
-  // ----- Utility: Decodifica robusta per bdata -----
   function decodePlotlyBdata(traceData) {
     if (!traceData || typeof traceData !== 'object' || !traceData.bdata) return traceData;
     try {
@@ -442,6 +438,20 @@
       } else {
         return traceData; 
       }
+
+      if (traceData.shape) {
+        const shape = traceData.shape.split(',').map(s => parseInt(s.trim(), 10));
+        if (shape.length === 2) {
+          const rows = shape[0];
+          const cols = shape[1];
+          const reshaped = [];
+          for (let r = 0; r < rows; r++) {
+            reshaped.push(arr.slice(r * cols, (r + 1) * cols));
+          }
+          return reshaped;
+        }
+      }
+
       return arr;
     } catch (e) {
       console.error("Avviso: Impossibile decodificare i dati bdata.", e);
@@ -454,6 +464,7 @@
     dataArray.forEach(trace => {
       if (trace.x) trace.x = decodePlotlyBdata(trace.x);
       if (trace.y) trace.y = decodePlotlyBdata(trace.y);
+      if (trace.z) trace.z = decodePlotlyBdata(trace.z);
       if (trace.customdata) trace.customdata = decodePlotlyBdata(trace.customdata);
     });
   }
@@ -461,7 +472,7 @@
   function getLayoutWithMargins(layout) {
     return {
       ...layout,
-      margin: { l: 60, r: 40, t: 50, b: 40 },
+      margin: { l: 60, r: 80, t: 50, b: 40 }, 
       plot_bgcolor: "transparent",
       paper_bgcolor: "transparent",
       font: { color: '#475569' },
@@ -469,7 +480,6 @@
     };
   }
 
-  // --- Utility per costruire la tabella delle allocazioni ---
   function buildAllocationTable(containerId, allocationObj, mcapObj = null) {
     const container = document.getElementById(containerId);
     if (!container || !allocationObj) return;
@@ -540,7 +550,6 @@
     container.innerHTML = html;
   }
 
-  // ----- Load Metrics from JSON -----
   async function loadMetrics() {
     function updateMetric(id, value, prefix = '', suffix = '', color = true) {
       const el = document.getElementById(id);
@@ -614,12 +623,8 @@
           if (metrics.ultima_allocazione_pesi) {
             buildAllocationTable(allocationContainerId, metrics.ultima_allocazione_pesi, metrics.capitalizzazione_mercato);
           }
-        } else {
-            console.error(`Could not fetch ${path}. Status: ${response.status}`);
         }
-      } catch (e) {
-        console.error(`Error loading metrics for ${strategy}:`, e);
-      }
+      } catch (e) { console.error(`Error loading metrics for ${strategy}:`, e); }
     }
 
     fetchAndUpdate('main', './charts/top5mktcap/metrics.json', 'main-allocation');
@@ -628,10 +633,7 @@
     fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-allocation');
   }
 
-  // ----- Load Strategy Charts from JSON -----
   async function loadStrategyCharts() {
-    
-    // 1. Performance Chart (Market Cap Index)
     try {
       const perfResponse = await fetch('./charts/top5mktcap/performance.json');
       if (perfResponse.ok) {
@@ -647,7 +649,6 @@
       }
     } catch (e) { console.error('Performance chart error:', e); }
 
-    // 2. Composition Chart (Market Cap Index)
     try {
       const compResponse = await fetch('./charts/top5mktcap/weights.json');
       if (compResponse.ok) {
@@ -662,7 +663,6 @@
       }
     } catch (e) { console.error('Composition chart error:', e); }
 
-    // 3. Tech Performance Chart
     try {
       const techPerfResponse = await fetch('./charts/TechMktCap_TH/performance.json');
       if (techPerfResponse.ok) {
@@ -679,7 +679,6 @@
       }
     } catch (e) { console.error('Tech performance chart error:', e); }
 
-    // 4. Tech Weights Chart
     try {
       const techWeightsResponse = await fetch('./charts/TechMktCap_TH/weights.json');
       if (techWeightsResponse.ok) {
@@ -691,9 +690,6 @@
       }
     } catch (e) { console.error('Tech weights chart error:', e); }
 
-    // ==========================================
-    // EXTRA TABS: NUOVA STRATEGIA 1
-    // ==========================================
     try {
       const extra1PerfRes = await fetch('./charts/DefiMktCap_TH/performance.json'); 
       const extra1CompRes = await fetch('./charts/DefiMktCap_TH/weights.json');
@@ -710,9 +706,6 @@
       }
     } catch (e) { console.error('Extra 1 chart error:', e); }
 
-    // ==========================================
-    // EXTRA TABS: NUOVA STRATEGIA 2
-    // ==========================================
     try {
       const extra2PerfRes = await fetch('./charts/PagamentiMktCap_TH/performance.json');
       const extra2WeightsRes = await fetch('./charts/PagamentiMktCap_TH/weights.json');
@@ -728,20 +721,100 @@
         if(extra2WeightsChartEl) Plotly.newPlot(extra2WeightsChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
       }
     } catch (e) { console.error('Extra 2 chart error:', e); }
-
   }
 
-  // ----- Funzione di inizializzazione principale -----
+  async function loadMarketAnalyticsCharts() {
+      const container = document.getElementById('market-analytics-charts-container');
+      if (!container) return;
+
+      const chartConfigs = [
+          { file: 'btc_dominance.json', title: 'BTC Dominance' },
+          { file: 'correlation_heatmap.json', title: 'Correlazione Asset' },
+          { file: 'market_volume.json', title: 'Volume del Mercato Crypto' },
+          { file: 'fear_and_greed.json', title: 'Fear & Greed Index' }
+      ];
+
+      for (let i = 0; i < chartConfigs.length; i++) {
+          const config = chartConfigs[i];
+          const chartId = `market-chart-${i}`;
+
+          const chartWrapper = document.createElement('div');
+          chartWrapper.className = 'chart-wrapper-box';
+          chartWrapper.innerHTML = `
+              <h3 class="font-bold mb-4">${config.title}</h3>
+              <div id="${chartId}" style="min-height: 400px;"></div>
+          `;
+          container.appendChild(chartWrapper);
+
+          try {
+              const response = await fetch(`./charts/market_analytics/${config.file}`);
+              if (response.ok) {
+                  const chartData = await response.json();
+                  const chartEl = document.getElementById(chartId);
+                  if (chartEl && chartData.data && chartData.layout) {
+                      processTraces(chartData.data);
+                      
+                      if (config.file === 'correlation_heatmap.json' && chartData.data[0]) {
+                        chartData.data[0].hovertemplate = 'X: %{x}<br>Y: %{y}<br>Correlazione: %{z:.4f}<extra></extra>';
+
+                        // ---- INIZIO LOGICA PER TROVARE I NAN E AGGIUNGERE LA X NERA ----
+                        let zData = chartData.data[0].z;
+                        let xData = chartData.data[0].x;
+                        let yData = chartData.data[0].y;
+                        
+                        let nanX = [];
+                        let nanY = [];
+                        
+                        if (zData && xData && yData) {
+                          for (let r = 0; r < yData.length; r++) {
+                            for (let c = 0; c < xData.length; c++) {
+                              let val = Array.isArray(zData[r]) ? zData[r][c] : zData[r * xData.length + c];
+                              // Se il valore è mancante o è Not-a-Number, registriamo le coordinate x e y
+                              if (val === null || val === undefined || Number.isNaN(val)) {
+                                nanX.push(xData[c]);
+                                nanY.push(yData[r]);
+                              }
+                            }
+                          }
+                        }
+                        
+                        // Se abbiamo trovato valori NaN, aggiungiamo una nuova "traccia scatter" per disegnarci sopra una "✖"
+                        if (nanX.length > 0) {
+                           chartData.data.push({
+                               type: 'scatter',
+                               mode: 'text',
+                               x: nanX,
+                               y: nanY,
+                               text: nanX.map(() => '✖'),
+                               textfont: { color: 'black', size: 12 },
+                               hoverinfo: 'skip',
+                               showlegend: false
+                           });
+                        }
+                        // ---- FINE LOGICA PER LA X ----
+                      }
+                      
+                      Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true });
+                  }
+              } else {
+                  document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Could not load chart.</p>`;
+              }
+          } catch (e) {
+              console.error(`Error loading market chart ${config.file}:`, e);
+              document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Error loading chart.</p>`;
+          }
+      }
+  }
+
   async function initDashboard() {
     await loadCryptoNames();
     loadStrategyCharts();
+    loadMarketAnalyticsCharts();
     loadMetrics();
   }
 
-  // Esecuzione
   initDashboard();
 
-  // ----- Tab Switching Functionality -----
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const tabName = this.getAttribute('data-tab');
