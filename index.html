@@ -95,7 +95,7 @@
 
 <div class="max-w-screen-2xl mx-auto px-6 py-12">
 
-  <div class="mb-20">
+  <div class="mb-10">
     <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
       <div>
         <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Conio Index</h2>
@@ -142,12 +142,12 @@
         <div id="main-allocation"></div>
       </div>
 
-      <div class="chart-wrapper mb-4">
+      <div class="chart-wrapper mb-16">
         <h3 class="font-bold mb-4">Composizione</h3>
         <div id="composition-chart"></div>
       </div>
-
-      <div class="mb-16">
+      <div class="mb-16"></div>
+      <div class="mb-6">
         <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Universo degli Asset</h3>
         <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
@@ -188,12 +188,12 @@
         <div id="tech-allocation"></div>
       </div>
 
-      <div class="chart-wrapper mb-8">
+      <div class="chart-wrapper mb-16">
         <h3 class="font-bold mb-4">Composizione</h3>
         <div id="tech-weights-chart"></div>
       </div>
-
-      <div class="mb-16">
+      <div class="mb-16"></div>
+      <div class="mb-6">
         <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Tech Asset</h3>
         <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
@@ -234,12 +234,12 @@
         <div id="extra1-allocation"></div>
       </div>
 
-      <div class="chart-wrapper mb-8">
+      <div class="chart-wrapper mb-16">
         <h3 class="font-bold mb-4">Composizione</h3>
         <div id="extra1-composition-chart"></div>
       </div>
-
-      <div class="mb-16">
+      <div class="mb-16"></div>
+      <div class="mb-6">
         <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Defi</h3>
         <p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
@@ -280,12 +280,12 @@
         <div id="extra2-allocation"></div>
       </div>
 
-      <div class="chart-wrapper mb-8">
+      <div class="chart-wrapper mb-16">
         <h3 class="font-bold mb-4">Composizione</h3>
         <div id="extra2-weights-chart"></div>
       </div>
-
-      <div class="mb-16">
+      <div class="mb-16"></div>
+      <div class="mb-6">
         <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Payments</h3>
         <p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
@@ -433,12 +433,8 @@
     const sortedAssets = Object.entries(allocationObj).sort((a, b) => b[1] - a[1]);
 
     for (const [asset, weight] of sortedAssets) {
-      // Estrae il Ticker "pulito"
       const tickerName = asset.split('-')[0].replace(/\d+$/, '');
-      
-      // Cerca il nome completo nel JSON appena scaricato (o usa il ticker come fallback)
       const fullName = cryptoNamesMap[asset] || tickerName;
-
       const weightPct = (weight * 100).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
       
       let mcapDisplay = "";
@@ -513,14 +509,52 @@
       }
     }
 
+    // NUOVA FUNZIONE PER LA VARIAZIONE NEL FORMATO: VALORE ASSOLUTO / PERCENTUALE
+    function updateVariationMetric(id, currentValue, pctChange) {
+      const el = document.getElementById(id);
+      if (!el || isNaN(currentValue) || isNaN(pctChange)) {
+        if (el) el.textContent = '--';
+        return;
+      }
+
+      // Calcola il valore precedente e la variazione assoluta
+      const prevValue = currentValue / (1 + pctChange);
+      const absChange = currentValue - prevValue;
+
+      // Formatta i valori rimuovendo il segno (che inseriremo manualmente)
+      const absStr = Math.abs(absChange).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      const pctStr = Math.abs(pctChange * 100).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+      let sign = '';
+      if (pctChange > 0) {
+        sign = '+';
+        el.classList.remove('text-red-500', 'text-slate-800');
+        el.classList.add('text-green-500');
+      } else if (pctChange < 0) {
+        sign = '-';
+        el.classList.remove('text-green-500', 'text-slate-800');
+        el.classList.add('text-red-500');
+      } else {
+        el.classList.remove('text-green-500', 'text-red-500');
+        el.classList.add('text-slate-800');
+      }
+
+      // Ricompone il testo finale con il formato richiesto
+      el.textContent = `${sign}${absStr} / ${sign}${pctStr}%`;
+    }
+
     async function fetchAndUpdate(strategy, path, allocationContainerId) {
       try {
         const response = await fetch(path);
         if (response.ok) {
           const metrics = await response.json();
-          updateMetric(`${strategy}-current-value`, metrics.ultimo_valore_indice, '$', '', false);
-          updateMetric(`${strategy}-change-24h`, metrics.variazione_24h_pct * 100, '', '%');
-          updateMetric(`${strategy}-change-ytd`, metrics.variazione_ytd_pct * 100, '', '%');
+          const currentVal = metrics.ultimo_valore_indice;
+          
+          updateMetric(`${strategy}-current-value`, currentVal, '$', '', false);
+          
+          // Uso la nuova funzione passando il currentVal per calcolare la variazione assoluta
+          updateVariationMetric(`${strategy}-change-24h`, currentVal, metrics.variazione_24h_pct);
+          updateVariationMetric(`${strategy}-change-ytd`, currentVal, metrics.variazione_ytd_pct);
 
           if (metrics.ultima_allocazione_pesi) {
             buildAllocationTable(allocationContainerId, metrics.ultima_allocazione_pesi, metrics.capitalizzazione_mercato);
