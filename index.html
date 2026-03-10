@@ -87,7 +87,6 @@
       
       <div class="flex items-center gap-3">
         <img src="https://media.licdn.com/dms/image/v2/D4D0BAQF68-WEFB0KLg/company-logo_200_200/company-logo_200_200/0/1697810707337/conio_logo?e=2147483647&v=beta&t=al0vx5YOQv08DXnuzKaUvTg4FmCbTU8JpmEjziVADHE" alt="Conio Logo" class="w-10 h-10 rounded-full shadow-md object-cover">
-        
         <span class="title-font text-2xl font-bold tracking-tight text-[#0a1b39]">Conio <span class="text-[#0050ff]">Analytics</span></span>
       </div>
     </div>
@@ -101,6 +100,9 @@
     </button>
     <button class="sidebar-btn w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-slate-600 hover:bg-slate-50" data-page="page-market">
       <i class="fa-solid fa-chart-line w-5 text-center"></i> Market Analytics
+    </button>
+    <button class="sidebar-btn w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-slate-600 hover:bg-slate-50" data-page="page-builder">
+      <i class="fa-solid fa-sliders w-5 text-center"></i> Strategy Builder
     </button>
   </div>
 </aside>
@@ -155,6 +157,43 @@
           <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
              <p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
           </div>
+        </div>
+
+        <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
+          <table class="w-full text-sm text-center whitespace-nowrap">
+            <thead>
+              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b]">
+                <th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2020</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2021</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2022</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2023</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2024</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2025</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-[#1e293b]">
+                <td class="py-3 px-4 text-left text-[#1e293b]">Rendimento totale (%) USD</td>
+                <td id="main-ret-2020" class="py-3 px-4">43,6</td>
+                <td id="main-ret-2021" class="py-3 px-4">29,7</td>
+                <td id="main-ret-2022" class="py-3 px-4">-32,5</td>
+                <td id="main-ret-2023" class="py-3 px-4">59,7</td>
+                <td id="main-ret-2024" class="py-3 px-4">26,0</td>
+                <td id="main-ret-2025" class="py-3 px-4">22,9</td>
+              </tr>
+              <tr class="border-b border-[#1e293b]">
+                <td class="py-3 px-4 text-left text-[#1e293b]">Benchmark (%) USD</td>
+                <td id="main-ben-2020" class="py-3 px-4">43,8</td>
+                <td id="main-ben-2021" class="py-3 px-4">29,8</td>
+                <td id="main-ben-2022" class="py-3 px-4">-32,4</td>
+                <td id="main-ben-2023" class="py-3 px-4">60,0</td>
+                <td id="main-ben-2024" class="py-3 px-4">26,2</td>
+                <td id="main-ben-2025" class="py-3 px-4">23,1</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div id="main-allocation"></div>
@@ -213,6 +252,43 @@
           </div>
         </div>
 
+        <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
+          <table class="w-full text-sm text-center whitespace-nowrap">
+            <thead>
+              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b]">
+                <th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2020</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2021</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2022</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2023</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2024</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2025</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-[#1e293b]">
+                <td class="py-3 px-4 text-left text-[#1e293b]">Rendimento totale (%) USD</td>
+                <td id="tech-ret-2020" class="py-3 px-4">85,4</td>
+                <td id="tech-ret-2021" class="py-3 px-4">142,1</td>
+                <td id="tech-ret-2022" class="py-3 px-4">-55,2</td>
+                <td id="tech-ret-2023" class="py-3 px-4">88,4</td>
+                <td id="tech-ret-2024" class="py-3 px-4">45,2</td>
+                <td id="tech-ret-2025" class="py-3 px-4">31,0</td>
+              </tr>
+              <tr class="border-b border-[#1e293b]">
+                <td class="py-3 px-4 text-left text-[#1e293b]">Benchmark (%) USD</td>
+                <td id="tech-ben-2020" class="py-3 px-4">43,8</td>
+                <td id="tech-ben-2021" class="py-3 px-4">29,8</td>
+                <td id="tech-ben-2022" class="py-3 px-4">-32,4</td>
+                <td id="tech-ben-2023" class="py-3 px-4">60,0</td>
+                <td id="tech-ben-2024" class="py-3 px-4">26,2</td>
+                <td id="tech-ben-2025" class="py-3 px-4">23,1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <div id="tech-allocation"></div>
         <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
            <p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
@@ -267,6 +343,43 @@
           <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
              <p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
           </div>
+        </div>
+
+        <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
+          <table class="w-full text-sm text-center whitespace-nowrap">
+            <thead>
+              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b]">
+                <th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2020</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2021</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2022</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2023</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2024</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2025</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-[#1e293b]">
+                <td class="py-3 px-4 text-left text-[#1e293b]">Rendimento totale (%) USD</td>
+                <td id="defi-ret-2020" class="py-3 px-4">120,5</td>
+                <td id="defi-ret-2021" class="py-3 px-4">205,0</td>
+                <td id="defi-ret-2022" class="py-3 px-4">-75,4</td>
+                <td id="defi-ret-2023" class="py-3 px-4">42,1</td>
+                <td id="defi-ret-2024" class="py-3 px-4">18,5</td>
+                <td id="defi-ret-2025" class="py-3 px-4">15,2</td>
+              </tr>
+              <tr class="border-b border-[#1e293b]">
+                <td class="py-3 px-4 text-left text-[#1e293b]">Benchmark (%) USD</td>
+                <td id="defi-ben-2020" class="py-3 px-4">43,8</td>
+                <td id="defi-ben-2021" class="py-3 px-4">29,8</td>
+                <td id="defi-ben-2022" class="py-3 px-4">-32,4</td>
+                <td id="defi-ben-2023" class="py-3 px-4">60,0</td>
+                <td id="defi-ben-2024" class="py-3 px-4">26,2</td>
+                <td id="defi-ben-2025" class="py-3 px-4">23,1</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div id="extra1-allocation"></div>
@@ -325,6 +438,43 @@
           </div>
         </div>
 
+        <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
+          <table class="w-full text-sm text-center whitespace-nowrap">
+            <thead>
+              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b]">
+                <th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2020</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2021</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2022</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2023</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2024</th>
+                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2025</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-[#1e293b]">
+                <td class="py-3 px-4 text-left text-[#1e293b]">Rendimento totale (%) USD</td>
+                <td id="pay-ret-2020" class="py-3 px-4">25,2</td>
+                <td id="pay-ret-2021" class="py-3 px-4">45,5</td>
+                <td id="pay-ret-2022" class="py-3 px-4">-22,1</td>
+                <td id="pay-ret-2023" class="py-3 px-4">35,0</td>
+                <td id="pay-ret-2024" class="py-3 px-4">12,4</td>
+                <td id="pay-ret-2025" class="py-3 px-4">18,5</td>
+              </tr>
+              <tr class="border-b border-[#1e293b]">
+                <td class="py-3 px-4 text-left text-[#1e293b]">Benchmark (%) USD</td>
+                <td id="pay-ben-2020" class="py-3 px-4">43,8</td>
+                <td id="pay-ben-2021" class="py-3 px-4">29,8</td>
+                <td id="pay-ben-2022" class="py-3 px-4">-32,4</td>
+                <td id="pay-ben-2023" class="py-3 px-4">60,0</td>
+                <td id="pay-ben-2024" class="py-3 px-4">26,2</td>
+                <td id="pay-ben-2025" class="py-3 px-4">23,1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <div id="extra2-allocation"></div>
         <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
            <p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
@@ -350,7 +500,6 @@
   </div>
 
   <div id="page-market" class="page-content hidden">
-
     <div class="mb-8">
       <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Statistiche di Mercato</h2>
       <p class="text-sm text-slate-600 mt-4 leading-relaxed">
@@ -388,7 +537,109 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <div id="page-builder" class="page-content hidden">
+    <div class="mb-8">
+      <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Strategy Builder</h2>
+      <p class="text-slate-500 mt-2 font-medium">Crea, backtesta e analizza il tuo portafoglio crypto personalizzato.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+      
+      <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit">
+        <h3 class="text-lg font-bold text-[#0a1b39] mb-4">Composizione Portafoglio</h3>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 mb-1">Seleziona Asset</label>
+          <div class="flex gap-2">
+            <select id="builder-asset-select" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+              <option value="Bitcoin">Bitcoin (BTC)</option>
+              <option value="Ethereum">Ethereum (ETH)</option>
+              <option value="Solana">Solana (SOL)</option>
+              <option value="XRP">XRP (XRP)</option>
+              <option value="Cardano">Cardano (ADA)</option>
+              <option value="Polkadot">Polkadot (DOT)</option>
+              <option value="Avalanche">Avalanche (AVAX)</option>
+              <option value="Chainlink">Chainlink (LINK)</option>
+              <option value="Dogecoin">Dogecoin (DOGE)</option>
+              <option value="Uniswap">Uniswap (UNI)</option>
+            </select>
+            <input type="number" id="builder-weight-input" placeholder="Peso %" min="1" max="100" class="block w-24 border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+            <button id="builder-add-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-3 rounded-lg transition-colors">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-lg p-3 min-h-[150px] border border-slate-100 mb-4">
+          <ul id="builder-portfolio-list" class="divide-y divide-slate-200 text-sm">
+            </ul>
+        </div>
+        
+        <div class="flex justify-between items-center mb-6 px-2">
+          <div>
+            <span class="font-medium text-slate-600">Totale allocato:</span>
+            <span id="builder-total-weight" class="font-bold text-lg text-slate-800 ml-1">0%</span>
+          </div>
+          <button id="builder-clear-btn" class="text-sm text-red-500 hover:text-red-700 font-medium transition-colors hidden">
+            <i class="fa-solid fa-trash-can mr-1"></i> Pulisci
+          </button>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-slate-700 mb-1">Timeframe Backtest</label>
+          <select id="builder-timeframe" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+            <option value="1M">Ultimo Mese</option>
+            <option value="6M">Ultimi 6 Mesi</option>
+            <option value="1Y" selected>Ultimo Anno</option>
+            <option value="YTD">Year to Date</option>
+          </select>
+        </div>
+
+        <button id="builder-run-btn" class="w-full bg-[#0050ff] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          Run Strategy
+        </button>
+        <p class="text-xs text-center text-slate-400 mt-3">Il totale dei pesi deve essere esattamente 100%.</p>
+      </div>
+
+      <div class="lg:col-span-2 flex flex-col gap-8">
+        
+        <div id="builder-results-placeholder" class="bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center h-full min-h-[400px]">
+          <div class="text-center text-slate-400">
+            <i class="fa-solid fa-chart-line text-4xl mb-3"></i>
+            <p>Seleziona i tuoi asset e clicca "Run Strategy" per visualizzare i risultati.</p>
+          </div>
+        </div>
+
+        <div id="builder-results-content" class="hidden flex-col gap-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <p class="text-xs font-medium text-slate-500 uppercase">Rendimento Totale</p>
+              <p id="b-stat-return" class="text-xl font-bold text-green-500 mt-1">--</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <p class="text-xs font-medium text-slate-500 uppercase">Volatilità (Ann.)</p>
+              <p id="b-stat-vol" class="text-xl font-bold text-slate-800 mt-1">--</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <p class="text-xs font-medium text-slate-500 uppercase">Max Drawdown</p>
+              <p id="b-stat-dd" class="text-xl font-bold text-red-500 mt-1">--</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <p class="text-xs font-medium text-slate-500 uppercase">Sharpe Ratio</p>
+              <p id="b-stat-sharpe" class="text-xl font-bold text-slate-800 mt-1">--</p>
+            </div>
+          </div>
+
+          <div class="chart-wrapper-box">
+            <h3 class="font-bold mb-4">Simulazione Equity Curve (Mock)</h3>
+            <div id="builder-performance-chart" style="min-height: 400px;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <footer class="text-center text-slate-500 text-sm py-12 border-t border-gray-200 mt-12">
@@ -426,11 +677,35 @@
         sidebar.classList.add('-translate-x-full');
       }
 
-      // Forza il resize per far adattare correttamente i grafici Plotly
       setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
     });
   });
+  // --- LOGICA SWITCH TAB SETTORI ---
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      // 1. Rimuovi la classe 'active' da tutti i bottoni tab
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      
+      // 2. Aggiungi la classe 'active' al bottone cliccato
+      this.classList.add('active');
 
+      // 3. Nascondi tutti i contenuti dei tab
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+
+      // 4. Mostra il contenuto corrispondente al data-tab
+      const tabId = this.getAttribute('data-tab');
+      document.getElementById(tabId).classList.add('active');
+
+      // 5. Fix Plotly: forza il resize per far disegnare correttamente 
+      // i grafici che prima erano display: none
+      setTimeout(() => { 
+        window.dispatchEvent(new Event('resize')); 
+      }, 50);
+    });
+  });
+  
   let cryptoNamesMap = {};
 
   async function loadCryptoNames() {
@@ -438,8 +713,6 @@
       const response = await fetch('./charts/crypto_name.json');
       if (response.ok) {
         cryptoNamesMap = await response.json();
-      } else {
-        console.warn('Impossibile caricare il file crypto_name.json. Verranno usati i ticker come fallback.');
       }
     } catch (e) {
       console.error('Errore nel caricamento dei nomi crypto:', e);
@@ -824,7 +1097,6 @@
                           for (let r = 0; r < yData.length; r++) {
                             for (let c = 0; c < xData.length; c++) {
                               let val = Array.isArray(zData[r]) ? zData[r][c] : zData[r * xData.length + c];
-                              // Se il valore è mancante o è Not-a-Number, registriamo le coordinate x e y
                               if (val === null || val === undefined || Number.isNaN(val)) {
                                 nanX.push(xData[c]);
                                 nanY.push(yData[r]);
@@ -833,7 +1105,6 @@
                           }
                         }
                         
-                        // Se abbiamo trovato valori NaN, aggiungiamo una nuova "traccia scatter" per disegnarci sopra una "✖"
                         if (nanX.length > 0) {
                            chartData.data.push({
                                type: 'scatter',
@@ -861,6 +1132,150 @@
       }
   }
 
+  // --- LOGICA BUILDER STRATEGIA (MOCK) ---
+  let customPortfolio = [];
+  
+  function updateBuilderUI() {
+    const listEl = document.getElementById('builder-portfolio-list');
+    const totalWeightEl = document.getElementById('builder-total-weight');
+    const runBtn = document.getElementById('builder-run-btn');
+    const clearBtn = document.getElementById('builder-clear-btn');
+    
+    let totalWeight = 0;
+    let html = '';
+    
+    if (customPortfolio.length === 0) {
+        html = '<li class="py-2 text-slate-500 italic text-center" id="builder-empty-msg">Nessun asset selezionato.</li>';
+        clearBtn.classList.add('hidden');
+    } else {
+        clearBtn.classList.remove('hidden');
+        customPortfolio.forEach((asset, index) => {
+            totalWeight += asset.weight;
+            html += `
+              <li class="py-2 flex justify-between items-center group">
+                <span class="font-semibold text-slate-700">${asset.name}</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-bold text-[#0050ff]">${asset.weight}%</span>
+                  <button onclick="removeAsset(${index})" class="text-slate-400 hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </li>
+            `;
+        });
+    }
+
+    listEl.innerHTML = html;
+    totalWeightEl.textContent = `${totalWeight}%`;
+    
+    if (totalWeight === 100) {
+        totalWeightEl.classList.remove('text-red-500');
+        totalWeightEl.classList.add('text-green-500');
+        runBtn.disabled = false;
+    } else {
+        totalWeightEl.classList.remove('text-green-500');
+        totalWeightEl.classList.add('text-red-500');
+        runBtn.disabled = true;
+    }
+  }
+
+  window.removeAsset = function(index) {
+      customPortfolio.splice(index, 1);
+      updateBuilderUI();
+  }
+
+  document.getElementById('builder-clear-btn').addEventListener('click', () => {
+      customPortfolio = [];
+      updateBuilderUI();
+      document.getElementById('builder-results-placeholder').classList.remove('hidden');
+      document.getElementById('builder-results-content').classList.add('hidden');
+      document.getElementById('builder-results-content').classList.remove('flex');
+  });
+
+  document.getElementById('builder-add-btn').addEventListener('click', () => {
+      const selectEl = document.getElementById('builder-asset-select');
+      const weightEl = document.getElementById('builder-weight-input');
+      const name = selectEl.options[selectEl.selectedIndex].text;
+      const weight = parseInt(weightEl.value, 10);
+
+      if (isNaN(weight) || weight <= 0) {
+          alert("Inserisci un peso valido maggiore di 0.");
+          return;
+      }
+
+      const existingIndex = customPortfolio.findIndex(a => a.name === name);
+      if (existingIndex > -1) {
+          customPortfolio[existingIndex].weight += weight;
+      } else {
+          customPortfolio.push({ name, weight });
+      }
+
+      weightEl.value = '';
+      updateBuilderUI();
+  });
+
+  document.getElementById('builder-run-btn').addEventListener('click', () => {
+      const runBtn = document.getElementById('builder-run-btn');
+      runBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Calcolo in corso...';
+      runBtn.disabled = true;
+
+      setTimeout(() => {
+          document.getElementById('builder-results-placeholder').classList.add('hidden');
+          document.getElementById('builder-results-content').classList.remove('hidden');
+          document.getElementById('builder-results-content').classList.add('flex');
+
+          const isPositive = Math.random() > 0.3;
+          const ret = (Math.random() * 50).toFixed(2);
+          document.getElementById('b-stat-return').textContent = isPositive ? `+${ret}%` : `-${ret}%`;
+          document.getElementById('b-stat-return').className = isPositive ? "text-xl font-bold text-green-500 mt-1" : "text-xl font-bold text-red-500 mt-1";
+          
+          document.getElementById('b-stat-vol').textContent = (Math.random() * 40 + 20).toFixed(2) + '%';
+          document.getElementById('b-stat-dd').textContent = '-' + (Math.random() * 30 + 10).toFixed(2) + '%';
+          document.getElementById('b-stat-sharpe').textContent = (Math.random() * 2 + 0.5).toFixed(2);
+
+          let yData = [10000];
+          let xData = ['2023-01-01'];
+          let currentDate = new Date('2023-01-01');
+          
+          for(let i=1; i<100; i++) {
+              currentDate.setDate(currentDate.getDate() + 3);
+              xData.push(currentDate.toISOString().split('T')[0]);
+              let change = (Math.random() - 0.48) * 500;
+              yData.push(yData[i-1] + change);
+          }
+
+          const trace = {
+              x: xData,
+              y: yData,
+              type: 'scatter',
+              mode: 'lines',
+              line: { color: '#0050ff', width: 2 },
+              fill: 'tozeroy',
+              fillcolor: 'rgba(0, 80, 255, 0.1)',
+              name: 'Portafoglio Custom'
+          };
+
+          const layout = {
+              margin: { l: 50, r: 20, t: 30, b: 40 },
+              paper_bgcolor: 'transparent',
+              plot_bgcolor: 'transparent',
+              xaxis: { showgrid: false },
+              yaxis: { tickprefix: '$', gridcolor: '#f1f5f9' },
+              hovermode: 'x unified'
+          };
+
+          Plotly.newPlot('builder-performance-chart', [trace], layout, {responsive: true, displayModeBar: false});
+
+          runBtn.innerHTML = 'Aggiorna Strategy';
+          runBtn.disabled = false;
+          
+          setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+
+      }, 1500);
+  });
+
+  updateBuilderUI();
+  
   async function initDashboard() {
     await loadCryptoNames();
     loadStrategyCharts();
@@ -870,39 +1285,6 @@
 
   initDashboard();
 
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const tabName = this.getAttribute('data-tab');
-      
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
-      this.classList.add('active');
-      const tabContent = document.getElementById(tabName);
-      if (tabContent) {
-        tabContent.classList.add('active');
-        
-        setTimeout(() => {
-          if (tabName === 'mainStrategy') {
-              if (performanceChartEl) Plotly.Plots.resize(performanceChartEl);
-              if (compositionChartEl) Plotly.Plots.resize(compositionChartEl);
-          }
-          if (tabName === 'techMarketCap') {
-              if (techPerformanceChartEl) Plotly.Plots.resize(techPerformanceChartEl);
-              if (techWeightsChartEl) Plotly.Plots.resize(techWeightsChartEl);
-          }
-          if (tabName === 'extraStrategy1') {
-              if (extra1PerfChartEl) Plotly.Plots.resize(extra1PerfChartEl);
-              if (extra1CompChartEl) Plotly.Plots.resize(extra1CompChartEl);
-          }
-          if (tabName === 'extraStrategy2') {
-              if (extra2PerfChartEl) Plotly.Plots.resize(extra2PerfChartEl);
-              if (extra2WeightsChartEl) Plotly.Plots.resize(extra2WeightsChartEl);
-          }
-        }, 50);
-      }
-    });
-  });
 })();
 </script>
 </body>
