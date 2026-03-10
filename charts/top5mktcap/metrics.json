@@ -1,0 +1,20 @@
+{
+    "ultimo_valore_indice": 61278.90020758457,
+    "variazione_24h_pct": 0.02517844461651375,
+    "variazione_7g_pct": -0.01749339769550262,
+    "variazione_ytd_pct": -0.2474966074512972,
+    "ultima_allocazione_pesi": {
+        "BTC-USD": 0.7778469484262205,
+        "ETH-USD": 0.13849853990670707,
+        "XRP-USD": 0.04744710154747145,
+        "SOL-USD": 0.027447226078080342,
+        "DOGE-USD": 0.00876018404152061
+    },
+    "capitalizzazione_mercato": {
+        "BTC-USD": 1353175983792.9844,
+        "ETH-USD": 240938012768.8789,
+        "XRP-USD": 82541017155.78711,
+        "SOL-USD": 47748374183.04492,
+        "DOGE-USD": 15239592676.394775
+    }
+}
