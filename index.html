@@ -921,7 +921,61 @@
       el.textContent = `${sign}${absStr} / ${sign}${pctStr}%`;
     }
 
-    async function fetchAndUpdate(strategy, path, allocationContainerId) {
+    // --- NUOVA FUNZIONE: Costruisce la tabella dei rendimenti in modo dinamico ---
+    // --- NUOVA FUNZIONE: Costruisce la tabella dei rendimenti in modo dinamico ---
+    function buildReturnsTable(tabId, rendimenti, benchmark) {
+      // Seleziona la tabella all'interno del tab corrente
+      const tableContainer = document.querySelector(`#${tabId} table`);
+      if (!tableContainer) return;
+
+      // Prende tutti gli anni disponibili e li ordina
+      const years = Object.keys(rendimenti).sort();
+
+      // Crea gli header dinamicamente in base agli anni
+      let headers = '<th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>';
+      years.forEach(year => {
+          headers += `<th class="py-3 px-4 font-bold text-[#1e293b] text-base">${year}</th>`;
+      });
+
+      // Riga Strategia (Rimosso il "%" dal titolo)
+      let stratRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Rendimento totale USD</td>';
+      years.forEach(year => {
+          const val = rendimenti[year];
+          const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+          const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'text-slate-800');
+          // Aggiunto il simbolo "%" vicino al numero
+          stratRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
+      });
+
+      // Riga Benchmark (Rimosso il "%" dal titolo)
+      let benchRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Benchmark USD</td>';
+      years.forEach(year => {
+          const val = benchmark[year];
+          const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+          const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'text-slate-800');
+          // Aggiunto il simbolo "%" vicino al numero
+          benchRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
+      });
+
+      // Sostituisce il contenuto html della tabella mantenendo lo stile
+      tableContainer.innerHTML = `
+          <thead>
+              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b] bg-slate-50/30">
+                  ${headers}
+              </tr>
+          </thead>
+          <tbody>
+              <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                  ${stratRow}
+              </tr>
+              <tr class="border-b border-[#1e293b] hover:bg-slate-50 transition-colors">
+                  ${benchRow}
+              </tr>
+          </tbody>
+      `;
+    }
+
+    async function fetchAndUpdate(strategy, path, allocationContainerId, tabId) {
       try {
         const response = await fetch(path);
         if (response.ok) {
@@ -936,14 +990,20 @@
           if (metrics.ultima_allocazione_pesi) {
             buildAllocationTable(allocationContainerId, metrics.ultima_allocazione_pesi, metrics.capitalizzazione_mercato);
           }
+
+          // Se i rendimenti sono nel json, aggiorna la tabella
+          if (metrics.rendimenti_annuali && metrics.benchmark_annuali && tabId) {
+            buildReturnsTable(tabId, metrics.rendimenti_annuali, metrics.benchmark_annuali);
+          }
         }
       } catch (e) { console.error(`Error loading metrics for ${strategy}:`, e); }
     }
 
-    fetchAndUpdate('main', './charts/top5mktcap/metrics.json', 'main-allocation');
-    fetchAndUpdate('tech', './charts/TechMktCap_TH/metrics.json', 'tech-allocation');
-    fetchAndUpdate('extra1', './charts/DefiMktCap_TH/metrics.json', 'extra1-allocation');
-    fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-allocation');
+    // Aggiunto l'ID del contenitore genitore come 4° parametro per localizzare la tabella
+    fetchAndUpdate('main', './charts/top5mktcap/metrics.json', 'main-allocation', 'mainStrategy');
+    fetchAndUpdate('tech', './charts/TechMktCap_TH/metrics.json', 'tech-allocation', 'techMarketCap');
+    fetchAndUpdate('extra1', './charts/DefiMktCap_TH/metrics.json', 'extra1-allocation', 'extraStrategy1');
+    fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-allocation', 'extraStrategy2');
   }
 
   async function loadStrategyCharts() {
