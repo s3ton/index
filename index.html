@@ -78,7 +78,9 @@
     }
   </style>
 </head>
-<body class="min-h-screen pt-[73px]"> <nav class="border-b border-gray-200 bg-white/90 backdrop-blur-md fixed top-0 left-0 w-full z-50 shadow-sm h-[73px] flex items-center">
+<body class="min-h-screen pt-[73px]"> 
+  
+<nav class="border-b border-gray-200 bg-white/90 backdrop-blur-md fixed top-0 left-0 w-full z-50 shadow-sm h-[73px] flex items-center">
   <div class="w-full px-4 md:px-6 flex items-center justify-between">
     <div class="flex items-center gap-4">
       <button id="mobile-menu-btn" class="md:hidden text-slate-500 hover:text-slate-800 focus:outline-none text-2xl">
@@ -162,38 +164,7 @@
         <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
           <table class="w-full text-sm text-center whitespace-nowrap">
-            <thead>
-              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b]">
-                <th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2020</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2021</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2022</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2023</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2024</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2025</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-[#1e293b]">
-                <td class="py-3 px-4 text-left text-[#1e293b]">Rendimento totale (%) USD</td>
-                <td id="main-ret-2020" class="py-3 px-4">43,6</td>
-                <td id="main-ret-2021" class="py-3 px-4">29,7</td>
-                <td id="main-ret-2022" class="py-3 px-4">-32,5</td>
-                <td id="main-ret-2023" class="py-3 px-4">59,7</td>
-                <td id="main-ret-2024" class="py-3 px-4">26,0</td>
-                <td id="main-ret-2025" class="py-3 px-4">22,9</td>
-              </tr>
-              <tr class="border-b border-[#1e293b]">
-                <td class="py-3 px-4 text-left text-[#1e293b]">Benchmark (%) USD</td>
-                <td id="main-ben-2020" class="py-3 px-4">43,8</td>
-                <td id="main-ben-2021" class="py-3 px-4">29,8</td>
-                <td id="main-ben-2022" class="py-3 px-4">-32,4</td>
-                <td id="main-ben-2023" class="py-3 px-4">60,0</td>
-                <td id="main-ben-2024" class="py-3 px-4">26,2</td>
-                <td id="main-ben-2025" class="py-3 px-4">23,1</td>
-              </tr>
-            </tbody>
-          </table>
+            </table>
         </div>
 
         <div id="main-allocation"></div>
@@ -255,38 +226,7 @@
         <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
           <table class="w-full text-sm text-center whitespace-nowrap">
-            <thead>
-              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b]">
-                <th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2020</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2021</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2022</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2023</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2024</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2025</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-[#1e293b]">
-                <td class="py-3 px-4 text-left text-[#1e293b]">Rendimento totale (%) USD</td>
-                <td id="tech-ret-2020" class="py-3 px-4">85,4</td>
-                <td id="tech-ret-2021" class="py-3 px-4">142,1</td>
-                <td id="tech-ret-2022" class="py-3 px-4">-55,2</td>
-                <td id="tech-ret-2023" class="py-3 px-4">88,4</td>
-                <td id="tech-ret-2024" class="py-3 px-4">45,2</td>
-                <td id="tech-ret-2025" class="py-3 px-4">31,0</td>
-              </tr>
-              <tr class="border-b border-[#1e293b]">
-                <td class="py-3 px-4 text-left text-[#1e293b]">Benchmark (%) USD</td>
-                <td id="tech-ben-2020" class="py-3 px-4">43,8</td>
-                <td id="tech-ben-2021" class="py-3 px-4">29,8</td>
-                <td id="tech-ben-2022" class="py-3 px-4">-32,4</td>
-                <td id="tech-ben-2023" class="py-3 px-4">60,0</td>
-                <td id="tech-ben-2024" class="py-3 px-4">26,2</td>
-                <td id="tech-ben-2025" class="py-3 px-4">23,1</td>
-              </tr>
-            </tbody>
-          </table>
+            </table>
         </div>
 
         <div id="tech-allocation"></div>
@@ -333,7 +273,7 @@
         <div class="strategy-description mb-8">
           <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
           <p class="text-sm leading-relaxed">
-            Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategy prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategie, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
+            Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategy prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategies, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
           </p>
         </div>
 
@@ -348,38 +288,7 @@
         <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
           <table class="w-full text-sm text-center whitespace-nowrap">
-            <thead>
-              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b]">
-                <th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2020</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2021</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2022</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2023</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2024</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2025</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-[#1e293b]">
-                <td class="py-3 px-4 text-left text-[#1e293b]">Rendimento totale (%) USD</td>
-                <td id="defi-ret-2020" class="py-3 px-4">120,5</td>
-                <td id="defi-ret-2021" class="py-3 px-4">205,0</td>
-                <td id="defi-ret-2022" class="py-3 px-4">-75,4</td>
-                <td id="defi-ret-2023" class="py-3 px-4">42,1</td>
-                <td id="defi-ret-2024" class="py-3 px-4">18,5</td>
-                <td id="defi-ret-2025" class="py-3 px-4">15,2</td>
-              </tr>
-              <tr class="border-b border-[#1e293b]">
-                <td class="py-3 px-4 text-left text-[#1e293b]">Benchmark (%) USD</td>
-                <td id="defi-ben-2020" class="py-3 px-4">43,8</td>
-                <td id="defi-ben-2021" class="py-3 px-4">29,8</td>
-                <td id="defi-ben-2022" class="py-3 px-4">-32,4</td>
-                <td id="defi-ben-2023" class="py-3 px-4">60,0</td>
-                <td id="defi-ben-2024" class="py-3 px-4">26,2</td>
-                <td id="defi-ben-2025" class="py-3 px-4">23,1</td>
-              </tr>
-            </tbody>
-          </table>
+             </table>
         </div>
 
         <div id="extra1-allocation"></div>
@@ -441,38 +350,7 @@
         <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
           <table class="w-full text-sm text-center whitespace-nowrap">
-            <thead>
-              <tr class="border-t-[3px] border-b-[2px] border-[#1e293b]">
-                <th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2020</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2021</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2022</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2023</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2024</th>
-                <th class="py-3 px-4 font-bold text-[#1e293b] text-base">2025</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-[#1e293b]">
-                <td class="py-3 px-4 text-left text-[#1e293b]">Rendimento totale (%) USD</td>
-                <td id="pay-ret-2020" class="py-3 px-4">25,2</td>
-                <td id="pay-ret-2021" class="py-3 px-4">45,5</td>
-                <td id="pay-ret-2022" class="py-3 px-4">-22,1</td>
-                <td id="pay-ret-2023" class="py-3 px-4">35,0</td>
-                <td id="pay-ret-2024" class="py-3 px-4">12,4</td>
-                <td id="pay-ret-2025" class="py-3 px-4">18,5</td>
-              </tr>
-              <tr class="border-b border-[#1e293b]">
-                <td class="py-3 px-4 text-left text-[#1e293b]">Benchmark (%) USD</td>
-                <td id="pay-ben-2020" class="py-3 px-4">43,8</td>
-                <td id="pay-ben-2021" class="py-3 px-4">29,8</td>
-                <td id="pay-ben-2022" class="py-3 px-4">-32,4</td>
-                <td id="pay-ben-2023" class="py-3 px-4">60,0</td>
-                <td id="pay-ben-2024" class="py-3 px-4">26,2</td>
-                <td id="pay-ben-2025" class="py-3 px-4">23,1</td>
-              </tr>
-            </tbody>
-          </table>
+            </table>
         </div>
 
         <div id="extra2-allocation"></div>
@@ -554,16 +432,16 @@
           <label class="block text-sm font-medium text-slate-700 mb-1">Seleziona Asset</label>
           <div class="flex gap-2">
             <select id="builder-asset-select" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
-              <option value="Bitcoin">Bitcoin (BTC)</option>
-              <option value="Ethereum">Ethereum (ETH)</option>
-              <option value="Solana">Solana (SOL)</option>
+              <option value="BTC">Bitcoin (BTC)</option>
+              <option value="ETH">Ethereum (ETH)</option>
+              <option value="SOL">Solana (SOL)</option>
               <option value="XRP">XRP (XRP)</option>
-              <option value="Cardano">Cardano (ADA)</option>
-              <option value="Polkadot">Polkadot (DOT)</option>
-              <option value="Avalanche">Avalanche (AVAX)</option>
-              <option value="Chainlink">Chainlink (LINK)</option>
-              <option value="Dogecoin">Dogecoin (DOGE)</option>
-              <option value="Uniswap">Uniswap (UNI)</option>
+              <option value="ADA">Cardano (ADA)</option>
+              <option value="DOT">Polkadot (DOT)</option>
+              <option value="AVAX">Avalanche (AVAX)</option>
+              <option value="LINK">Chainlink (LINK)</option>
+              <option value="DOGE">Dogecoin (DOGE)</option>
+              <option value="UNI">Uniswap (UNI)</option>
             </select>
             <input type="number" id="builder-weight-input" placeholder="Peso %" min="1" max="100" class="block w-24 border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
             <button id="builder-add-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-3 rounded-lg transition-colors">
@@ -589,12 +467,26 @@
 
         <div class="mb-6">
           <label class="block text-sm font-medium text-slate-700 mb-1">Timeframe Backtest</label>
-          <select id="builder-timeframe" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+          <select id="builder-timeframe" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border mb-3">
             <option value="1M">Ultimo Mese</option>
             <option value="6M">Ultimi 6 Mesi</option>
             <option value="1Y" selected>Ultimo Anno</option>
+            <option value="3Y">Ultimi 3 Anni</option>
+            <option value="5Y">Ultimi 5 Anni</option>
             <option value="YTD">Year to Date</option>
+            <option value="CUSTOM">Date Personalizzate</option>
           </select>
+          
+          <div id="custom-date-range" class="hidden grid grid-cols-2 gap-2 transition-all">
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Data Inizio</label>
+              <input type="date" id="builder-start-date" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Data Fine</label>
+              <input type="date" id="builder-end-date" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+            </div>
+          </div>
         </div>
 
         <button id="builder-run-btn" class="w-full bg-[#0050ff] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
@@ -633,7 +525,7 @@
           </div>
 
           <div class="chart-wrapper-box">
-            <h3 class="font-bold mb-4">Simulazione Equity Curve (Mock)</h3>
+            <h3 class="font-bold mb-4">Equity Curve della Strategia</h3>
             <div id="builder-performance-chart" style="min-height: 400px;"></div>
           </div>
         </div>
@@ -656,6 +548,7 @@
     sidebar.classList.toggle('-translate-x-full');
   });
 
+  // --- LOGICA MENU LATERALE ---
   document.querySelectorAll('.sidebar-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       document.querySelectorAll('.sidebar-btn').forEach(b => {
@@ -680,6 +573,7 @@
       setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
     });
   });
+
   // --- LOGICA SWITCH TAB SETTORI ---
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -698,8 +592,7 @@
       const tabId = this.getAttribute('data-tab');
       document.getElementById(tabId).classList.add('active');
 
-      // 5. Fix Plotly: forza il resize per far disegnare correttamente 
-      // i grafici che prima erano display: none
+      // 5. Fix Plotly: forza il resize per far disegnare correttamente i grafici nascosti
       setTimeout(() => { 
         window.dispatchEvent(new Event('resize')); 
       }, 50);
@@ -764,7 +657,6 @@
           return reshaped;
         }
       }
-
       return arr;
     } catch (e) {
       console.error("Avviso: Impossibile decodificare i dati bdata.", e);
@@ -863,6 +755,51 @@
     container.innerHTML = html;
   }
 
+  // --- NUOVA FUNZIONE: Costruisce la tabella dei rendimenti in modo dinamico ---
+  function buildReturnsTable(tabId, rendimenti, benchmark) {
+    const tableContainer = document.querySelector(`#${tabId} table`);
+    if (!tableContainer) return;
+
+    const years = Object.keys(rendimenti).sort();
+
+    let headers = '<th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>';
+    years.forEach(year => {
+        headers += `<th class="py-3 px-4 font-bold text-[#1e293b] text-base">${year}</th>`;
+    });
+
+    let stratRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Rendimento totale USD</td>';
+    years.forEach(year => {
+        const val = rendimenti[year];
+        const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+        const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'text-slate-800');
+        stratRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
+    });
+
+    let benchRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Benchmark USD</td>';
+    years.forEach(year => {
+        const val = benchmark[year];
+        const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+        const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'text-slate-800');
+        benchRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
+    });
+
+    tableContainer.innerHTML = `
+        <thead>
+            <tr class="border-t-[3px] border-b-[2px] border-[#1e293b] bg-slate-50/30">
+                ${headers}
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                ${stratRow}
+            </tr>
+            <tr class="border-b border-[#1e293b] hover:bg-slate-50 transition-colors">
+                ${benchRow}
+            </tr>
+        </tbody>
+    `;
+  }
+
   async function loadMetrics() {
     function updateMetric(id, value, prefix = '', suffix = '', color = true) {
       const el = document.getElementById(id);
@@ -921,7 +858,7 @@
       el.textContent = `${sign}${absStr} / ${sign}${pctStr}%`;
     }
 
-    async function fetchAndUpdate(strategy, path, allocationContainerId) {
+    async function fetchAndUpdate(strategy, path, allocationContainerId, tabId) {
       try {
         const response = await fetch(path);
         if (response.ok) {
@@ -936,14 +873,18 @@
           if (metrics.ultima_allocazione_pesi) {
             buildAllocationTable(allocationContainerId, metrics.ultima_allocazione_pesi, metrics.capitalizzazione_mercato);
           }
+
+          if (metrics.rendimenti_annuali && metrics.benchmark_annuali && tabId) {
+            buildReturnsTable(tabId, metrics.rendimenti_annuali, metrics.benchmark_annuali);
+          }
         }
       } catch (e) { console.error(`Error loading metrics for ${strategy}:`, e); }
     }
 
-    fetchAndUpdate('main', './charts/top5mktcap/metrics.json', 'main-allocation');
-    fetchAndUpdate('tech', './charts/TechMktCap_TH/metrics.json', 'tech-allocation');
-    fetchAndUpdate('extra1', './charts/DefiMktCap_TH/metrics.json', 'extra1-allocation');
-    fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-allocation');
+    fetchAndUpdate('main', './charts/top5mktcap/metrics.json', 'main-allocation', 'mainStrategy');
+    fetchAndUpdate('tech', './charts/TechMktCap_TH/metrics.json', 'tech-allocation', 'techMarketCap');
+    fetchAndUpdate('extra1', './charts/DefiMktCap_TH/metrics.json', 'extra1-allocation', 'extraStrategy1');
+    fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-allocation', 'extraStrategy2');
   }
 
   async function loadStrategyCharts() {
@@ -1085,7 +1026,6 @@
                       if (config.file === 'correlation_heatmap.json' && chartData.data[0]) {
                         chartData.data[0].hovertemplate = 'X: %{x}<br>Y: %{y}<br>Correlazione: %{z:.4f}<extra></extra>';
 
-                        // ---- INIZIO LOGICA PER TROVARE I NAN E AGGIUNGERE LA X NERA ----
                         let zData = chartData.data[0].z;
                         let xData = chartData.data[0].x;
                         let yData = chartData.data[0].y;
@@ -1117,7 +1057,6 @@
                                showlegend: false
                            });
                         }
-                        // ---- FINE LOGICA PER LA X ----
                       }
                       
                       Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true });
@@ -1132,7 +1071,7 @@
       }
   }
 
-  // --- LOGICA BUILDER STRATEGIA (MOCK) ---
+  // --- LOGICA BUILDER STRATEGIA (REALE) ---
   let customPortfolio = [];
   
   function updateBuilderUI() {
@@ -1195,6 +1134,8 @@
   document.getElementById('builder-add-btn').addEventListener('click', () => {
       const selectEl = document.getElementById('builder-asset-select');
       const weightEl = document.getElementById('builder-weight-input');
+      
+      const rawValue = selectEl.value; 
       const name = selectEl.options[selectEl.selectedIndex].text;
       const weight = parseInt(weightEl.value, 10);
 
@@ -1203,46 +1144,188 @@
           return;
       }
 
+      let tickerName = "btc";
+      if (rawValue.includes("BTC")) tickerName = "btc";
+      else if (rawValue.includes("ETH")) tickerName = "eth";
+      else if (rawValue.includes("SOL")) tickerName = "sol";
+      else if (rawValue.includes("XRP")) tickerName = "xrp";
+      else if (rawValue.includes("ADA")) tickerName = "ada";
+      else if (rawValue.includes("DOT")) tickerName = "dot";
+      else if (rawValue.includes("AVAX")) tickerName = "avax";
+      else if (rawValue.includes("LINK")) tickerName = "link";
+      else if (rawValue.includes("DOGE")) tickerName = "doge";
+      else if (rawValue.includes("UNI")) tickerName = "uni";
+
       const existingIndex = customPortfolio.findIndex(a => a.name === name);
       if (existingIndex > -1) {
           customPortfolio[existingIndex].weight += weight;
       } else {
-          customPortfolio.push({ name, weight });
+          customPortfolio.push({ name, weight, ticker: tickerName });
       }
 
       weightEl.value = '';
       updateBuilderUI();
   });
 
-  document.getElementById('builder-run-btn').addEventListener('click', () => {
+  // Mostra i campi data personalizzata se l'utente sceglie CUSTOM
+  document.getElementById('builder-timeframe').addEventListener('change', function() {
+      const customDates = document.getElementById('custom-date-range');
+      if (this.value === 'CUSTOM') {
+          customDates.classList.remove('hidden');
+      } else {
+          customDates.classList.add('hidden');
+      }
+  });
+
+  // Calcolo metriche matematiche
+  function calculateMetrics(prices) {
+      if (prices.length < 2) return { returnPct: 0, volAnn: 0, maxDd: 0, sharpe: 0 };
+      
+      const startPrice = prices[0];
+      const endPrice = prices[prices.length - 1];
+      const returnPct = ((endPrice - startPrice) / startPrice) * 100;
+      
+      let dailyReturns = [];
+      for(let i = 1; i < prices.length; i++){
+          dailyReturns.push((prices[i] - prices[i-1]) / prices[i-1]);
+      }
+      
+      const meanRet = dailyReturns.reduce((a, b) => a + b, 0) / dailyReturns.length;
+      const variance = dailyReturns.reduce((a, b) => a + Math.pow(b - meanRet, 2), 0) / dailyReturns.length;
+      const stdDev = Math.sqrt(variance);
+      const volAnn = stdDev * Math.sqrt(365) * 100;
+      
+      const sharpe = volAnn !== 0 ? (meanRet * 365) / (stdDev * Math.sqrt(365)) : 0;
+      
+      let maxPrice = prices[0];
+      let maxDd = 0;
+      for(let p of prices) {
+          if(p > maxPrice) maxPrice = p;
+          const dd = (p - maxPrice) / maxPrice;
+          if(dd < maxDd) maxDd = dd;
+      }
+      
+      return { returnPct, volAnn, maxDd: maxDd * 100, sharpe };
+  }
+
+  document.getElementById('builder-run-btn').addEventListener('click', async () => {
       const runBtn = document.getElementById('builder-run-btn');
       runBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Calcolo in corso...';
       runBtn.disabled = true;
 
-      setTimeout(() => {
+      try {
+          let dateMap = {}; 
+          
+          for (const asset of customPortfolio) {
+              const res = await fetch(`./data/historical/${asset.ticker}.json`);
+              if (!res.ok) throw new Error(`Dati storici per ${asset.name} non trovati. Manca il file json in data/historical.`);
+              
+              const data = await res.json();
+              const dates = data.dates;
+              const prices = data.prices;
+              
+              for(let i=0; i<dates.length; i++) {
+                  if(!dateMap[dates[i]]) dateMap[dates[i]] = {};
+                  dateMap[dates[i]][asset.ticker] = prices[i];
+              }
+          }
+
+          const allSortedDates = Object.keys(dateMap).sort();
+          if (allSortedDates.length === 0) throw new Error("Nessun dato disponibile.");
+
+          const tf = document.getElementById('builder-timeframe').value;
+          const now = new Date();
+          let targetStart = new Date('2000-01-01');
+          let targetEnd = new Date(); 
+
+          if (tf === '1M') { targetStart = new Date(now); targetStart.setMonth(now.getMonth() - 1); }
+          else if (tf === '6M') { targetStart = new Date(now); targetStart.setMonth(now.getMonth() - 6); }
+          else if (tf === '1Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 1); }
+          else if (tf === '3Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 3); }
+          else if (tf === '5Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 5); }
+          else if (tf === 'YTD') { targetStart = new Date(now.getFullYear(), 0, 1); }
+          else if (tf === 'CUSTOM') {
+              const sd = document.getElementById('builder-start-date').value;
+              const ed = document.getElementById('builder-end-date').value;
+              if(sd) targetStart = new Date(sd);
+              if(ed) targetEnd = new Date(ed);
+              
+              if(targetStart > targetEnd) throw new Error("La data di inizio deve essere precedente alla data di fine.");
+          }
+
+          const getLocalYMD = (dateObj) => {
+              const y = dateObj.getFullYear();
+              const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+              const d = String(dateObj.getDate()).padStart(2, '0');
+              return `${y}-${m}-${d}`;
+          };
+
+          const startStr = getLocalYMD(targetStart);
+          const endStr = getLocalYMD(targetEnd);
+
+          const sortedDates = allSortedDates.filter(d => d >= startStr && d <= endStr);
+          
+          if (sortedDates.length === 0) throw new Error("Nessun dato disponibile per il periodo temporale selezionato. Verifica le date o lo storico scaricato.");
+
+          let initialCapital = 10000;
+          let yData = [];
+          let xData = [];
+          
+          let startIndex = 0;
+          let initialPrices = null;
+          
+          for(let i = 0; i < sortedDates.length; i++) {
+              const d = sortedDates[i];
+              const prices = dateMap[d];
+              let hasAllPrices = true;
+              for(const asset of customPortfolio) {
+                  if(!prices[asset.ticker]) hasAllPrices = false;
+              }
+              if(hasAllPrices) {
+                  startIndex = i;
+                  initialPrices = prices;
+                  break;
+              }
+          }
+          
+          if(!initialPrices) throw new Error("Nessun punto di partenza comune trovato. Assicurati che le monete selezionate esistessero nella data di inizio.");
+
+          let shares = {};
+          customPortfolio.forEach(asset => {
+              const allocatedDollars = initialCapital * (asset.weight / 100);
+              shares[asset.ticker] = allocatedDollars / initialPrices[asset.ticker];
+          });
+
+          for (let i = startIndex; i < sortedDates.length; i++) {
+              const d = sortedDates[i];
+              const prices = dateMap[d];
+              let dailyValue = 0;
+              
+              for (const asset of customPortfolio) {
+                  if(prices[asset.ticker]) {
+                     dailyValue += shares[asset.ticker] * prices[asset.ticker];
+                  }
+              }
+              
+              if(dailyValue > 0) {
+                  xData.push(d);
+                  yData.push(dailyValue);
+              }
+          }
+
+          const stats = calculateMetrics(yData);
+
           document.getElementById('builder-results-placeholder').classList.add('hidden');
           document.getElementById('builder-results-content').classList.remove('hidden');
           document.getElementById('builder-results-content').classList.add('flex');
 
-          const isPositive = Math.random() > 0.3;
-          const ret = (Math.random() * 50).toFixed(2);
-          document.getElementById('b-stat-return').textContent = isPositive ? `+${ret}%` : `-${ret}%`;
+          const isPositive = stats.returnPct >= 0;
+          document.getElementById('b-stat-return').textContent = isPositive ? `+${stats.returnPct.toFixed(2)}%` : `${stats.returnPct.toFixed(2)}%`;
           document.getElementById('b-stat-return').className = isPositive ? "text-xl font-bold text-green-500 mt-1" : "text-xl font-bold text-red-500 mt-1";
           
-          document.getElementById('b-stat-vol').textContent = (Math.random() * 40 + 20).toFixed(2) + '%';
-          document.getElementById('b-stat-dd').textContent = '-' + (Math.random() * 30 + 10).toFixed(2) + '%';
-          document.getElementById('b-stat-sharpe').textContent = (Math.random() * 2 + 0.5).toFixed(2);
-
-          let yData = [10000];
-          let xData = ['2023-01-01'];
-          let currentDate = new Date('2023-01-01');
-          
-          for(let i=1; i<100; i++) {
-              currentDate.setDate(currentDate.getDate() + 3);
-              xData.push(currentDate.toISOString().split('T')[0]);
-              let change = (Math.random() - 0.48) * 500;
-              yData.push(yData[i-1] + change);
-          }
+          document.getElementById('b-stat-vol').textContent = stats.volAnn.toFixed(2) + '%';
+          document.getElementById('b-stat-dd').textContent = stats.maxDd.toFixed(2) + '%';
+          document.getElementById('b-stat-sharpe').textContent = stats.sharpe.toFixed(2);
 
           const trace = {
               x: xData,
@@ -1266,12 +1349,14 @@
 
           Plotly.newPlot('builder-performance-chart', [trace], layout, {responsive: true, displayModeBar: false});
 
+      } catch (error) {
+          console.error("Errore nel calcolo del portafoglio:", error);
+          alert("Errore: " + error.message);
+      } finally {
           runBtn.innerHTML = 'Aggiorna Strategy';
           runBtn.disabled = false;
-          
           setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
-
-      }, 1500);
+      }
   });
 
   updateBuilderUI();
