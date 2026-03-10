@@ -18,10 +18,11 @@
     .chart-card { 
       background: #ffffff; 
       border-radius: 24px; 
-      overflow: visible; 
+      overflow: hidden; 
       border: 1px solid #f1f5f9; 
       box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05); 
-      display: grid;
+      display: flex;
+      flex-direction: column;
     }
     
     .chart-container { min-height: 605px; position: relative; padding: 1.5rem; }
@@ -150,7 +151,7 @@
         <div class="strategy-description mb-8">
           <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
           <p class="text-sm leading-relaxed">
-            Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato per tracciare le 5 criptovalute a maggiore capitalizzazione all'interno del nostro universo di asset idonei. All'interno dell'indice, ogni criptovaluta è pesata in modo proporzionale alla propria capitalizzazione di mercato, offrendo un'esposizione che riflette fedelmente le reali gerarchie del settore. Per garantire che l'indice rimanga sempre rappresentativo, il portafoglio subisce un ribilanciamento automatico ogni sei mesi, durante il quale vengono ricalcolati i pesi e aggiornati gli asset in base all'attuale top 5. Infine, per rendere l'analisi delle performance più intuitiva, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC). Quest'ultimo viene inoltre utilizzato come benchmark di riferimento nei grafici, permettendo di confrontare visivamente e in modo immediato l'andamento della strategia rispetto al leader di mercato.
+            Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato per tracciare le 5 criptovalute a maggiore capitalizzazione all'interno del nostro universo di asset idonei. All'interno dell'indice, ogni criptovaluta è pesata in modo proporzionale alla propria capitalizzazione di mercato, offrendo un'esposizione che riflette fedelmente le reali gerarchie del settore. Per garantire che l'indice rimanga sempre rappresentativo, il portafoglio subisce un ribilanciamento automatico ogni sei mesi, durante il quale vengono ricalcolati i pesi e aggiornati gli asset in base all'attuale top 5. Infine, per rendere l'analisi delle performance più intuitiva, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC). Quest'ultimo viene inoltre utilizzato come benchmark di riferimento nei grafici, permettendo di confrontare visivamente e in modo immediato l'andamento della strategy rispetto al leader di mercato.
           </p>
           <div id="main-allocation"></div>
         </div>
@@ -196,7 +197,7 @@
         <div class="strategy-description mb-12">
           <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Tech</h3>
           <p class="text-sm leading-relaxed">
-            Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset che supportano infrastrutture e soluzioni tecnologiche avanzate. Per essere incluso nell'indice, ogni progetto deve soddisfare un criterio di capitalizzazione di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati proprio in base alla loro capitalizzazione, offrendo un'esposizione proporzionale al loro peso reale nel mercato. Per mantenere la strategia aggiornata e in linea con le soglie richieste, l'indice prevede un ribilanciamento automatico ogni sei mesi, durante il quale i pesi vengono ricalcolati e i componenti rivisti. Il valore di partenza dell'indice è stato equiparato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare le performance di questo comparto tecnologico rispetto al leader generale del mercato.
+            Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset che supportano infrastrutture e soluzioni tecnologiche avanzate. Per essere incluso nell'indice, ogni progetto deve soddisfare un criterio di capitalizzazione di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati proprio in base alla loro capitalizzazione, offrendo un'esposizione proporzionale al loro peso reale nel mercato. Per mantenere la strategy aggiornata e in linea con le soglie richieste, l'indice prevede un ribilanciamento automatico ogni sei mesi, durante il quale i pesi vengono ricalcolati e i componenti rivisti. Il valore di partenza dell'indice è stato equiparato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare le performance di questo comparto tecnologico rispetto al leader generale del mercato.
           </p>
           <div id="tech-allocation"></div>
         </div>
@@ -242,7 +243,7 @@
         <div class="strategy-description mb-8">
           <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
           <p class="text-sm leading-relaxed">
-            Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategia prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategie, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
+            Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategy prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategie, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
           </p>
           <div id="extra1-allocation"></div>
         </div>
@@ -310,42 +311,44 @@
   </div>
 
   <div id="page-market" class="page-content hidden">
-    <div class="mb-10">
-      <div class="flex items-center justify-between mb-8 flex-wrap gap-2">
-        <div>
-          <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Price History Analytics</h2>
-          <p class="text-slate-500 mt-2 font-medium">Interactive long-term charts • Public Google Sheets data</p>
-        </div>
-      </div>
 
+    <div class="mb-8">
+      <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Statistiche di Mercato</h2>
+      <p class="text-slate-500 mt-2 font-medium">Interactive long-term charts</p>
+      <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+        In questa sezione puoi monitorare le principali metriche macroeconomiche e di mercato che influenzano l'ecosistema delle criptovalute. L'analisi di parametri chiave come la Bitcoin Dominance, le correlazioni tra i vari asset digitali rispetto al leader di mercato, i volumi di scambio e l'andamento della volatilità fornisce una visione olistica e approfondita sui trend in corso. Questi strumenti interattivi sono stati appositamente pensati per aiutarti a comprendere i complessi flussi di capitale all'interno del mercato crypto, permettendoti di decifrare in modo più accurato e consapevole il sentiment generale degli investitori. Che si tratti di valutare l'avversione al rischio durante le fasi di contrazione o di misurare l'euforia nei periodi rialzisti, avere a disposizione una panoramica completa e aggiornata è fondamentale. In questo modo potrai contestualizzare le singole variazioni di prezzo all'interno del più ampio scenario finanziario globale, supportando in maniera data-driven le tue decisioni analitiche e strategiche di medio e lungo termine.
+      </p>
+    </div>
+
+    <div class="mb-16">
+      <div class="flex flex-col gap-10" id="market-analytics-charts-container">
+      </div>
+    </div>
+
+    <div class="mb-10">
       <div class="grid lg:grid-cols-2 gap-10">
-        <div class="chart-card">
-          <div class="chart-container p-0 overflow-hidden rounded-3xl" style="min-height: 410px;">
+        <div class="chart-card bg-white">
+          <div class="chart-container p-0" style="min-height: 410px;">
             <div class="chart-wrapper">
               <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
             </div>
           </div>
+          <div class="p-5 border-t border-slate-100 bg-slate-50 mt-auto">
+             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento storico del prezzo di Bitcoin (BTC) con la sua volatilità di mercato. Osservare i picchi di volatilità in relazione ai movimenti di prezzo permette di identificare le fasi di maggiore stress o euforia del mercato, aiutando a contestualizzare i cicli rialzisti e ribassisti storici della principale criptovaluta.</p>
+          </div>
         </div>
-        <div class="chart-card">
-          <div class="chart-container p-0 overflow-hidden rounded-3xl" style="min-height: 410px;">
+        
+        <div class="chart-card bg-white">
+          <div class="chart-container p-0" style="min-height: 410px;">
             <div class="chart-wrapper">
               <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=1143695036&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
             </div>
           </div>
+          <div class="p-5 border-t border-slate-100 bg-slate-50 mt-auto">
+            <p class="text-sm text-slate-600 leading-relaxed">Similmente al grafico precedente, questo strumento mette in relazione il prezzo storico di Ethereum (ETH) con i suoi livelli di volatilità. Poiché Ethereum rappresenta il fulcro della finanza decentralizzata (DeFi) e degli smart contract, monitorarne la volatilità rispetto al prezzo è fondamentale per comprendere i flussi di capitale e il sentiment di rischio associato al settore delle altcoin.</p>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="mb-10 mt-16">
-      <div class="flex items-center justify-between mb-8 flex-wrap gap-2">
-        <div>
-          <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Market Analytics</h2>
-          <p class="text-slate-500 mt-2 font-medium">Interactive long-term charts</p>
-        </div>
-      </div>
-
-      <div class="grid lg:grid-cols-2 gap-10" id="market-analytics-charts-container">
-        </div>
     </div>
 
   </div>
@@ -385,9 +388,8 @@
         sidebar.classList.add('-translate-x-full');
       }
 
-      if(pageId === 'page-settori') {
-         setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
-      }
+      // Forza il resize per far adattare correttamente i grafici Plotly
+      setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
     });
   });
 
@@ -728,10 +730,21 @@
       if (!container) return;
 
       const chartConfigs = [
-          { file: 'btc_dominance.json', title: 'BTC Dominance' },
-          { file: 'correlation_heatmap.json', title: 'Correlazione Asset' },
-          { file: 'market_volume.json', title: 'Volume del Mercato Crypto' },
-          { file: 'fear_and_greed.json', title: 'Fear & Greed Index' }
+          { 
+            file: 'btc_dominance.json', 
+            title: 'BTC Dominance',
+            description: 'Il grafico della BTC Dominance mostra la quota di mercato di Bitcoin rispetto all\'intero settore crypto. Una dominance in aumento suggerisce generalmente un afflusso di capitali verso l\'asset percepito come più sicuro e stabile (Bitcoin), evento tipico delle fasi di mercato incerte. Al contrario, un calo della dominance può indicare una maggiore propensione al rischio e liquidità in spostamento verso le altcoin.'
+          },
+          { 
+            file: 'correlation_heatmap.json', 
+            title: 'Correlazione Asset con BTC',
+            description: 'Questa mappa di calore (heatmap) evidenzia in che modo le principali altcoin si muovono in relazione a Bitcoin (BTC) nel tempo. Valori prossimi all\'1 (colori accesi) indicano una forte correlazione positiva: l\'altcoin tende a muoversi nella stessa direzione di Bitcoin. Valori prossimi allo zero o negativi suggeriscono invece movimenti indipendenti. È uno strumento cruciale per comprendere e gestire la diversificazione all\'interno di un portafoglio rispetto al benchmark principale del mercato.'
+          },
+          { 
+            file: 'market_volume.json', 
+            title: 'Volume del Mercato Crypto',
+            description: 'Il grafico mostra l\'evoluzione dei volumi di scambio giornalieri delle principali criptovalute. Livelli elevati di volume confermano spesso la solidità di un trend di mercato (sia esso rialzista o ribassista) e segnalano un\'elevata partecipazione da parte degli investitori. Periodi prolungati di bassi volumi possono invece indicare fasi di accumulo, consolidamento o incertezza generale.'
+          }
       ];
 
       for (let i = 0; i < chartConfigs.length; i++) {
@@ -739,10 +752,14 @@
           const chartId = `market-chart-${i}`;
 
           const chartWrapper = document.createElement('div');
-          chartWrapper.className = 'chart-wrapper-box';
+          chartWrapper.className = 'chart-wrapper-box flex flex-col';
+          
           chartWrapper.innerHTML = `
-              <h3 class="font-bold mb-4">${config.title}</h3>
-              <div id="${chartId}" style="min-height: 400px;"></div>
+              <h3 class="font-bold mb-4 text-xl text-[#0a1b39]">${config.title}</h3>
+              <div id="${chartId}" style="min-height: 500px; width: 100%;"></div>
+              <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                <p class="text-sm text-slate-600 leading-relaxed">${config.description}</p>
+              </div>
           `;
           container.appendChild(chartWrapper);
 
@@ -797,11 +814,11 @@
                       Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true });
                   }
               } else {
-                  document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Could not load chart.</p>`;
+                  document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Impossibile caricare il grafico.</p>`;
               }
           } catch (e) {
               console.error(`Error loading market chart ${config.file}:`, e);
-              document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Error loading chart.</p>`;
+              document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Errore caricamento grafico.</p>`;
           }
       }
   }
