@@ -1,1374 +1,1434 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Conio • Crypto Analytics</title>
-  <meta name="description" content="Real-time crypto market analytics dashboard with live data."/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conio • Crypto Analytics</title>
+<meta name="description" content="Real-time crypto market analytics dashboard with live data."/>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  
-  <style>
-    body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; }
-    .title-font { font-family: 'Space Grotesk', sans-serif; }
-    
-    .chart-card { 
-      background: #ffffff; 
-      border-radius: 24px; 
-      overflow: hidden; 
-      border: 1px solid #f1f5f9; 
-      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05); 
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .chart-container { min-height: 605px; position: relative; padding: 1.5rem; }
-    .chart-wrapper { position: relative; width: 100%; height: 100%; }
-    
-    @media (max-width: 1023px) { .chart-container { min-height: 666px; padding: 1rem; } }
-    @media (max-width: 640px) { .chart-container { min-height: 605px; } }
-    
-    .plotly .hovertext { z-index: 1000; }
-    .hovertext { max-height: 280px; overflow-y: auto; }
-    .hovertext::-webkit-scrollbar { width: 6px; }
-    .hovertext::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
-    .hovertext::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-    
-    .tab-container { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; overflow-x: auto;}
-    .tab-btn { 
-      padding: 1rem 1.5rem; 
-      font-size: 1rem; 
-      font-weight: 600; 
-      color: #64748b; 
-      border: none; 
-      background: none; 
-      cursor: pointer; 
-      transition: all 0.3s ease; 
-      border-bottom: 3px solid transparent; 
-      margin-bottom: -2px;
-      white-space: nowrap;
-    }
-    .tab-btn:hover { color: #0050ff; }
-    .tab-btn.active { color: #0050ff; border-bottom-color: #0050ff; }
-    .tab-content { display: none; }
-    .tab-content.active { display: grid; }
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<style>
+body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; }
+.title-font { font-family: 'Space Grotesk', sans-serif; }
+.chart-card {
+background: #ffffff;
+border-radius: 24px;
+overflow: hidden;
+border: 1px solid #f1f5f9;
+box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+display: flex;
+flex-direction: column;
+}
+.chart-container { min-height: 605px; position: relative; padding: 1.5rem; }
+.chart-wrapper { position: relative; width: 100%; height: 100%; }
+@media (max-width: 1023px) { .chart-container { min-height: 666px; padding: 1rem; } }
+@media (max-width: 640px) { .chart-container { min-height: 605px; } }
+.plotly .hovertext { z-index: 1000; }
+.hovertext { max-height: 280px; overflow-y: auto; }
+.hovertext::-webkit-scrollbar { width: 6px; }
+.hovertext::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+.hovertext::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.tab-container { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; overflow-x: auto;}
+.tab-btn {
+padding: 1rem 1.5rem;
+font-size: 1rem;
+font-weight: 600;
+color: #64748b;
+border: none;
+background: none;
+cursor: pointer;
+transition: all 0.3s ease;
+border-bottom: 3px solid transparent;
+margin-bottom: -2px;
+white-space: nowrap;
+}
+.tab-btn:hover { color: #0050ff; }
+.tab-btn.active { color: #0050ff; border-bottom-color: #0050ff; }
+.tab-content { display: none; }
+.tab-content.active { display: grid; }
 
-    .chart-wrapper-box {
-      min-width: 300px;
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      padding: 15px;
-      width: 100%;
-    }
+.chart-wrapper-box {
+min-width: 300px;
+background: #ffffff;
+border-radius: 8px;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+padding: 15px;
+width: 100%;
+}
 
-    .strategy-description {
-      background-color: #f8fafc;
-      border-radius: 6px;
-      padding: 1.5rem; 
-      color: #334155;
-    }
+.strategy-description {
+background-color: #f8fafc;
+border-radius: 6px;
+padding: 1.5rem;
+color: #334155;
+}
 
-    .strategy-description h3 {
-      margin-top: 0;
-      color: #0f172a;
-    }
-  </style>
+.strategy-description h3 {
+margin-top: 0;
+color: #0f172a;
+}
+</style>
 </head>
-<body class="min-h-screen pt-[73px]"> 
-  
+<body class="min-h-screen pt-[73px]">
 <nav class="border-b border-gray-200 bg-white/90 backdrop-blur-md fixed top-0 left-0 w-full z-50 shadow-sm h-[73px] flex items-center">
-  <div class="w-full px-4 md:px-6 flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <button id="mobile-menu-btn" class="md:hidden text-slate-500 hover:text-slate-800 focus:outline-none text-2xl">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-      
-      <div class="flex items-center gap-3">
-        <img src="https://media.licdn.com/dms/image/v2/D4D0BAQF68-WEFB0KLg/company-logo_200_200/company-logo_200_200/0/1697810707337/conio_logo?e=2147483647&v=beta&t=al0vx5YOQv08DXnuzKaUvTg4FmCbTU8JpmEjziVADHE" alt="Conio Logo" class="w-10 h-10 rounded-full shadow-md object-cover">
-        <span class="title-font text-2xl font-bold tracking-tight text-[#0a1b39]">Conio <span class="text-[#0050ff]">Analytics</span></span>
-      </div>
-    </div>
-  </div>
+<div class="w-full px-4 md:px-6 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button id="mobile-menu-btn" class="md:hidden text-slate-500 hover:text-slate-800 focus:outline-none text-2xl">
+<i class="fa-solid fa-bars"></i>
+</button>
+<div class="flex items-center gap-3">
+<img src="https://media.licdn.com/dms/image/v2/D4D0BAQF68-WEFB0KLg/company-logo_200_200/company-logo_200_200/0/1697810707337/conio_logo?e=2147483647&v=beta&t=al0vx5YOQv08DXnuzKaUvTg4FmCbTU8JpmEjziVADHE" alt="Conio Logo" class="w-10 h-10 rounded-full shadow-md object-cover">
+<span class="title-font text-2xl font-bold tracking-tight text-[#0a1b39]">Conio <span class="text-[#0050ff]">Analytics</span></span>
+</div>
+</div>
+</div>
 </nav>
 
 <aside id="sidebar" class="fixed top-[73px] left-0 w-64 h-[calc(100vh-73px)] bg-white border-r border-slate-200 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto shadow-lg md:shadow-none">
-  <div class="p-4 flex flex-col gap-2">
-    <button class="sidebar-btn active w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-[#0050ff] bg-blue-50" data-page="page-settori">
-      <i class="fa-solid fa-chart-pie w-5 text-center"></i> Settori
-    </button>
-    <button class="sidebar-btn w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-slate-600 hover:bg-slate-50" data-page="page-market">
-      <i class="fa-solid fa-chart-line w-5 text-center"></i> Market Analytics
-    </button>
-    <button class="sidebar-btn w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-slate-600 hover:bg-slate-50" data-page="page-builder">
-      <i class="fa-solid fa-sliders w-5 text-center"></i> Strategy Builder
-    </button>
-  </div>
+<div class="p-4 flex flex-col gap-2">
+<button class="sidebar-btn active w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-[#0050ff] bg-blue-50" data-page="page-settori">
+<i class="fa-solid fa-chart-pie w-5 text-center"></i> Settori
+</button>
+<button class="sidebar-btn w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-slate-600 hover:bg-slate-50" data-page="page-market">
+<i class="fa-solid fa-chart-line w-5 text-center"></i> Market Analytics
+</button>
+<button class="sidebar-btn w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-slate-600 hover:bg-slate-50" data-page="page-builder">
+<i class="fa-solid fa-sliders w-5 text-center"></i> Strategy Builder
+</button>
+</div>
 </aside>
 
 <main class="md:ml-64 p-4 md:p-8 transition-all duration-300 max-w-screen-2xl mx-auto">
 
-  <div id="page-settori" class="page-content block">
-    <div class="mb-10">
-      <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
-        <div>
-          <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Indici Settoriali</h2>
-          <p class="text-slate-500 mt-2 font-medium">Dynamic cryptocurrency portfolios</p>
-        </div>
-      </div>
+<div id="page-settori" class="page-content block">
+<div class="mb-10">
+<div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+<div>
+<h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Indici Settoriali</h2>
+<p class="text-slate-500 mt-2 font-medium">Dynamic cryptocurrency portfolios</p>
+</div>
+</div>
 
-      <div class="tab-container">
-        <button class="tab-btn active" data-tab="mainStrategy">Top 5 Market Cap</button>
-        <button class="tab-btn" data-tab="techMarketCap">Tech</button>
-        <button class="tab-btn" data-tab="extraStrategy1">DeFi</button>
-        <button class="tab-btn" data-tab="extraStrategy2">Payments</button>
-      </div>
+<div class="tab-container">
+<button class="tab-btn active" data-tab="mainStrategy">Top 5 Market Cap</button>
+<button class="tab-btn" data-tab="techMarketCap">Tech</button>
+<button class="tab-btn" data-tab="extraStrategy1">DeFi</button>
+<button class="tab-btn" data-tab="extraStrategy2">Payments</button>
+</div>
 
-      <div id="mainStrategy" class="tab-content active">
-        <div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
-            <div>
-              <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
-              <p id="main-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-              <p id="main-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-              <p id="main-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-          </div>
-        </div>
+<div id="mainStrategy" class="tab-content active">
+<div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+<div>
+<p class="text-sm font-medium text-slate-500">Valore Attuale</p>
+<p id="main-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
+<p id="main-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
+<p id="main-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+</div>
+</div>
 
-        <div class="strategy-description mb-8">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
-          <p class="text-sm leading-relaxed">
-            Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato per tracciare le 5 criptovalute a maggiore capitalizzazione all'interno del nostro universo di asset idonei. All'interno dell'indice, ogni criptovaluta è pesata in modo proporzionale alla propria capitalizzazione di mercato, offrendo un'esposizione che riflette fedelmente le reali gerarchie del settore. Per garantire che l'indice rimanga sempre rappresentativo, il portafoglio subisce un ribilanciamento automatico ogni sei mesi, durante il quale vengono ricalcolati i pesi e aggiornati gli asset in base all'attuale top 5. Infine, per rendere l'analisi delle performance più intuitiva, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC). Quest'ultimo viene inoltre utilizzato come benchmark di riferimento nei grafici, permettendo di confrontare visivamente e in modo immediato l'andamento della strategia rispetto al leader di mercato.
-          </p>
-        </div>
+<div class="strategy-description mb-8">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
+<p class="text-sm leading-relaxed">
+Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato per tracciare le 5 criptovalute a maggiore capitalizzazione all'interno del nostro universo di asset idonei. All'interno dell'indice, ogni criptovaluta è pesata in modo proporzionale alla propria capitalizzazione di mercato, offrendo un'esposizione che riflette fedelmente le reali gerarchie del settore. Per garantire che l'indice rimanga sempre rappresentativo, il portafoglio subisce un ribilanciamento automatico ogni sei mesi, durante il quale vengono ricalcolati i pesi e aggiornati gli asset in base all'attuale top 5. Infine, per rendere l'analisi delle performance più intuitiva, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC). Quest'ultimo viene inoltre utilizzato come benchmark di riferimento nei grafici, permettendo di confrontare visivamente e in modo immediato l'andamento della strategia rispetto al leader di mercato.
+</p>
+</div>
 
-        <div class="chart-wrapper-box mb-8">
-          <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-          <div id="performance-chart"></div>
-          <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
-          </div>
-        </div>
+<div class="chart-wrapper-box mb-8">
+<h3 class="font-bold mb-4">Performance dell'Indice</h3>
+<div id="performance-chart"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
+</div>
+</div>
 
-        <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
-          <table class="w-full text-sm text-center whitespace-nowrap">
-            </table>
-        </div>
+<div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
+<table class="w-full text-sm text-center whitespace-nowrap">
+</table>
+</div>
 
-        <div id="main-allocation"></div>
-        <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-           <p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
-        </div>
+<div id="main-allocation"></div>
+<div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
+</div>
 
-        <div class="chart-wrapper-box mb-16">
-          <h3 class="font-bold mb-4">Composizione</h3>
-          <div id="composition-chart"></div>
-          <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
-          </div>
-        </div>
+<div class="chart-wrapper-box mb-16">
+<h3 class="font-bold mb-4">Composizione</h3>
+<div id="composition-chart"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
+</div>
+</div>
 
-        <div class="mb-6">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Universo degli Asset</h3>
-          <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
-            <span>Bitcoin</span><span>Ethereum</span><span>XRP</span><span>Solana</span><span>Dogecoin</span><span>Cardano</span><span>Chainlink</span><span>Avalanche</span><span>Polkadot</span><span>Uniswap</span><span>Sky</span><span>Near</span><span>Cosmos</span><span>Polygon</span><span>Algorand</span><span>Aptos</span><span>Arbitrum</span><span>Stacks</span><span>Injective</span><span>Celestia</span><span>The Graph</span><span>Optimism</span><span>Sui</span><span>Stellar Lumens</span><span>XPL</span><span>Ondo</span><span>Hedera</span><span>Filecoin</span><span>Aave</span><span>Midnight</span><span>Ethereum Classic</span><span>Litecoin</span>
-          </div>
-        </div>
-      </div>
+<div class="mb-6">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Universo degli Asset</h3>
+<p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+<span>Bitcoin</span><span>Ethereum</span><span>XRP</span><span>Solana</span><span>Dogecoin</span><span>Cardano</span><span>Chainlink</span><span>Avalanche</span><span>Polkadot</span><span>Uniswap</span><span>Sky</span><span>Near</span><span>Cosmos</span><span>Polygon</span><span>Algorand</span><span>Aptos</span><span>Arbitrum</span><span>Stacks</span><span>Injective</span><span>Celestia</span><span>The Graph</span><span>Optimism</span><span>Sui</span><span>Stellar Lumens</span><span>XPL</span><span>Ondo</span><span>Hedera</span><span>Filecoin</span><span>Aave</span><span>Midnight</span><span>Ethereum Classic</span><span>Litecoin</span>
+</div>
+</div>
+</div>
 
-      <div id="techMarketCap" class="tab-content">
-        <div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
-            <div>
-              <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
-              <p id="tech-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-              <p id="tech-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-              <p id="tech-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-          </div>
-        </div>
+<div id="techMarketCap" class="tab-content">
+<div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+<div>
+<p class="text-sm font-medium text-slate-500">Valore Attuale</p>
+<p id="tech-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
+<p id="tech-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
+<p id="tech-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+</div>
+</div>
 
-        <div class="strategy-description mb-8">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Tech</h3>
-          <p class="text-sm leading-relaxed">
-            Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset che supportano infrastrutture e soluzioni tecnologiche avanzate. Per essere incluso nell'indice, ogni progetto deve soddisfare un criterio di capitalizzazione di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati proprio in base alla loro capitalizzazione, offrendo un'esposizione proporzionale al loro peso reale nel mercato. Per mantenere la strategy aggiornata e in linea con le soglie richieste, l'indice prevede un ribilanciamento automatico ogni sei mesi, durante il quale i pesi vengono ricalcolati e i componenti rivisti. Il valore di partenza dell'indice è stato equiparato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare le performance di questo comparto tecnologico rispetto al leader generale del mercato.
-          </p>
-        </div>
+<div class="strategy-description mb-8">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Tech</h3>
+<p class="text-sm leading-relaxed">
+Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset che supportano infrastrutture e soluzioni tecnologiche avanzate. Per essere incluso nell'indice, ogni progetto deve soddisfare un criterio di capitalizzazione di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati proprio in base alla loro capitalizzazione, offrendo un'esposizione proporzionale al loro peso reale nel mercato. Per mantenere la strategy aggiornata e in linea con le soglie richieste, l'indice prevede un ribilanciamento automatico ogni sei mesi, durante il quale i pesi vengono ricalcolati e i componenti rivisti. Il valore di partenza dell'indice è stato equiparato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare le performance di questo comparto tecnologico rispetto al leader generale del mercato.
+</p>
+</div>
 
-        <div class="chart-wrapper-box mb-8">
-          <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-          <div id="tech-performance-chart"></div>
-          <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
-          </div>
-        </div>
+<div class="chart-wrapper-box mb-8">
+<h3 class="font-bold mb-4">Performance dell'Indice</h3>
+<div id="tech-performance-chart"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
+</div>
+</div>
 
-        <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
-          <table class="w-full text-sm text-center whitespace-nowrap">
-            </table>
-        </div>
+<div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
+<table class="w-full text-sm text-center whitespace-nowrap">
+</table>
+</div>
 
-        <div id="tech-allocation"></div>
-        <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-           <p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
-        </div>
+<div id="tech-allocation"></div>
+<div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
+</div>
 
-        <div class="chart-wrapper-box mb-16">
-          <h3 class="font-bold mb-4">Composizione</h3>
-          <div id="tech-weights-chart"></div>
-          <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
-          </div>
-        </div>
+<div class="chart-wrapper-box mb-16">
+<h3 class="font-bold mb-4">Composizione</h3>
+<div id="tech-weights-chart"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
+</div>
+</div>
 
-        <div class="mb-6">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Tech Asset</h3>
-          <p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
-            <span>Ethereum</span><span>Solana</span><span>Cardano</span><span>Avalanche</span><span>Polkadot</span><span>Near</span><span>Cosmos</span><span>Algorand</span><span>Aptos</span><span>Celestia</span><span>Sui</span><span>Hedera</span>
-          </div>
-        </div>
-      </div>
+<div class="mb-6">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Tech Asset</h3>
+<p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+<span>Ethereum</span><span>Solana</span><span>Cardano</span><span>Avalanche</span><span>Polkadot</span><span>Near</span><span>Cosmos</span><span>Algorand</span><span>Aptos</span><span>Celestia</span><span>Sui</span><span>Hedera</span>
+</div>
+</div>
+</div>
 
-      <div id="extraStrategy1" class="tab-content">
-        <div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
-            <div>
-              <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
-              <p id="extra1-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-              <p id="extra1-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-              <p id="extra1-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-          </div>
-        </div>
+<div id="extraStrategy1" class="tab-content">
+<div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+<div>
+<p class="text-sm font-medium text-slate-500">Valore Attuale</p>
+<p id="extra1-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
+<p id="extra1-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
+<p id="extra1-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+</div>
+</div>
 
-        <div class="strategy-description mb-8">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
-          <p class="text-sm leading-relaxed">
-            Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategy prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategies, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
-          </p>
-        </div>
+<div class="strategy-description mb-8">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
+<p class="text-sm leading-relaxed">
+Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategy prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategies, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
+</p>
+</div>
 
-        <div class="chart-wrapper-box mb-8">
-          <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-          <div id="extra1-performance-chart"></div>
-          <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
-          </div>
-        </div>
+<div class="chart-wrapper-box mb-8">
+<h3 class="font-bold mb-4">Performance dell'Indice</h3>
+<div id="extra1-performance-chart"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
+</div>
+</div>
 
-        <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
-          <table class="w-full text-sm text-center whitespace-nowrap">
-             </table>
-        </div>
+<div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
+<table class="w-full text-sm text-center whitespace-nowrap">
+</table>
+</div>
 
-        <div id="extra1-allocation"></div>
-        <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-           <p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
-        </div>
+<div id="extra1-allocation"></div>
+<div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
+</div>
 
-        <div class="chart-wrapper-box mb-16">
-          <h3 class="font-bold mb-4">Composizione</h3>
-          <div id="extra1-composition-chart"></div>
-          <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
-          </div>
-        </div>
+<div class="chart-wrapper-box mb-16">
+<h3 class="font-bold mb-4">Composizione</h3>
+<div id="extra1-composition-chart"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
+</div>
+</div>
 
-        <div class="mb-6">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Defi</h3>
-          <p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
-            <span>Chainlink</span><span>Uniswap</span><span>Sky</span><span>Injective</span><span>Ondo</span><span>Aave</span>
-          </div>
-        </div>
-      </div>
+<div class="mb-6">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Defi</h3>
+<p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+<span>Chainlink</span><span>Uniswap</span><span>Sky</span><span>Injective</span><span>Ondo</span><span>Aave</span>
+</div>
+</div>
+</div>
 
-      <div id="extraStrategy2" class="tab-content">
-        <div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
-            <div>
-              <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
-              <p id="extra2-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-              <p id="extra2-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-              <p id="extra2-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-          </div>
-        </div>
+<div id="extraStrategy2" class="tab-content">
+<div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+<div>
+<p class="text-sm font-medium text-slate-500">Valore Attuale</p>
+<p id="extra2-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
+<p id="extra2-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
+<p id="extra2-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+</div>
+</div>
+</div>
 
-        <div class="strategy-description mb-8">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Payments</h3>
-          <p class="text-sm leading-relaxed">
-            Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset progettate per innovare e migliorare l'efficienza dei sistemi di pagamento. Per garantire solidità e rilevanza, l'inclusione nell'indice è subordinata al superamento di una rigorosa soglia d'ingresso: ogni progetto deve raggiungere una capitalizzazione di mercato di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati in base alla loro capitalizzazione, offrendo così un'esposizione proporzionale alla loro effettiva adozione e grandezza nel settore. Per mantenere la composizione sempre aggiornata e fedele alle evoluzioni del mercato, la strategia prevede un ribilanciamento automatico con cadenza semestrale, momento in cui i pesi vengono ricalcolati e i componenti verificati. Infine, per rendere l'analisi delle performance il più intuitiva possibile, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare l'andamento del comparto pagamenti con il leader indiscusso del mercato.
-          </p>
-        </div>
+<div class="strategy-description mb-8">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Payments</h3>
+<p class="text-sm leading-relaxed">
+Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset progettate per innovare e migliorare l'efficienza dei sistemi di pagamento. Per garantire solidità e rilevanza, l'inclusione nell'indice è subordinata al superamento di una rigorosa soglia d'ingresso: ogni progetto deve raggiungere una capitalizzazione di mercato di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati in base alla loro capitalizzazione, offrendo così un'esposizione proporzionale alla loro effettiva adozione e grandezza nel settore. Per mantenere la composizione sempre aggiornata e fedele alle evoluzioni del mercato, la strategia prevede un ribilanciamento automatico con cadenza semestrale, momento in cui i pesi vengono ricalcolati e i componenti verificati. Infine, per rendere l'analisi delle performance il più intuitiva possibile, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare l'andamento del comparto pagamenti con il leader indiscusso del mercato.
+</p>
+</div>
 
-        <div class="chart-wrapper-box mb-8">
-          <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-          <div id="extra2-performance-chart"></div>
-          <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
-          </div>
-        </div>
+<div class="chart-wrapper-box mb-8">
+<h3 class="font-bold mb-4">Performance dell'Indice</h3>
+<div id="extra2-performance-chart"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
+</div>
+</div>
 
-        <div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
-          <table class="w-full text-sm text-center whitespace-nowrap">
-            </table>
-        </div>
+<div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
+<table class="w-full text-sm text-center whitespace-nowrap">
+</table>
+</div>
 
-        <div id="extra2-allocation"></div>
-        <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-           <p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
-        </div>
+<div id="extra2-allocation"></div>
+<div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
+</div>
 
-        <div class="chart-wrapper-box mb-16">
-          <h3 class="font-bold mb-4">Composizione</h3>
-          <div id="extra2-weights-chart"></div>
-          <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
-          </div>
-        </div>
+<div class="chart-wrapper-box mb-16">
+<h3 class="font-bold mb-4">Composizione</h3>
+<div id="extra2-weights-chart"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
+</div>
+</div>
 
-        <div class="mb-6">
-          <h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Payments</h3>
-          <p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
-            <span>Bitcoin</span><span>XRP</span><span>Stellar</span><span>Plasma</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="mb-6">
+<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Payments</h3>
+<p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+<span>Bitcoin</span><span>XRP</span><span>Stellar</span><span>Plasma</span>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-  <div id="page-market" class="page-content hidden">
-    <div class="mb-8">
-      <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Statistiche di Mercato</h2>
-      <p class="text-sm text-slate-600 mt-4 leading-relaxed">
-        In questa sezione puoi monitorare le principali metriche macroeconomiche e di mercato che influenzano l'ecosistema delle criptovalute. L'analisi di parametri chiave come la Bitcoin Dominance, le correlazioni tra i vari asset digitali rispetto al leader di mercato, i volumi di scambio e l'andamento della volatilità fornisce una visione olistica e approfondita sui trend in corso. Questi strumenti interattivi sono stati appositamente pensati per aiutarti a comprendere i complessi flussi di capitale all'interno del mercato crypto, permettendoti di decifrare in modo più accurato e consapevole il sentiment generale degli investitori. Che si tratti di valutare l'avversione al rischio durante le fasi di contrazione o di misurare l'euforia nei periodi rialzisti, avere a disposizione una panoramica completa e aggiornata è fondamentale. In questo modo potrai contestualizzare le singole variazioni di prezzo all'interno del più ampio scenario finanziario globale, supportando in maniera data-driven le tue decisioni analitiche e strategiche di medio e lungo termine.
-      </p>
-    </div>
+<div id="page-market" class="page-content hidden">
+<div class="mb-8">
+<h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Statistiche di Mercato</h2>
+<p class="text-sm text-slate-600 mt-4 leading-relaxed">
+In questa sezione puoi monitorare le principali metriche macroeconomiche e di mercato che influenzano l'ecosistema delle criptovalute. L'analisi di parametri chiave come la Bitcoin Dominance, le correlazioni tra i vari asset digitali rispetto al leader di mercato, i volumi di scambio e l'andamento della volatilità fornisce una visione olistica e approfondita sui trend in corso. Questi strumenti interattivi sono stati appositamente pensati per aiutarti a comprendere i complessi flussi di capitale all'interno del mercato crypto, permettendoti di decifrare in modo più accurato e consapevole il sentiment generale degli investitori. Che si tratti di valutare l'avversione al rischio durante le fasi di contrazione o di misurare l'euforia nei periodi rialzisti, avere a disposizione una panoramica completa e aggiornata è fondamentale. In questo modo potrai contestualizzare le singole variazioni di prezzo all'interno del più ampio scenario finanziario globale, supportando in maniera data-driven le tue decisioni analitiche e strategiche di medio e lungo termine.
+</p>
+</div>
 
-    <div class="mb-16">
-      <div class="flex flex-col gap-10" id="market-analytics-charts-container">
-      </div>
-    </div>
+<div class="mb-16">
+<div class="flex flex-col gap-10" id="market-analytics-charts-container">
+</div>
+</div>
 
-    <div class="mb-10">
-      <div class="grid lg:grid-cols-2 gap-10">
-        <div class="chart-card bg-white">
-          <div class="chart-container p-0" style="min-height: 410px;">
-            <div class="chart-wrapper">
-              <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
-            </div>
-          </div>
-          <div class="p-5 border-t border-slate-100 bg-slate-50 mt-auto">
-             <p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento storico del prezzo di Bitcoin (BTC) con la sua volatilità di mercato. Osservare i picchi di volatilità in relazione ai movimenti di prezzo permette di identificare le fasi di maggiore stress o euforia del mercato, aiutando a contestualizzare i cicli rialzisti e ribassisti storici della principale criptovaluta.</p>
-          </div>
-        </div>
-        
-        <div class="chart-card bg-white">
-          <div class="chart-container p-0" style="min-height: 410px;">
-            <div class="chart-wrapper">
-              <iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=1143695036&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
-            </div>
-          </div>
-          <div class="p-5 border-t border-slate-100 bg-slate-50 mt-auto">
-            <p class="text-sm text-slate-600 leading-relaxed">Similmente al grafico precedente, questo strumento mette in relazione il prezzo storico di Ethereum (ETH) con i suoi livelli di volatilità. Poiché Ethereum rappresenta il fulcro della finanza decentralizzata (DeFi) e degli smart contract, monitorarne la volatilità rispetto al prezzo è fondamentale per comprendere i flussi di capitale e il sentiment di rischio associato al settore delle altcoin.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="mb-10">
+<div class="grid lg:grid-cols-2 gap-10">
+<div class="chart-card bg-white">
+<div class="chart-container p-0" style="min-height: 410px;">
+<div class="chart-wrapper">
+<iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
+</div>
+</div>
+<div class="p-5 border-t border-slate-100 bg-slate-50 mt-auto">
+<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento storico del prezzo di Bitcoin (BTC) con la sua volatilità di mercato. Osservare i picchi di volatilità in relazione ai movimenti di prezzo permette di identificare le fasi di maggiore stress o euforia del mercato, aiutando a contestualizzare i cicli rialzisti e ribassisti storici della principale criptovaluta.</p>
+</div>
+</div>
+<div class="chart-card bg-white">
+<div class="chart-container p-0" style="min-height: 410px;">
+<div class="chart-wrapper">
+<iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=1143695036&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
+</div>
+</div>
+<div class="p-5 border-t border-slate-100 bg-slate-50 mt-auto">
+<p class="text-sm text-slate-600 leading-relaxed">Similmente al grafico precedente, questo strumento mette in relazione il prezzo storico di Ethereum (ETH) con i suoi livelli di volatilità. Poiché Ethereum rappresenta il fulcro della finanza decentralizzata (DeFi) e degli smart contract, monitorarne la volatilità rispetto al prezzo è fondamentale per comprendere i flussi di capitale e il sentiment di rischio associato al settore delle altcoin.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-  <div id="page-builder" class="page-content hidden">
-    <div class="mb-8">
-      <h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Strategy Builder</h2>
-      <p class="text-slate-500 mt-2 font-medium">Crea, backtesta e analizza il tuo portafoglio crypto personalizzato.</p>
-    </div>
+<div id="page-builder" class="page-content hidden">
+<div class="mb-8">
+<h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Strategy Builder</h2>
+<p class="text-slate-500 mt-2 font-medium">Crea, backtesta e analizza i tuoi portafogli crypto personalizzati.</p>
+</div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-      
-      <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit">
-        <h3 class="text-lg font-bold text-[#0a1b39] mb-4">Composizione Portafoglio</h3>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-slate-700 mb-1">Seleziona Asset</label>
-          <div class="flex gap-2">
-            <select id="builder-asset-select" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
-              <option value="BTC">Bitcoin (BTC)</option>
-              <option value="ETH">Ethereum (ETH)</option>
-              <option value="SOL">Solana (SOL)</option>
-              <option value="XRP">XRP (XRP)</option>
-              <option value="ADA">Cardano (ADA)</option>
-              <option value="DOT">Polkadot (DOT)</option>
-              <option value="AVAX">Avalanche (AVAX)</option>
-              <option value="LINK">Chainlink (LINK)</option>
-              <option value="DOGE">Dogecoin (DOGE)</option>
-              <option value="UNI">Uniswap (UNI)</option>
-            </select>
-            <input type="number" id="builder-weight-input" placeholder="Peso %" min="1" max="100" class="block w-24 border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
-            <button id="builder-add-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-3 rounded-lg transition-colors">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-        </div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+<div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit">
+<h3 class="text-lg font-bold text-[#0a1b39] mb-4">Composizione Portafogli</h3>
+<div class="mb-6">
+<label class="block text-sm font-medium text-slate-700 mb-1">Aggiungi a:</label>
+<select id="builder-target-portfolio" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border mb-3">
+<option value="1">Portafoglio A</option>
+<option value="2">Portafoglio B (Opzionale, per confronto)</option>
+</select>
 
-        <div class="bg-slate-50 rounded-lg p-3 min-h-[150px] border border-slate-100 mb-4">
-          <ul id="builder-portfolio-list" class="divide-y divide-slate-200 text-sm">
-            </ul>
-        </div>
-        
-        <div class="flex justify-between items-center mb-6 px-2">
-          <div>
-            <span class="font-medium text-slate-600">Totale allocato:</span>
-            <span id="builder-total-weight" class="font-bold text-lg text-slate-800 ml-1">0%</span>
-          </div>
-          <button id="builder-clear-btn" class="text-sm text-red-500 hover:text-red-700 font-medium transition-colors hidden">
-            <i class="fa-solid fa-trash-can mr-1"></i> Pulisci
-          </button>
-        </div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Seleziona Asset</label>
+<div class="flex gap-2">
+<select id="builder-asset-select" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+<option value="BTC">Bitcoin (BTC)</option>
+<option value="ETH">Ethereum (ETH)</option>
+<option value="SOL">Solana (SOL)</option>
+<option value="XRP">XRP (XRP)</option>
+<option value="ADA">Cardano (ADA)</option>
+<option value="DOT">Polkadot (DOT)</option>
+<option value="AVAX">Avalanche (AVAX)</option>
+<option value="LINK">Chainlink (LINK)</option>
+<option value="DOGE">Dogecoin (DOGE)</option>
+<option value="UNI">Uniswap (UNI)</option>
+</select>
+<input type="number" id="builder-weight-input" placeholder="Peso %" min="1" max="100" class="block w-24 border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+<button id="builder-add-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-3 rounded-lg transition-colors">
+<i class="fa-solid fa-plus"></i>
+</button>
+</div>
+</div>
 
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-slate-700 mb-1">Timeframe Backtest</label>
-          <select id="builder-timeframe" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border mb-3">
-            <option value="1M">Ultimo Mese</option>
-            <option value="6M">Ultimi 6 Mesi</option>
-            <option value="1Y" selected>Ultimo Anno</option>
-            <option value="3Y">Ultimi 3 Anni</option>
-            <option value="5Y">Ultimi 5 Anni</option>
-            <option value="YTD">Year to Date</option>
-            <option value="CUSTOM">Date Personalizzate</option>
-          </select>
-          
-          <div id="custom-date-range" class="hidden grid grid-cols-2 gap-2 transition-all">
-            <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Data Inizio</label>
-              <input type="date" id="builder-start-date" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-500 mb-1">Data Fine</label>
-              <input type="date" id="builder-end-date" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
-            </div>
-          </div>
-        </div>
+<div class="mb-4">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm font-bold text-slate-700">Portafoglio A</span>
+<button id="builder-clear-btn-1" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors hidden">
+<i class="fa-solid fa-trash-can mr-1"></i> Pulisci
+</button>
+</div>
+<div class="bg-slate-50 rounded-lg p-3 min-h-[80px] border border-slate-100 mb-2">
+<ul id="builder-portfolio-list-1" class="divide-y divide-slate-200 text-sm">
+</ul>
+</div>
+<div class="px-2">
+<span class="text-xs font-medium text-slate-600">Totale allocato:</span>
+<span id="builder-total-weight-1" class="font-bold text-sm text-slate-800 ml-1">0%</span>
+</div>
+</div>
 
-        <button id="builder-run-btn" class="w-full bg-[#0050ff] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-          Run Strategy
-        </button>
-        <p class="text-xs text-center text-slate-400 mt-3">Il totale dei pesi deve essere esattamente 100%.</p>
-      </div>
+<div class="mb-6">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm font-bold text-slate-700">Portafoglio B <span class="text-slate-400 font-normal">(Confronto)</span></span>
+<button id="builder-clear-btn-2" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors hidden">
+<i class="fa-solid fa-trash-can mr-1"></i> Pulisci
+</button>
+</div>
+<div class="bg-slate-50 rounded-lg p-3 min-h-[80px] border border-slate-100 mb-2">
+<ul id="builder-portfolio-list-2" class="divide-y divide-slate-200 text-sm">
+</ul>
+</div>
+<div class="px-2">
+<span class="text-xs font-medium text-slate-600">Totale allocato:</span>
+<span id="builder-total-weight-2" class="font-bold text-sm text-slate-800 ml-1">0%</span>
+</div>
+</div>
 
-      <div class="lg:col-span-2 flex flex-col gap-8">
-        
-        <div id="builder-results-placeholder" class="bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center h-full min-h-[400px]">
-          <div class="text-center text-slate-400">
-            <i class="fa-solid fa-chart-line text-4xl mb-3"></i>
-            <p>Seleziona i tuoi asset e clicca "Run Strategy" per visualizzare i risultati.</p>
-          </div>
-        </div>
+<div class="mb-6">
+<label class="block text-sm font-medium text-slate-700 mb-1">Timeframe Backtest</label>
+<select id="builder-timeframe" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border mb-3">
+<option value="1M">Ultimo Mese</option>
+<option value="6M">Ultimi 6 Mesi</option>
+<option value="1Y" selected>Ultimo Anno</option>
+<option value="3Y">Ultimi 3 Anni</option>
+<option value="5Y">Ultimi 5 Anni</option>
+<option value="YTD">Year to Date</option>
+<option value="CUSTOM">Date Personalizzate</option>
+</select>
+<div id="custom-date-range" class="hidden grid grid-cols-2 gap-2 transition-all">
+<div>
+<label class="block text-xs font-medium text-slate-500 mb-1">Data Inizio</label>
+<input type="date" id="builder-start-date" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+</div>
+<div>
+<label class="block text-xs font-medium text-slate-500 mb-1">Data Fine</label>
+<input type="date" id="builder-end-date" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+</div>
+</div>
+</div>
 
-        <div id="builder-results-content" class="hidden flex-col gap-6">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <p class="text-xs font-medium text-slate-500 uppercase">Rendimento Totale</p>
-              <p id="b-stat-return" class="text-xl font-bold text-green-500 mt-1">--</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <p class="text-xs font-medium text-slate-500 uppercase">Volatilità (Ann.)</p>
-              <p id="b-stat-vol" class="text-xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <p class="text-xs font-medium text-slate-500 uppercase">Max Drawdown</p>
-              <p id="b-stat-dd" class="text-xl font-bold text-red-500 mt-1">--</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <p class="text-xs font-medium text-slate-500 uppercase">Sharpe Ratio</p>
-              <p id="b-stat-sharpe" class="text-xl font-bold text-slate-800 mt-1">--</p>
-            </div>
-          </div>
+<button id="builder-run-btn" class="w-full bg-[#0050ff] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+Run Strategy
+</button>
+<p class="text-xs text-center text-slate-400 mt-3">I pesi di ogni portafoglio attivo devono essere al 100%.</p>
+</div>
 
-          <div class="chart-wrapper-box">
-            <h3 class="font-bold mb-4">Equity Curve della Strategia</h3>
-            <div id="builder-performance-chart" style="min-height: 400px;"></div>
-          </div>
-        </div>
+<div class="lg:col-span-2 flex flex-col gap-8">
+<div id="builder-results-placeholder" class="bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center h-full min-h-[400px]">
+<div class="text-center text-slate-400">
+<i class="fa-solid fa-chart-line text-4xl mb-3"></i>
+<p>Seleziona i tuoi asset e clicca "Run Strategy" per visualizzare i risultati.</p>
+</div>
+</div>
 
-      </div>
-    </div>
-  </div>
+<div id="builder-results-content" class="hidden flex-col gap-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+<p class="text-xs font-medium text-slate-500 uppercase mb-2">Rendimento Totale</p>
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-slate-400">A:</span>
+<span id="b-stat-return-1" class="text-lg font-bold">--</span>
+</div>
+<div class="flex justify-between items-center mt-1" id="box-b-stat-return-2">
+<span class="text-xs font-bold text-slate-400">B:</span>
+<span id="b-stat-return-2" class="text-lg font-bold">--</span>
+</div>
+</div>
+<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+<p class="text-xs font-medium text-slate-500 uppercase mb-2">Volatilità (Ann.)</p>
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-slate-400">A:</span>
+<span id="b-stat-vol-1" class="text-lg font-bold text-slate-800">--</span>
+</div>
+<div class="flex justify-between items-center mt-1" id="box-b-stat-vol-2">
+<span class="text-xs font-bold text-slate-400">B:</span>
+<span id="b-stat-vol-2" class="text-lg font-bold text-slate-800">--</span>
+</div>
+</div>
+<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+<p class="text-xs font-medium text-slate-500 uppercase mb-2">Max Drawdown</p>
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-slate-400">A:</span>
+<span id="b-stat-dd-1" class="text-lg font-bold text-slate-800">--</span>
+</div>
+<div class="flex justify-between items-center mt-1" id="box-b-stat-dd-2">
+<span class="text-xs font-bold text-slate-400">B:</span>
+<span id="b-stat-dd-2" class="text-lg font-bold text-slate-800">--</span>
+</div>
+</div>
+<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+<p class="text-xs font-medium text-slate-500 uppercase mb-2">Sharpe Ratio</p>
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-slate-400">A:</span>
+<span id="b-stat-sharpe-1" class="text-lg font-bold text-slate-800">--</span>
+</div>
+<div class="flex justify-between items-center mt-1" id="box-b-stat-sharpe-2">
+<span class="text-xs font-bold text-slate-400">B:</span>
+<span id="b-stat-sharpe-2" class="text-lg font-bold text-slate-800">--</span>
+</div>
+</div>
+</div>
 
-  <footer class="text-center text-slate-500 text-sm py-12 border-t border-gray-200 mt-12">
-    &copy; 2026 Conio Analytics
-  </footer>
+<div class="chart-wrapper-box">
+<h3 class="font-bold mb-4">Equity Curve delle Strategie</h3>
+<div id="builder-performance-chart" style="min-height: 400px;"></div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<footer class="text-center text-slate-500 text-sm py-12 border-t border-gray-200 mt-12">
+&copy; 2026 Conio Analytics
+</footer>
 </main>
 
 <script>
 (function() {
-  const sidebar = document.getElementById('sidebar');
-  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-
-  mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('-translate-x-full');
-  });
-
-  // --- LOGICA MENU LATERALE ---
-  document.querySelectorAll('.sidebar-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.sidebar-btn').forEach(b => {
-        b.classList.remove('text-[#0050ff]', 'bg-blue-50', 'active');
-        b.classList.add('text-slate-600', 'hover:bg-slate-50');
-      });
-      this.classList.remove('text-slate-600', 'hover:bg-slate-50');
-      this.classList.add('text-[#0050ff]', 'bg-blue-50', 'active');
-
-      const pageId = this.getAttribute('data-page');
-      document.querySelectorAll('.page-content').forEach(page => {
-        page.classList.add('hidden');
-        page.classList.remove('block');
-      });
-      document.getElementById(pageId).classList.remove('hidden');
-      document.getElementById(pageId).classList.add('block');
-
-      if (window.innerWidth < 768) {
-        sidebar.classList.add('-translate-x-full');
-      }
-
-      setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
-    });
-  });
-
-  // --- LOGICA SWITCH TAB SETTORI ---
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      // 1. Rimuovi la classe 'active' da tutti i bottoni tab
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      
-      // 2. Aggiungi la classe 'active' al bottone cliccato
-      this.classList.add('active');
-
-      // 3. Nascondi tutti i contenuti dei tab
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-
-      // 4. Mostra il contenuto corrispondente al data-tab
-      const tabId = this.getAttribute('data-tab');
-      document.getElementById(tabId).classList.add('active');
-
-      // 5. Fix Plotly: forza il resize per far disegnare correttamente i grafici nascosti
-      setTimeout(() => { 
-        window.dispatchEvent(new Event('resize')); 
-      }, 50);
-    });
-  });
-  
-  let cryptoNamesMap = {};
-
-  async function loadCryptoNames() {
-    try {
-      const response = await fetch('./charts/crypto_name.json');
-      if (response.ok) {
-        cryptoNamesMap = await response.json();
-      }
-    } catch (e) {
-      console.error('Errore nel caricamento dei nomi crypto:', e);
-    }
-  }
-
-  const performanceChartEl = document.getElementById('performance-chart');
-  const compositionChartEl = document.getElementById('composition-chart');
-  const techPerformanceChartEl = document.getElementById('tech-performance-chart');
-  const techWeightsChartEl = document.getElementById('tech-weights-chart');
-  const extra1PerfChartEl = document.getElementById('extra1-performance-chart');
-  const extra1CompChartEl = document.getElementById('extra1-composition-chart');
-  const extra2PerfChartEl = document.getElementById('extra2-performance-chart');
-  const extra2WeightsChartEl = document.getElementById('extra2-weights-chart');
-
-  function decodePlotlyBdata(traceData) {
-    if (!traceData || typeof traceData !== 'object' || !traceData.bdata) return traceData;
-    try {
-      const b64 = traceData.bdata.replace(/[^A-Za-z0-9+/=]/g, "");
-      const binaryString = window.atob(b64);
-      const len = binaryString.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
-      const dataView = new DataView(bytes.buffer);
-      const arr = [];
-      const isLittleEndian = true;
-      if (traceData.dtype === 'f8' || traceData.dtype === '<f8') {
-        const maxLen = len - (len % 8); 
-        for (let i = 0; i < maxLen; i += 8) arr.push(dataView.getFloat64(i, isLittleEndian));
-      } else if (traceData.dtype === 'f4' || traceData.dtype === '<f4') {
-        const maxLen = len - (len % 4);
-        for (let i = 0; i < maxLen; i += 4) arr.push(dataView.getFloat32(i, isLittleEndian));
-      } else if (traceData.dtype === 'i4' || traceData.dtype === '<i4') {
-        const maxLen = len - (len % 4);
-        for (let i = 0; i < maxLen; i += 4) arr.push(dataView.getInt32(i, isLittleEndian));
-      } else {
-        return traceData; 
-      }
-
-      if (traceData.shape) {
-        const shape = traceData.shape.split(',').map(s => parseInt(s.trim(), 10));
-        if (shape.length === 2) {
-          const rows = shape[0];
-          const cols = shape[1];
-          const reshaped = [];
-          for (let r = 0; r < rows; r++) {
-            reshaped.push(arr.slice(r * cols, (r + 1) * cols));
-          }
-          return reshaped;
-        }
-      }
-      return arr;
-    } catch (e) {
-      console.error("Avviso: Impossibile decodificare i dati bdata.", e);
-      return traceData; 
-    }
-  }
-
-  function processTraces(dataArray) {
-    if (!Array.isArray(dataArray)) return;
-    dataArray.forEach(trace => {
-      if (trace.x) trace.x = decodePlotlyBdata(trace.x);
-      if (trace.y) trace.y = decodePlotlyBdata(trace.y);
-      if (trace.z) trace.z = decodePlotlyBdata(trace.z);
-      if (trace.customdata) trace.customdata = decodePlotlyBdata(trace.customdata);
-    });
-  }
-
-  function getLayoutWithMargins(layout) {
-    return {
-      ...layout,
-      margin: { l: 60, r: 80, t: 50, b: 40 }, 
-      plot_bgcolor: "transparent",
-      paper_bgcolor: "transparent",
-      font: { color: '#475569' },
-      hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, color: "#0f172a" } }
-    };
-  }
-
-  function buildAllocationTable(containerId, allocationObj, mcapObj = null) {
-    const container = document.getElementById(containerId);
-    if (!container || !allocationObj) return;
-
-    let html = `
-      <div class="mt-8 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-sm text-left">
-            <thead class="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ticker</th>
-                <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Asset</th>
-                <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Market Cap</th>
-                <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Allocazione</th>
-                <th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider"></th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-    `;
-
-    const sortedAssets = Object.entries(allocationObj).sort((a, b) => b[1] - a[1]);
-
-    for (const [asset, weight] of sortedAssets) {
-      const tickerName = asset.split('-')[0].replace(/\d+$/, '');
-      const fullName = cryptoNamesMap[asset] || tickerName;
-      const weightPct = (weight * 100).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
-      
-      let mcapDisplay = "";
-      if (mcapObj && mcapObj[asset]) {
-          mcapDisplay = '$ ' + (mcapObj[asset] / 1e9).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' B';
-      } else {
-          const mockMcap = (Math.random() * 40 + 2).toFixed(2);
-          mcapDisplay = `$ ${mockMcap} B`;
-      }
-
-      const barWidth = Math.min((weight * 100), 100).toFixed(2) + '%';
-
-      html += `
-        <tr class="hover:bg-slate-50/80 transition-colors group">
-          <td class="px-6 py-4 whitespace-nowrap font-bold text-slate-600">
-            ${tickerName}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap font-semibold text-[#0a1b39]">
-            ${fullName}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-slate-600">
-            ${mcapDisplay}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-right font-bold text-[#0050ff]">
-            ${weightPct}
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap w-48">
-            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-              <div class="bg-[#0050ff] h-2.5 rounded-full" style="width: ${barWidth}"></div>
-            </div>
-          </td>
-        </tr>
-      `;
-    }
-
-    html += `
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-
-    container.innerHTML = html;
-  }
-
-  // --- NUOVA FUNZIONE: Costruisce la tabella dei rendimenti in modo dinamico ---
-  function buildReturnsTable(tabId, rendimenti, benchmark) {
-    const tableContainer = document.querySelector(`#${tabId} table`);
-    if (!tableContainer) return;
-
-    const years = Object.keys(rendimenti).sort();
-
-    let headers = '<th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>';
-    years.forEach(year => {
-        headers += `<th class="py-3 px-4 font-bold text-[#1e293b] text-base">${year}</th>`;
-    });
-
-    let stratRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Rendimento totale USD</td>';
-    years.forEach(year => {
-        const val = rendimenti[year];
-        const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
-        const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'text-slate-800');
-        stratRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
-    });
-
-    let benchRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Benchmark USD</td>';
-    years.forEach(year => {
-        const val = benchmark[year];
-        const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
-        const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'text-slate-800');
-        benchRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
-    });
-
-    tableContainer.innerHTML = `
-        <thead>
-            <tr class="border-t-[3px] border-b-[2px] border-[#1e293b] bg-slate-50/30">
-                ${headers}
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
-                ${stratRow}
-            </tr>
-            <tr class="border-b border-[#1e293b] hover:bg-slate-50 transition-colors">
-                ${benchRow}
-            </tr>
-        </tbody>
-    `;
-  }
-
-  async function loadMetrics() {
-    function updateMetric(id, value, prefix = '', suffix = '', color = true) {
-      const el = document.getElementById(id);
-      if (el) {
-        if (typeof value === 'number' && !isNaN(value)) {
-          let valueStr = value.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-          el.textContent = `${prefix}${valueStr}${suffix}`;
-          if (color) {
-            if (value > 0) {
-              el.classList.remove('text-red-500', 'text-slate-800');
-              el.classList.add('text-green-500');
-              el.textContent = `+${el.textContent}`;
-            } else if (value < 0) {
-              el.classList.remove('text-green-500', 'text-slate-800');
-              el.classList.add('text-red-500');
-            } else {
-              el.classList.remove('text-green-500', 'text-red-500');
-              el.classList.add('text-slate-800');
-            }
-          }
-        } else {
-          el.textContent = '--';
-          el.classList.remove('text-green-500', 'text-red-500');
-          el.classList.add('text-slate-800');
-        }
-      }
-    }
-
-    function updateVariationMetric(id, currentValue, pctChange) {
-      const el = document.getElementById(id);
-      if (!el || isNaN(currentValue) || isNaN(pctChange)) {
-        if (el) el.textContent = '--';
-        return;
-      }
-
-      const prevValue = currentValue / (1 + pctChange);
-      const absChange = currentValue - prevValue;
-
-      const absStr = Math.abs(absChange).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-      const pctStr = Math.abs(pctChange * 100).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-      let sign = '';
-      if (pctChange > 0) {
-        sign = '+';
-        el.classList.remove('text-red-500', 'text-slate-800');
-        el.classList.add('text-green-500');
-      } else if (pctChange < 0) {
-        sign = '-';
-        el.classList.remove('text-green-500', 'text-slate-800');
-        el.classList.add('text-red-500');
-      } else {
-        el.classList.remove('text-green-500', 'text-red-500');
-        el.classList.add('text-slate-800');
-      }
-
-      el.textContent = `${sign}${absStr} / ${sign}${pctStr}%`;
-    }
-
-    async function fetchAndUpdate(strategy, path, allocationContainerId, tabId) {
-      try {
-        const response = await fetch(path);
-        if (response.ok) {
-          const metrics = await response.json();
-          const currentVal = metrics.ultimo_valore_indice;
-          
-          updateMetric(`${strategy}-current-value`, currentVal, '$', '', false);
-          
-          updateVariationMetric(`${strategy}-change-24h`, currentVal, metrics.variazione_24h_pct);
-          updateVariationMetric(`${strategy}-change-ytd`, currentVal, metrics.variazione_ytd_pct);
-
-          if (metrics.ultima_allocazione_pesi) {
-            buildAllocationTable(allocationContainerId, metrics.ultima_allocazione_pesi, metrics.capitalizzazione_mercato);
-          }
-
-          if (metrics.rendimenti_annuali && metrics.benchmark_annuali && tabId) {
-            buildReturnsTable(tabId, metrics.rendimenti_annuali, metrics.benchmark_annuali);
-          }
-        }
-      } catch (e) { console.error(`Error loading metrics for ${strategy}:`, e); }
-    }
-
-    fetchAndUpdate('main', './charts/top5mktcap/metrics.json', 'main-allocation', 'mainStrategy');
-    fetchAndUpdate('tech', './charts/TechMktCap_TH/metrics.json', 'tech-allocation', 'techMarketCap');
-    fetchAndUpdate('extra1', './charts/DefiMktCap_TH/metrics.json', 'extra1-allocation', 'extraStrategy1');
-    fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-allocation', 'extraStrategy2');
-  }
-
-  async function loadStrategyCharts() {
-    try {
-      const perfResponse = await fetch('./charts/top5mktcap/performance.json');
-      if (perfResponse.ok) {
-        const perfData = await perfResponse.json();
-        if (performanceChartEl && perfData.data && perfData.layout) {
-          processTraces(perfData.data); 
-          if (perfData.data.length > 0 && perfData.data[0]) perfData.data[0].hovertemplate = 'Indice: %{y:$,.0f}<extra></extra>';
-          if (perfData.data.length > 1 && perfData.data[1]) perfData.data[1].hovertemplate = 'Benchmark: %{y:$,.0f}<extra></extra>';
-          if (!perfData.layout.yaxis) perfData.layout.yaxis = {};
-          perfData.layout.yaxis.tickformat = '$,.0f';
-          Plotly.newPlot(performanceChartEl, perfData.data, getLayoutWithMargins(perfData.layout), { responsive: true, displayModeBar: true });
-        }
-      }
-    } catch (e) { console.error('Performance chart error:', e); }
-
-    try {
-      const compResponse = await fetch('./charts/top5mktcap/weights.json');
-      if (compResponse.ok) {
-        const compData = await compResponse.json();
-        if (compositionChartEl && compData.data && compData.layout) {
-          processTraces(compData.data);
-          compData.data.forEach(trace => {
-            if (trace.name) trace.hovertemplate = `<b>%{fullData.name}</b>: %{y:.0%}<extra></extra>`;
-          });
-          Plotly.newPlot(compositionChartEl, compData.data, getLayoutWithMargins(compData.layout), { responsive: true, displayModeBar: true });
-        }
-      }
-    } catch (e) { console.error('Composition chart error:', e); }
-
-    try {
-      const techPerfResponse = await fetch('./charts/TechMktCap_TH/performance.json');
-      if (techPerfResponse.ok) {
-        const techPerfData = await techPerfResponse.json();
-        if (techPerformanceChartEl && techPerfData.data && techPerfData.layout) {
-          processTraces(techPerfData.data);
-          techPerfData.data.forEach(trace => {
-            if (trace.name && trace.name !== "Ribilanciamento") {
-               trace.hovertemplate = '<b>%{fullData.name}</b>: %{y:$,.0f}<extra></extra>';
-            }
-          });
-          Plotly.newPlot(techPerformanceChartEl, techPerfData.data, getLayoutWithMargins(techPerfData.layout), { responsive: true, displayModeBar: true });
-        }
-      }
-    } catch (e) { console.error('Tech performance chart error:', e); }
-
-    try {
-      const techWeightsResponse = await fetch('./charts/TechMktCap_TH/weights.json');
-      if (techWeightsResponse.ok) {
-        const techWeightsData = await techWeightsResponse.json();
-        if (techWeightsChartEl && techWeightsData.data && techWeightsData.layout) {
-          processTraces(techWeightsData.data);
-          Plotly.newPlot(techWeightsChartEl, techWeightsData.data, getLayoutWithMargins(techWeightsData.layout), { responsive: true, displayModeBar: true });
-        }
-      }
-    } catch (e) { console.error('Tech weights chart error:', e); }
-
-    try {
-      const extra1PerfRes = await fetch('./charts/DefiMktCap_TH/performance.json'); 
-      const extra1CompRes = await fetch('./charts/DefiMktCap_TH/weights.json');
-      
-      if (extra1PerfRes.ok) {
-        const data = await extra1PerfRes.json();
-        processTraces(data.data);
-        if(extra1PerfChartEl) Plotly.newPlot(extra1PerfChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
-      }
-      if (extra1CompRes.ok) {
-        const data = await extra1CompRes.json();
-        processTraces(data.data);
-        if(extra1CompChartEl) Plotly.newPlot(extra1CompChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
-      }
-    } catch (e) { console.error('Extra 1 chart error:', e); }
-
-    try {
-      const extra2PerfRes = await fetch('./charts/PagamentiMktCap_TH/performance.json');
-      const extra2WeightsRes = await fetch('./charts/PagamentiMktCap_TH/weights.json');
-
-      if (extra2PerfRes.ok) {
-        const data = await extra2PerfRes.json();
-        processTraces(data.data);
-        if(extra2PerfChartEl) Plotly.newPlot(extra2PerfChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
-      }
-      if (extra2WeightsRes.ok) {
-        const data = await extra2WeightsRes.json();
-        processTraces(data.data);
-        if(extra2WeightsChartEl) Plotly.newPlot(extra2WeightsChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
-      }
-    } catch (e) { console.error('Extra 2 chart error:', e); }
-  }
-
-  async function loadMarketAnalyticsCharts() {
-      const container = document.getElementById('market-analytics-charts-container');
-      if (!container) return;
-
-      const chartConfigs = [
-          { 
-            file: 'btc_dominance.json', 
-            title: 'BTC Dominance',
-            description: 'Il grafico della BTC Dominance mostra la quota di mercato di Bitcoin rispetto all\'intero settore crypto. Una dominance in aumento suggerisce generalmente un afflusso di capitali verso l\'asset percepito come più sicuro e stabile (Bitcoin), evento tipico delle fasi di mercato incerte. Al contrario, un calo della dominance può indicare una maggiore propensione al rischio e liquidità in spostamento verso le altcoin.'
-          },
-          { 
-            file: 'correlation_heatmap.json', 
-            title: 'Correlazione Asset con BTC',
-            description: 'Questa mappa di calore (heatmap) evidenzia in che modo le principali altcoin si muovono in relazione a Bitcoin (BTC) nel tempo. Valori prossimi all\'1 (colori accesi) indicano una forte correlazione positiva: l\'altcoin tende a muoversi nella stessa direzione di Bitcoin. Valori prossimi allo zero o negativi suggeriscono invece movimenti indipendenti. È uno strumento cruciale per comprendere e gestire la diversificazione all\'interno di un portafoglio rispetto al benchmark principale del mercato.'
-          },
-          { 
-            file: 'market_volume.json', 
-            title: 'Volume del Mercato Crypto',
-            description: 'Il grafico mostra l\'evoluzione dei volumi di scambio giornalieri delle principali criptovalute. Livelli elevati di volume confermano spesso la solidità di un trend di mercato (sia esso rialzista o ribassista) e segnalano un\'elevata partecipazione da parte degli investitori. Periodi prolungati di bassi volumi possono invece indicare fasi di accumulo, consolidamento o incertezza generale.'
-          }
-      ];
-
-      for (let i = 0; i < chartConfigs.length; i++) {
-          const config = chartConfigs[i];
-          const chartId = `market-chart-${i}`;
-
-          const chartWrapper = document.createElement('div');
-          chartWrapper.className = 'chart-wrapper-box flex flex-col';
-          
-          chartWrapper.innerHTML = `
-              <h3 class="font-bold mb-4 text-xl text-[#0a1b39]">${config.title}</h3>
-              <div id="${chartId}" style="min-height: 500px; width: 100%;"></div>
-              <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                <p class="text-sm text-slate-600 leading-relaxed">${config.description}</p>
-              </div>
-          `;
-          container.appendChild(chartWrapper);
-
-          try {
-              const response = await fetch(`./charts/market_analytics/${config.file}`);
-              if (response.ok) {
-                  const chartData = await response.json();
-                  const chartEl = document.getElementById(chartId);
-                  if (chartEl && chartData.data && chartData.layout) {
-                      processTraces(chartData.data);
-                      
-                      if (config.file === 'correlation_heatmap.json' && chartData.data[0]) {
-                        chartData.data[0].hovertemplate = 'X: %{x}<br>Y: %{y}<br>Correlazione: %{z:.4f}<extra></extra>';
-
-                        let zData = chartData.data[0].z;
-                        let xData = chartData.data[0].x;
-                        let yData = chartData.data[0].y;
-                        
-                        let nanX = [];
-                        let nanY = [];
-                        
-                        if (zData && xData && yData) {
-                          for (let r = 0; r < yData.length; r++) {
-                            for (let c = 0; c < xData.length; c++) {
-                              let val = Array.isArray(zData[r]) ? zData[r][c] : zData[r * xData.length + c];
-                              if (val === null || val === undefined || Number.isNaN(val)) {
-                                nanX.push(xData[c]);
-                                nanY.push(yData[r]);
-                              }
-                            }
-                          }
-                        }
-                        
-                        if (nanX.length > 0) {
-                           chartData.data.push({
-                               type: 'scatter',
-                               mode: 'text',
-                               x: nanX,
-                               y: nanY,
-                               text: nanX.map(() => '✖'),
-                               textfont: { color: 'black', size: 12 },
-                               hoverinfo: 'skip',
-                               showlegend: false
-                           });
-                        }
-                      }
-                      
-                      Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true });
-                  }
-              } else {
-                  document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Impossibile caricare il grafico.</p>`;
-              }
-          } catch (e) {
-              console.error(`Error loading market chart ${config.file}:`, e);
-              document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Errore caricamento grafico.</p>`;
-          }
-      }
-  }
-
-  // --- LOGICA BUILDER STRATEGIA (REALE) ---
-  let customPortfolio = [];
-  
-  function updateBuilderUI() {
-    const listEl = document.getElementById('builder-portfolio-list');
-    const totalWeightEl = document.getElementById('builder-total-weight');
-    const runBtn = document.getElementById('builder-run-btn');
-    const clearBtn = document.getElementById('builder-clear-btn');
-    
-    let totalWeight = 0;
-    let html = '';
-    
-    if (customPortfolio.length === 0) {
-        html = '<li class="py-2 text-slate-500 italic text-center" id="builder-empty-msg">Nessun asset selezionato.</li>';
-        clearBtn.classList.add('hidden');
-    } else {
-        clearBtn.classList.remove('hidden');
-        customPortfolio.forEach((asset, index) => {
-            totalWeight += asset.weight;
-            html += `
-              <li class="py-2 flex justify-between items-center group">
-                <span class="font-semibold text-slate-700">${asset.name}</span>
-                <div class="flex items-center gap-3">
-                  <span class="font-bold text-[#0050ff]">${asset.weight}%</span>
-                  <button onclick="removeAsset(${index})" class="text-slate-400 hover:text-red-500 transition-colors">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
-              </li>
-            `;
-        });
-    }
-
-    listEl.innerHTML = html;
-    totalWeightEl.textContent = `${totalWeight}%`;
-    
-    if (totalWeight === 100) {
-        totalWeightEl.classList.remove('text-red-500');
-        totalWeightEl.classList.add('text-green-500');
-        runBtn.disabled = false;
-    } else {
-        totalWeightEl.classList.remove('text-green-500');
-        totalWeightEl.classList.add('text-red-500');
-        runBtn.disabled = true;
-    }
-  }
-
-  window.removeAsset = function(index) {
-      customPortfolio.splice(index, 1);
-      updateBuilderUI();
-  }
-
-  document.getElementById('builder-clear-btn').addEventListener('click', () => {
-      customPortfolio = [];
-      updateBuilderUI();
-      document.getElementById('builder-results-placeholder').classList.remove('hidden');
-      document.getElementById('builder-results-content').classList.add('hidden');
-      document.getElementById('builder-results-content').classList.remove('flex');
-  });
-
-  document.getElementById('builder-add-btn').addEventListener('click', () => {
-      const selectEl = document.getElementById('builder-asset-select');
-      const weightEl = document.getElementById('builder-weight-input');
-      
-      const rawValue = selectEl.value; 
-      const name = selectEl.options[selectEl.selectedIndex].text;
-      const weight = parseInt(weightEl.value, 10);
-
-      if (isNaN(weight) || weight <= 0) {
-          alert("Inserisci un peso valido maggiore di 0.");
-          return;
-      }
-
-      let tickerName = "btc";
-      if (rawValue.includes("BTC")) tickerName = "btc";
-      else if (rawValue.includes("ETH")) tickerName = "eth";
-      else if (rawValue.includes("SOL")) tickerName = "sol";
-      else if (rawValue.includes("XRP")) tickerName = "xrp";
-      else if (rawValue.includes("ADA")) tickerName = "ada";
-      else if (rawValue.includes("DOT")) tickerName = "dot";
-      else if (rawValue.includes("AVAX")) tickerName = "avax";
-      else if (rawValue.includes("LINK")) tickerName = "link";
-      else if (rawValue.includes("DOGE")) tickerName = "doge";
-      else if (rawValue.includes("UNI")) tickerName = "uni";
-
-      const existingIndex = customPortfolio.findIndex(a => a.name === name);
-      if (existingIndex > -1) {
-          customPortfolio[existingIndex].weight += weight;
-      } else {
-          customPortfolio.push({ name, weight, ticker: tickerName });
-      }
-
-      weightEl.value = '';
-      updateBuilderUI();
-  });
-
-  // Mostra i campi data personalizzata se l'utente sceglie CUSTOM
-  document.getElementById('builder-timeframe').addEventListener('change', function() {
-      const customDates = document.getElementById('custom-date-range');
-      if (this.value === 'CUSTOM') {
-          customDates.classList.remove('hidden');
-      } else {
-          customDates.classList.add('hidden');
-      }
-  });
-
-  // Calcolo metriche matematiche
-  function calculateMetrics(prices) {
-      if (prices.length < 2) return { returnPct: 0, volAnn: 0, maxDd: 0, sharpe: 0 };
-      
-      const startPrice = prices[0];
-      const endPrice = prices[prices.length - 1];
-      const returnPct = ((endPrice - startPrice) / startPrice) * 100;
-      
-      let dailyReturns = [];
-      for(let i = 1; i < prices.length; i++){
-          dailyReturns.push((prices[i] - prices[i-1]) / prices[i-1]);
-      }
-      
-      const meanRet = dailyReturns.reduce((a, b) => a + b, 0) / dailyReturns.length;
-      const variance = dailyReturns.reduce((a, b) => a + Math.pow(b - meanRet, 2), 0) / dailyReturns.length;
-      const stdDev = Math.sqrt(variance);
-      const volAnn = stdDev * Math.sqrt(365) * 100;
-      
-      const sharpe = volAnn !== 0 ? (meanRet * 365) / (stdDev * Math.sqrt(365)) : 0;
-      
-      let maxPrice = prices[0];
-      let maxDd = 0;
-      for(let p of prices) {
-          if(p > maxPrice) maxPrice = p;
-          const dd = (p - maxPrice) / maxPrice;
-          if(dd < maxDd) maxDd = dd;
-      }
-      
-      return { returnPct, volAnn, maxDd: maxDd * 100, sharpe };
-  }
-
-  document.getElementById('builder-run-btn').addEventListener('click', async () => {
-      const runBtn = document.getElementById('builder-run-btn');
-      runBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Calcolo in corso...';
-      runBtn.disabled = true;
-
-      try {
-          let dateMap = {}; 
-          
-          for (const asset of customPortfolio) {
-              const res = await fetch(`./data/historical/${asset.ticker}.json`);
-              if (!res.ok) throw new Error(`Dati storici per ${asset.name} non trovati. Manca il file json in data/historical.`);
-              
-              const data = await res.json();
-              const dates = data.dates;
-              const prices = data.prices;
-              
-              for(let i=0; i<dates.length; i++) {
-                  if(!dateMap[dates[i]]) dateMap[dates[i]] = {};
-                  dateMap[dates[i]][asset.ticker] = prices[i];
-              }
-          }
-
-          const allSortedDates = Object.keys(dateMap).sort();
-          if (allSortedDates.length === 0) throw new Error("Nessun dato disponibile.");
-
-          const tf = document.getElementById('builder-timeframe').value;
-          const now = new Date();
-          let targetStart = new Date('2000-01-01');
-          let targetEnd = new Date(); 
-
-          if (tf === '1M') { targetStart = new Date(now); targetStart.setMonth(now.getMonth() - 1); }
-          else if (tf === '6M') { targetStart = new Date(now); targetStart.setMonth(now.getMonth() - 6); }
-          else if (tf === '1Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 1); }
-          else if (tf === '3Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 3); }
-          else if (tf === '5Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 5); }
-          else if (tf === 'YTD') { targetStart = new Date(now.getFullYear(), 0, 1); }
-          else if (tf === 'CUSTOM') {
-              const sd = document.getElementById('builder-start-date').value;
-              const ed = document.getElementById('builder-end-date').value;
-              if(sd) targetStart = new Date(sd);
-              if(ed) targetEnd = new Date(ed);
-              
-              if(targetStart > targetEnd) throw new Error("La data di inizio deve essere precedente alla data di fine.");
-          }
-
-          const getLocalYMD = (dateObj) => {
-              const y = dateObj.getFullYear();
-              const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-              const d = String(dateObj.getDate()).padStart(2, '0');
-              return `${y}-${m}-${d}`;
-          };
-
-          const startStr = getLocalYMD(targetStart);
-          const endStr = getLocalYMD(targetEnd);
-
-          const sortedDates = allSortedDates.filter(d => d >= startStr && d <= endStr);
-          
-          if (sortedDates.length === 0) throw new Error("Nessun dato disponibile per il periodo temporale selezionato. Verifica le date o lo storico scaricato.");
-
-          let initialCapital = 10000;
-          let yData = [];
-          let xData = [];
-          
-          let startIndex = 0;
-          let initialPrices = null;
-          
-          for(let i = 0; i < sortedDates.length; i++) {
-              const d = sortedDates[i];
-              const prices = dateMap[d];
-              let hasAllPrices = true;
-              for(const asset of customPortfolio) {
-                  if(!prices[asset.ticker]) hasAllPrices = false;
-              }
-              if(hasAllPrices) {
-                  startIndex = i;
-                  initialPrices = prices;
-                  break;
-              }
-          }
-          
-          if(!initialPrices) throw new Error("Nessun punto di partenza comune trovato. Assicurati che le monete selezionate esistessero nella data di inizio.");
-
-          let shares = {};
-          customPortfolio.forEach(asset => {
-              const allocatedDollars = initialCapital * (asset.weight / 100);
-              shares[asset.ticker] = allocatedDollars / initialPrices[asset.ticker];
-          });
-
-          for (let i = startIndex; i < sortedDates.length; i++) {
-              const d = sortedDates[i];
-              const prices = dateMap[d];
-              let dailyValue = 0;
-              
-              for (const asset of customPortfolio) {
-                  if(prices[asset.ticker]) {
-                     dailyValue += shares[asset.ticker] * prices[asset.ticker];
-                  }
-              }
-              
-              if(dailyValue > 0) {
-                  xData.push(d);
-                  yData.push(dailyValue);
-              }
-          }
-
-          const stats = calculateMetrics(yData);
-
-          document.getElementById('builder-results-placeholder').classList.add('hidden');
-          document.getElementById('builder-results-content').classList.remove('hidden');
-          document.getElementById('builder-results-content').classList.add('flex');
-
-          const isPositive = stats.returnPct >= 0;
-          document.getElementById('b-stat-return').textContent = isPositive ? `+${stats.returnPct.toFixed(2)}%` : `${stats.returnPct.toFixed(2)}%`;
-          document.getElementById('b-stat-return').className = isPositive ? "text-xl font-bold text-green-500 mt-1" : "text-xl font-bold text-red-500 mt-1";
-          
-          document.getElementById('b-stat-vol').textContent = stats.volAnn.toFixed(2) + '%';
-          document.getElementById('b-stat-dd').textContent = stats.maxDd.toFixed(2) + '%';
-          document.getElementById('b-stat-sharpe').textContent = stats.sharpe.toFixed(2);
-
-          const trace = {
-              x: xData,
-              y: yData,
-              type: 'scatter',
-              mode: 'lines',
-              line: { color: '#0050ff', width: 2 },
-              fill: 'tozeroy',
-              fillcolor: 'rgba(0, 80, 255, 0.1)',
-              name: 'Portafoglio Custom'
-          };
-
-          const layout = {
-              margin: { l: 50, r: 20, t: 30, b: 40 },
-              paper_bgcolor: 'transparent',
-              plot_bgcolor: 'transparent',
-              xaxis: { showgrid: false },
-              yaxis: { tickprefix: '$', gridcolor: '#f1f5f9' },
-              hovermode: 'x unified'
-          };
-
-          Plotly.newPlot('builder-performance-chart', [trace], layout, {responsive: true, displayModeBar: false});
-
-      } catch (error) {
-          console.error("Errore nel calcolo del portafoglio:", error);
-          alert("Errore: " + error.message);
-      } finally {
-          runBtn.innerHTML = 'Aggiorna Strategy';
-          runBtn.disabled = false;
-          setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
-      }
-  });
-
-  updateBuilderUI();
-  
-  async function initDashboard() {
-    await loadCryptoNames();
-    loadStrategyCharts();
-    loadMarketAnalyticsCharts();
-    loadMetrics();
-  }
-
-  initDashboard();
+const sidebar = document.getElementById('sidebar');
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+
+mobileMenuBtn.addEventListener('click', () => {
+sidebar.classList.toggle('-translate-x-full');
+});
+
+// --- LOGICA MENU LATERALE ---
+document.querySelectorAll('.sidebar-btn').forEach(btn => {
+btn.addEventListener('click', function() {
+document.querySelectorAll('.sidebar-btn').forEach(b => {
+b.classList.remove('text-[#0050ff]', 'bg-blue-50', 'active');
+b.classList.add('text-slate-600', 'hover:bg-slate-50');
+});
+this.classList.remove('text-slate-600', 'hover:bg-slate-50');
+this.classList.add('text-[#0050ff]', 'bg-blue-50', 'active');
+
+const pageId = this.getAttribute('data-page');
+document.querySelectorAll('.page-content').forEach(page => {
+page.classList.add('hidden');
+page.classList.remove('block');
+});
+document.getElementById(pageId).classList.remove('hidden');
+document.getElementById(pageId).classList.add('block');
+
+if (window.innerWidth < 768) {
+sidebar.classList.add('-translate-x-full');
+}
+
+setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+});
+});
+
+// --- LOGICA SWITCH TAB SETTORI ---
+document.querySelectorAll('.tab-btn').forEach(btn => {
+btn.addEventListener('click', function() {
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+this.classList.add('active');
+
+document.querySelectorAll('.tab-content').forEach(content => {
+content.classList.remove('active');
+});
+
+const tabId = this.getAttribute('data-tab');
+document.getElementById(tabId).classList.add('active');
+
+setTimeout(() => {
+window.dispatchEvent(new Event('resize'));
+}, 50);
+});
+});
+let cryptoNamesMap = {};
+
+async function loadCryptoNames() {
+try {
+const response = await fetch('./charts/crypto_name.json');
+if (response.ok) {
+cryptoNamesMap = await response.json();
+}
+} catch (e) {
+console.error('Errore nel caricamento dei nomi crypto:', e);
+}
+}
+
+const performanceChartEl = document.getElementById('performance-chart');
+const compositionChartEl = document.getElementById('composition-chart');
+const techPerformanceChartEl = document.getElementById('tech-performance-chart');
+const techWeightsChartEl = document.getElementById('tech-weights-chart');
+const extra1PerfChartEl = document.getElementById('extra1-performance-chart');
+const extra1CompChartEl = document.getElementById('extra1-composition-chart');
+const extra2PerfChartEl = document.getElementById('extra2-performance-chart');
+const extra2WeightsChartEl = document.getElementById('extra2-weights-chart');
+
+function decodePlotlyBdata(traceData) {
+if (!traceData || typeof traceData !== 'object' || !traceData.bdata) return traceData;
+try {
+const b64 = traceData.bdata.replace(/[^A-Za-z0-9+/=]/g, "");
+const binaryString = window.atob(b64);
+const len = binaryString.length;
+const bytes = new Uint8Array(len);
+for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+const dataView = new DataView(bytes.buffer);
+const arr = [];
+const isLittleEndian = true;
+if (traceData.dtype === 'f8' || traceData.dtype === '<f8') {
+const maxLen = len - (len % 8);
+for (let i = 0; i < maxLen; i += 8) arr.push(dataView.getFloat64(i, isLittleEndian));
+} else if (traceData.dtype === 'f4' || traceData.dtype === '<f4') {
+const maxLen = len - (len % 4);
+for (let i = 0; i < maxLen; i += 4) arr.push(dataView.getFloat32(i, isLittleEndian));
+} else if (traceData.dtype === 'i4' || traceData.dtype === '<i4') {
+const maxLen = len - (len % 4);
+for (let i = 0; i < maxLen; i += 4) arr.push(dataView.getInt32(i, isLittleEndian));
+} else {
+return traceData;
+}
+
+if (traceData.shape) {
+const shape = traceData.shape.split(',').map(s => parseInt(s.trim(), 10));
+if (shape.length === 2) {
+const rows = shape[0];
+const cols = shape[1];
+const reshaped = [];
+for (let r = 0; r < rows; r++) {
+reshaped.push(arr.slice(r * cols, (r + 1) * cols));
+}
+return reshaped;
+}
+}
+return arr;
+} catch (e) {
+console.error("Avviso: Impossibile decodificare i dati bdata.", e);
+return traceData;
+}
+}
+
+function processTraces(dataArray) {
+if (!Array.isArray(dataArray)) return;
+dataArray.forEach(trace => {
+if (trace.x) trace.x = decodePlotlyBdata(trace.x);
+if (trace.y) trace.y = decodePlotlyBdata(trace.y);
+if (trace.z) trace.z = decodePlotlyBdata(trace.z);
+if (trace.customdata) trace.customdata = decodePlotlyBdata(trace.customdata);
+});
+}
+
+function getLayoutWithMargins(layout) {
+return {
+...layout,
+margin: { l: 60, r: 80, t: 50, b: 40 },
+plot_bgcolor: "transparent",
+paper_bgcolor: "transparent",
+font: { color: '#475569' },
+hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, color: "#0f172a" } }
+};
+}
+
+function buildAllocationTable(containerId, allocationObj, mcapObj = null) {
+const container = document.getElementById(containerId);
+if (!container || !allocationObj) return;
+
+let html = `
+<div class="mt-8 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm text-left">
+<thead class="bg-slate-50 border-b border-slate-200">
+<tr>
+<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ticker</th>
+<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Asset</th>
+<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Market Cap</th>
+<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Allocazione</th>
+<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+`;
+
+const sortedAssets = Object.entries(allocationObj).sort((a, b) => b[1] - a[1]);
+
+for (const [asset, weight] of sortedAssets) {
+const tickerName = asset.split('-')[0].replace(/\d+$/, '');
+const fullName = cryptoNamesMap[asset] || tickerName;
+const weightPct = (weight * 100).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
+let mcapDisplay = "";
+if (mcapObj && mcapObj[asset]) {
+mcapDisplay = '$ ' + (mcapObj[asset] / 1e9).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' B';
+} else {
+const mockMcap = (Math.random() * 40 + 2).toFixed(2);
+mcapDisplay = `$ ${mockMcap} B`;
+}
+
+const barWidth = Math.min((weight * 100), 100).toFixed(2) + '%';
+
+html += `
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap font-bold text-slate-600">
+${tickerName}
+</td>
+<td class="px-6 py-4 whitespace-nowrap font-semibold text-[#0a1b39]">
+${fullName}
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-slate-600">
+${mcapDisplay}
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-bold text-[#0050ff]">
+${weightPct}
+</td>
+<td class="px-6 py-4 whitespace-nowrap w-48">
+<div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+<div class="bg-[#0050ff] h-2.5 rounded-full" style="width: ${barWidth}"></div>
+</div>
+</td>
+</tr>
+`;
+}
+
+html += `
+</tbody>
+</table>
+</div>
+</div>
+`;
+
+container.innerHTML = html;
+}
+
+function buildReturnsTable(tabId, rendimenti, benchmark) {
+const tableContainer = document.querySelector(`#${tabId} table`);
+if (!tableContainer) return;
+
+const years = Object.keys(rendimenti).sort();
+
+let headers = '<th class="py-3 px-4 text-left font-bold text-[#1e293b]"></th>';
+years.forEach(year => {
+headers += `<th class="py-3 px-4 font-bold text-[#1e293b] text-base">${year}</th>`;
+});
+
+let stratRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Rendimento totale USD</td>';
+years.forEach(year => {
+const val = rendimenti[year];
+const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'text-slate-800');
+stratRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
+});
+
+let benchRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Benchmark USD</td>';
+years.forEach(year => {
+const val = benchmark[year];
+const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'text-slate-800');
+benchRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
+});
+
+tableContainer.innerHTML = `
+<thead>
+<tr class="border-t-[3px] border-b-[2px] border-[#1e293b] bg-slate-50/30">
+${headers}
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+${stratRow}
+</tr>
+<tr class="border-b border-[#1e293b] hover:bg-slate-50 transition-colors">
+${benchRow}
+</tr>
+</tbody>
+`;
+}
+
+async function loadMetrics() {
+function updateMetric(id, value, prefix = '', suffix = '', color = true) {
+const el = document.getElementById(id);
+if (el) {
+if (typeof value === 'number' && !isNaN(value)) {
+let valueStr = value.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+el.textContent = `${prefix}${valueStr}${suffix}`;
+if (color) {
+if (value > 0) {
+el.classList.remove('text-red-500', 'text-slate-800');
+el.classList.add('text-green-500');
+el.textContent = `+${el.textContent}`;
+} else if (value < 0) {
+el.classList.remove('text-green-500', 'text-slate-800');
+el.classList.add('text-red-500');
+} else {
+el.classList.remove('text-green-500', 'text-red-500');
+el.classList.add('text-slate-800');
+}
+}
+} else {
+el.textContent = '--';
+el.classList.remove('text-green-500', 'text-red-500');
+el.classList.add('text-slate-800');
+}
+}
+}
+
+function updateVariationMetric(id, currentValue, pctChange) {
+const el = document.getElementById(id);
+if (!el || isNaN(currentValue) || isNaN(pctChange)) {
+if (el) el.textContent = '--';
+return;
+}
+
+const prevValue = currentValue / (1 + pctChange);
+const absChange = currentValue - prevValue;
+
+const absStr = Math.abs(absChange).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const pctStr = Math.abs(pctChange * 100).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+let sign = '';
+if (pctChange > 0) {
+sign = '+';
+el.classList.remove('text-red-500', 'text-slate-800');
+el.classList.add('text-green-500');
+} else if (pctChange < 0) {
+sign = '-';
+el.classList.remove('text-green-500', 'text-slate-800');
+el.classList.add('text-red-500');
+} else {
+el.classList.remove('text-green-500', 'text-red-500');
+el.classList.add('text-slate-800');
+}
+
+el.textContent = `${sign}${absStr} / ${sign}${pctStr}%`;
+}
+
+async function fetchAndUpdate(strategy, path, allocationContainerId, tabId) {
+try {
+const response = await fetch(path);
+if (response.ok) {
+const metrics = await response.json();
+const currentVal = metrics.ultimo_valore_indice;
+updateMetric(`${strategy}-current-value`, currentVal, '$', '', false);
+updateVariationMetric(`${strategy}-change-24h`, currentVal, metrics.variazione_24h_pct);
+updateVariationMetric(`${strategy}-change-ytd`, currentVal, metrics.variazione_ytd_pct);
+
+if (metrics.ultima_allocazione_pesi) {
+buildAllocationTable(allocationContainerId, metrics.ultima_allocazione_pesi, metrics.capitalizzazione_mercato);
+}
+
+if (metrics.rendimenti_annuali && metrics.benchmark_annuali && tabId) {
+buildReturnsTable(tabId, metrics.rendimenti_annuali, metrics.benchmark_annuali);
+}
+}
+} catch (e) { console.error(`Error loading metrics for ${strategy}:`, e); }
+}
+
+fetchAndUpdate('main', './charts/top5mktcap/metrics.json', 'main-allocation', 'mainStrategy');
+fetchAndUpdate('tech', './charts/TechMktCap_TH/metrics.json', 'tech-allocation', 'techMarketCap');
+fetchAndUpdate('extra1', './charts/DefiMktCap_TH/metrics.json', 'extra1-allocation', 'extraStrategy1');
+fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-allocation', 'extraStrategy2');
+}
+
+async function loadStrategyCharts() {
+try {
+const perfResponse = await fetch('./charts/top5mktcap/performance.json');
+if (perfResponse.ok) {
+const perfData = await perfResponse.json();
+if (performanceChartEl && perfData.data && perfData.layout) {
+processTraces(perfData.data);
+if (perfData.data.length > 0 && perfData.data[0]) perfData.data[0].hovertemplate = 'Indice: %{y:$,.0f}<extra></extra>';
+if (perfData.data.length > 1 && perfData.data[1]) perfData.data[1].hovertemplate = 'Benchmark: %{y:$,.0f}<extra></extra>';
+if (!perfData.layout.yaxis) perfData.layout.yaxis = {};
+perfData.layout.yaxis.tickformat = '$,.0f';
+Plotly.newPlot(performanceChartEl, perfData.data, getLayoutWithMargins(perfData.layout), { responsive: true, displayModeBar: true });
+}
+}
+} catch (e) { console.error('Performance chart error:', e); }
+
+try {
+const compResponse = await fetch('./charts/top5mktcap/weights.json');
+if (compResponse.ok) {
+const compData = await compResponse.json();
+if (compositionChartEl && compData.data && compData.layout) {
+processTraces(compData.data);
+compData.data.forEach(trace => {
+if (trace.name) trace.hovertemplate = `<b>%{fullData.name}</b>: %{y:.0%}<extra></extra>`;
+});
+Plotly.newPlot(compositionChartEl, compData.data, getLayoutWithMargins(compData.layout), { responsive: true, displayModeBar: true });
+}
+}
+} catch (e) { console.error('Composition chart error:', e); }
+
+try {
+const techPerfResponse = await fetch('./charts/TechMktCap_TH/performance.json');
+if (techPerfResponse.ok) {
+const techPerfData = await techPerfResponse.json();
+if (techPerformanceChartEl && techPerfData.data && techPerfData.layout) {
+processTraces(techPerfData.data);
+techPerfData.data.forEach(trace => {
+if (trace.name && trace.name !== "Ribilanciamento") {
+trace.hovertemplate = '<b>%{fullData.name}</b>: %{y:$,.0f}<extra></extra>';
+}
+});
+Plotly.newPlot(techPerformanceChartEl, techPerfData.data, getLayoutWithMargins(techPerfData.layout), { responsive: true, displayModeBar: true });
+}
+}
+} catch (e) { console.error('Tech performance chart error:', e); }
+
+try {
+const techWeightsResponse = await fetch('./charts/TechMktCap_TH/weights.json');
+if (techWeightsResponse.ok) {
+const techWeightsData = await techWeightsResponse.json();
+if (techWeightsChartEl && techWeightsData.data && techWeightsData.layout) {
+processTraces(techWeightsData.data);
+Plotly.newPlot(techWeightsChartEl, techWeightsData.data, getLayoutWithMargins(techWeightsData.layout), { responsive: true, displayModeBar: true });
+}
+}
+} catch (e) { console.error('Tech weights chart error:', e); }
+
+try {
+const extra1PerfRes = await fetch('./charts/DefiMktCap_TH/performance.json');
+const extra1CompRes = await fetch('./charts/DefiMktCap_TH/weights.json');
+if (extra1PerfRes.ok) {
+const data = await extra1PerfRes.json();
+processTraces(data.data);
+if(extra1PerfChartEl) Plotly.newPlot(extra1PerfChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
+}
+if (extra1CompRes.ok) {
+const data = await extra1CompRes.json();
+processTraces(data.data);
+if(extra1CompChartEl) Plotly.newPlot(extra1CompChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
+}
+} catch (e) { console.error('Extra 1 chart error:', e); }
+
+try {
+const extra2PerfRes = await fetch('./charts/PagamentiMktCap_TH/performance.json');
+const extra2WeightsRes = await fetch('./charts/PagamentiMktCap_TH/weights.json');
+
+if (extra2PerfRes.ok) {
+const data = await extra2PerfRes.json();
+processTraces(data.data);
+if(extra2PerfChartEl) Plotly.newPlot(extra2PerfChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
+}
+if (extra2WeightsRes.ok) {
+const data = await extra2WeightsRes.json();
+processTraces(data.data);
+if(extra2WeightsChartEl) Plotly.newPlot(extra2WeightsChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
+}
+} catch (e) { console.error('Extra 2 chart error:', e); }
+}
+
+async function loadMarketAnalyticsCharts() {
+const container = document.getElementById('market-analytics-charts-container');
+if (!container) return;
+
+const chartConfigs = [
+{
+file: 'btc_dominance.json',
+title: 'BTC Dominance',
+description: 'Il grafico della BTC Dominance mostra la quota di mercato di Bitcoin rispetto all\'intero settore crypto. Una dominance in aumento suggerisce generalmente un afflusso di capitali verso l\'asset percepito come più sicuro e stabile (Bitcoin), evento tipico delle fasi di mercato incerte. Al contrario, un calo della dominance può indicare una maggiore propensione al rischio e liquidità in spostamento verso le altcoin.',
+height: '500px'
+},
+{
+file: 'correlation_heatmap.json',
+title: 'Correlazione Asset con BTC',
+description: 'Questa mappa di calore (heatmap) evidenzia in che modo le principali altcoin si muovono in relazione a Bitcoin (BTC) nel tempo. Valori prossimi all\'1 (colori accesi) indicano una forte correlazione positiva: l\'altcoin tende a muoversi nella stessa direzione di Bitcoin. Valori prossimi allo zero o negativi suggeriscono invece movimenti indipendenti. È uno strumento cruciale per comprendere e gestire la diversificazione all\'interno di un portafoglio rispetto al benchmark principale del mercato.',
+height: '850px'
+},
+{
+file: 'market_volume.json',
+title: 'Volume del Mercato Crypto',
+description: 'Il grafico mostra l\'evoluzione dei volumi di scambio giornalieri delle principali criptovalute. Livelli elevati di volume confermano spesso la solidità di un trend di mercato (sia esso rialzista o ribassista) e segnalano un\'elevata partecipazione da parte degli investitori. Periodi prolungati di bassi volumi possono invece indicare fasi di accumulo, consolidamento o incertezza generale.',
+height: '500px'
+}
+];
+
+for (let i = 0; i < chartConfigs.length; i++) {
+const config = chartConfigs[i];
+const chartId = `market-chart-${i}`;
+
+const chartWrapper = document.createElement('div');
+chartWrapper.className = 'chart-wrapper-box flex flex-col';
+chartWrapper.innerHTML = `
+<h3 class="font-bold mb-4 text-xl text-[#0a1b39]">${config.title}</h3>
+<div id="${chartId}" style="min-height: ${config.height}; width: 100%;"></div>
+<div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+<p class="text-sm text-slate-600 leading-relaxed">${config.description}</p>
+</div>
+`;
+container.appendChild(chartWrapper);
+
+try {
+const response = await fetch(`./charts/market_analytics/${config.file}`);
+if (response.ok) {
+const chartData = await response.json();
+const chartEl = document.getElementById(chartId);
+if (chartEl && chartData.data && chartData.layout) {
+processTraces(chartData.data);
+if (config.file === 'correlation_heatmap.json' && chartData.data[0]) {
+chartData.data[0].hovertemplate = 'X: %{x}<br>Y: %{y}<br>Correlazione: %{z:.4f}<extra></extra>';
+
+chartData.data[0].zmin = -1;
+chartData.data[0].zmax = 1;
+
+chartData.data[0].colorscale = [
+[0.0, '#0a1a6b'],
+[0.5, '#0050ff'],
+[0.75, '#8800ff'],
+[1.0, '#ffffff']
+];
+
+let zData = chartData.data[0].z;
+let xData = chartData.data[0].x;
+let yData = chartData.data[0].y;
+let nullIndices = [];
+if (zData && xData && yData) {
+for (let r = 0; r < yData.length; r++) {
+for (let c = 0; c < xData.length; c++) {
+let val = Array.isArray(zData[r]) ? zData[r][c] : zData[r * xData.length + c];
+if (val === null || val === undefined || Number.isNaN(val)) {
+nullIndices.push({ c: c, r: r });
+}
+}
+}
+}
+if (nullIndices.length > 0) {
+if (!chartData.layout.shapes) chartData.layout.shapes = [];
+nullIndices.forEach(idx => {
+let cx = idx.c;
+let cy = idx.r;
+chartData.layout.shapes.push({
+type: 'line', x0: cx - 0.5, y0: cy - 0.5, x1: cx + 0.5, y1: cy + 0.5,
+line: { color: 'rgba(15, 23, 42, 0.35)', width: 1 }, layer: 'above'
+});
+chartData.layout.shapes.push({
+type: 'line', x0: cx - 0.5, y0: cy + 0.5, x1: cx + 0.5, y1: cy - 0.5,
+line: { color: 'rgba(15, 23, 42, 0.35)', width: 1 }, layer: 'above'
+});
+});
+}
+}
+Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true });
+}
+} else {
+document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Impossibile caricare il grafico.</p>`;
+}
+} catch (e) {
+console.error(`Error loading market chart ${config.file}:`, e);
+document.getElementById(chartId).innerHTML = `<p class="text-center text-slate-500 p-4">Errore caricamento grafico.</p>`;
+}
+}
+}
+
+// --- LOGICA BUILDER STRATEGIA AGGIORNATA ---
+let p1 = [];
+let p2 = [];
+
+function renderPortfolioList(portfolio, listId, totalId, clearBtnId, pIndex) {
+const listEl = document.getElementById(listId);
+const totalWeightEl = document.getElementById(totalId);
+const clearBtn = document.getElementById(clearBtnId);
+let totalWeight = 0;
+let html = '';
+
+if (portfolio.length === 0) {
+html = '<li class="py-2 text-slate-400 italic text-center text-xs">Nessun asset inserito.</li>';
+clearBtn.classList.add('hidden');
+} else {
+clearBtn.classList.remove('hidden');
+portfolio.forEach((asset, index) => {
+totalWeight += asset.weight;
+html += `
+<li class="py-2 flex justify-between items-center group">
+<span class="font-semibold text-slate-700">${asset.name}</span>
+<div class="flex items-center gap-3">
+<span class="font-bold text-[#0050ff]">${asset.weight}%</span>
+<button onclick="removeAsset(${pIndex}, ${index})" class="text-slate-400 hover:text-red-500 transition-colors">
+<i class="fa-solid fa-trash-can"></i>
+</button>
+</div>
+</li>
+`;
+});
+}
+
+listEl.innerHTML = html;
+totalWeightEl.textContent = `${totalWeight}%`;
+
+if (totalWeight === 100) {
+totalWeightEl.classList.remove('text-red-500');
+totalWeightEl.classList.add('text-green-500');
+} else {
+totalWeightEl.classList.remove('text-green-500');
+totalWeightEl.classList.add('text-red-500');
+}
+return totalWeight;
+}
+
+function updateBuilderUI() {
+const runBtn = document.getElementById('builder-run-btn');
+
+const w1 = renderPortfolioList(p1, 'builder-portfolio-list-1', 'builder-total-weight-1', 'builder-clear-btn-1', 1);
+const w2 = renderPortfolioList(p2, 'builder-portfolio-list-2', 'builder-total-weight-2', 'builder-clear-btn-2', 2);
+
+const valid1 = (w1 === 100);
+const valid2 = (p2.length === 0 || w2 === 100);
+
+if (valid1 && valid2) {
+runBtn.disabled = false;
+} else {
+runBtn.disabled = true;
+}
+}
+
+window.removeAsset = function(pIndex, index) {
+if (pIndex === 1) p1.splice(index, 1);
+else if (pIndex === 2) p2.splice(index, 1);
+updateBuilderUI();
+}
+
+function resetResults() {
+document.getElementById('builder-results-placeholder').classList.remove('hidden');
+document.getElementById('builder-results-content').classList.add('hidden');
+document.getElementById('builder-results-content').classList.remove('flex');
+}
+
+document.getElementById('builder-clear-btn-1').addEventListener('click', () => { p1 = []; updateBuilderUI(); resetResults(); });
+document.getElementById('builder-clear-btn-2').addEventListener('click', () => { p2 = []; updateBuilderUI(); resetResults(); });
+
+document.getElementById('builder-add-btn').addEventListener('click', () => {
+const targetSelect = document.getElementById('builder-target-portfolio').value;
+const selectEl = document.getElementById('builder-asset-select');
+const weightEl = document.getElementById('builder-weight-input');
+const rawValue = selectEl.value;
+const name = selectEl.options[selectEl.selectedIndex].text;
+const weight = parseInt(weightEl.value, 10);
+
+if (isNaN(weight) || weight <= 0) {
+alert("Inserisci un peso valido maggiore di 0.");
+return;
+}
+
+let tickerName = "btc";
+if (rawValue.includes("BTC")) tickerName = "btc";
+else if (rawValue.includes("ETH")) tickerName = "eth";
+else if (rawValue.includes("SOL")) tickerName = "sol";
+else if (rawValue.includes("XRP")) tickerName = "xrp";
+else if (rawValue.includes("ADA")) tickerName = "ada";
+else if (rawValue.includes("DOT")) tickerName = "dot";
+else if (rawValue.includes("AVAX")) tickerName = "avax";
+else if (rawValue.includes("LINK")) tickerName = "link";
+else if (rawValue.includes("DOGE")) tickerName = "doge";
+else if (rawValue.includes("UNI")) tickerName = "uni";
+
+const targetPortfolio = targetSelect === "1" ? p1 : p2;
+const existingIndex = targetPortfolio.findIndex(a => a.name === name);
+
+if (existingIndex > -1) {
+targetPortfolio[existingIndex].weight += weight;
+} else {
+targetPortfolio.push({ name, weight, ticker: tickerName });
+}
+
+weightEl.value = '';
+updateBuilderUI();
+});
+
+document.getElementById('builder-timeframe').addEventListener('change', function() {
+const customDates = document.getElementById('custom-date-range');
+if (this.value === 'CUSTOM') customDates.classList.remove('hidden');
+else customDates.classList.add('hidden');
+});
+
+function calculateMetrics(prices) {
+if (prices.length < 2) return { returnPct: 0, volAnn: 0, maxDd: 0, sharpe: 0 };
+const startPrice = prices[0];
+const endPrice = prices[prices.length - 1];
+const returnPct = ((endPrice - startPrice) / startPrice) * 100;
+let dailyReturns = [];
+for(let i = 1; i < prices.length; i++){
+dailyReturns.push((prices[i] - prices[i-1]) / prices[i-1]);
+}
+const meanRet = dailyReturns.reduce((a, b) => a + b, 0) / dailyReturns.length;
+const variance = dailyReturns.reduce((a, b) => a + Math.pow(b - meanRet, 2), 0) / dailyReturns.length;
+const stdDev = Math.sqrt(variance);
+const volAnn = stdDev * Math.sqrt(365) * 100;
+const sharpe = volAnn !== 0 ? (meanRet * 365) / (stdDev * Math.sqrt(365)) : 0;
+let maxPrice = prices[0];
+let maxDd = 0;
+for(let p of prices) {
+if(p > maxPrice) maxPrice = p;
+const dd = (p - maxPrice) / maxPrice;
+if(dd < maxDd) maxDd = dd;
+}
+return { returnPct, volAnn, maxDd: maxDd * 100, sharpe };
+}
+
+function displayStats(stats, prefix) {
+const returnEl = document.getElementById(`b-stat-return-${prefix}`);
+const isPositive = stats.returnPct >= 0;
+returnEl.textContent = isPositive ? `+${stats.returnPct.toFixed(2)}%` : `${stats.returnPct.toFixed(2)}%`;
+returnEl.className = isPositive ? "text-lg font-bold text-green-500" : "text-lg font-bold text-red-500";
+
+document.getElementById(`b-stat-vol-${prefix}`).textContent = stats.volAnn.toFixed(2) + '%';
+document.getElementById(`b-stat-dd-${prefix}`).textContent = stats.maxDd.toFixed(2) + '%';
+document.getElementById(`b-stat-sharpe-${prefix}`).textContent = stats.sharpe.toFixed(2);
+}
+
+document.getElementById('builder-run-btn').addEventListener('click', async () => {
+const runBtn = document.getElementById('builder-run-btn');
+runBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Calcolo in corso...';
+runBtn.disabled = true;
+
+try {
+let dateMap = {};
+const allAssets = [...new Set([...p1, ...p2].map(a => a.ticker))];
+
+for (const ticker of allAssets) {
+const res = await fetch(`./data/historical/${ticker}.json`);
+if (!res.ok) throw new Error(`Dati storici per ${ticker} non trovati. Manca il file json in data/historical.`);
+const data = await res.json();
+const dates = data.dates;
+const prices = data.prices;
+for(let i=0; i<dates.length; i++) {
+if(!dateMap[dates[i]]) dateMap[dates[i]] = {};
+dateMap[dates[i]][ticker] = prices[i];
+}
+}
+
+const allSortedDates = Object.keys(dateMap).sort();
+if (allSortedDates.length === 0) throw new Error("Nessun dato disponibile.");
+
+const tf = document.getElementById('builder-timeframe').value;
+const now = new Date();
+let targetStart = new Date('2000-01-01');
+let targetEnd = new Date();
+
+if (tf === '1M') { targetStart = new Date(now); targetStart.setMonth(now.getMonth() - 1); }
+else if (tf === '6M') { targetStart = new Date(now); targetStart.setMonth(now.getMonth() - 6); }
+else if (tf === '1Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 1); }
+else if (tf === '3Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 3); }
+else if (tf === '5Y') { targetStart = new Date(now); targetStart.setFullYear(now.getFullYear() - 5); }
+else if (tf === 'YTD') { targetStart = new Date(now.getFullYear(), 0, 1); }
+else if (tf === 'CUSTOM') {
+const sd = document.getElementById('builder-start-date').value;
+const ed = document.getElementById('builder-end-date').value;
+if(sd) targetStart = new Date(sd);
+if(ed) targetEnd = new Date(ed);
+if(targetStart > targetEnd) throw new Error("La data di inizio deve essere precedente alla data di fine.");
+}
+
+const getLocalYMD = (dateObj) => {
+const y = dateObj.getFullYear();
+const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+const d = String(dateObj.getDate()).padStart(2, '0');
+return `${y}-${m}-${d}`;
+};
+
+const startStr = getLocalYMD(targetStart);
+const endStr = getLocalYMD(targetEnd);
+
+const sortedDates = allSortedDates.filter(d => d >= startStr && d <= endStr);
+if (sortedDates.length === 0) throw new Error("Nessun dato disponibile per il periodo selezionato.");
+
+let initialCapital = 10000;
+let xData = [];
+let yData1 = [];
+let yData2 = [];
+let startIndex = 0;
+let initialPrices = null;
+
+// Troviamo il primo giorno in cui tutti gli asset selezionati esistono per avere un vero paragone
+for(let i = 0; i < sortedDates.length; i++) {
+const d = sortedDates[i];
+const prices = dateMap[d];
+let hasAllPrices = true;
+for(const ticker of allAssets) {
+if(!prices[ticker]) hasAllPrices = false;
+}
+if(hasAllPrices) {
+startIndex = i;
+initialPrices = prices;
+break;
+}
+}
+if(!initialPrices) throw new Error("Nessun punto di partenza comune trovato tra i token. Scegli monete con uno storico coincidente.");
+
+let shares1 = {};
+let shares2 = {};
+p1.forEach(a => shares1[a.ticker] = (initialCapital * (a.weight / 100)) / initialPrices[a.ticker]);
+p2.forEach(a => shares2[a.ticker] = (initialCapital * (a.weight / 100)) / initialPrices[a.ticker]);
+
+for (let i = startIndex; i < sortedDates.length; i++) {
+const d = sortedDates[i];
+const prices = dateMap[d];
+let val1 = 0;
+let val2 = 0;
+
+p1.forEach(a => { if(prices[a.ticker]) val1 += shares1[a.ticker] * prices[a.ticker]; });
+p2.forEach(a => { if(prices[a.ticker]) val2 += shares2[a.ticker] * prices[a.ticker]; });
+
+if(val1 > 0) {
+xData.push(d);
+yData1.push(val1);
+if (p2.length > 0) yData2.push(val2);
+}
+}
+
+document.getElementById('builder-results-placeholder').classList.add('hidden');
+document.getElementById('builder-results-content').classList.remove('hidden');
+document.getElementById('builder-results-content').classList.add('flex');
+
+const stats1 = calculateMetrics(yData1);
+displayStats(stats1, '1');
+
+const traces = [{
+x: xData,
+y: yData1,
+type: 'scatter',
+mode: 'lines',
+line: { color: '#0050ff', width: 2 },
+fill: p2.length === 0 ? 'tozeroy' : 'none',
+fillcolor: 'rgba(0, 80, 255, 0.1)',
+name: 'Portafoglio A'
+}];
+
+if (p2.length > 0) {
+const stats2 = calculateMetrics(yData2);
+displayStats(stats2, '2');
+document.querySelectorAll('[id^="box-b-stat-"]').forEach(el => el.classList.remove('hidden', 'flex'));
+document.querySelectorAll('[id^="box-b-stat-"]').forEach(el => el.classList.add('flex'));
+
+traces.push({
+x: xData,
+y: yData2,
+type: 'scatter',
+mode: 'lines',
+line: { color: '#ff8c00', width: 2 },
+name: 'Portafoglio B'
+});
+} else {
+document.querySelectorAll('[id^="box-b-stat-"]').forEach(el => el.classList.remove('flex'));
+document.querySelectorAll('[id^="box-b-stat-"]').forEach(el => el.classList.add('hidden'));
+}
+
+const layout = {
+margin: { l: 50, r: 20, t: 30, b: 40 },
+paper_bgcolor: 'transparent',
+plot_bgcolor: 'transparent',
+xaxis: { showgrid: false },
+yaxis: { tickprefix: '$', gridcolor: '#f1f5f9' },
+hovermode: 'x unified'
+};
+
+Plotly.newPlot('builder-performance-chart', traces, layout, {responsive: true, displayModeBar: false});
+
+} catch (error) {
+console.error("Errore nel calcolo del portafoglio:", error);
+alert("Errore: " + error.message);
+} finally {
+runBtn.innerHTML = 'Aggiorna Strategy';
+runBtn.disabled = false;
+setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+}
+});
+
+updateBuilderUI();
+async function initDashboard() {
+await loadCryptoNames();
+loadStrategyCharts();
+loadMarketAnalyticsCharts();
+loadMetrics();
+}
+
+initDashboard();
 
 })();
 </script>
