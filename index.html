@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <style>
-body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; }
+body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; overflow-x: hidden; }
 .title-font { font-family: 'Space Grotesk', sans-serif; }
 .chart-card {
 background: #ffffff;
@@ -25,69 +25,60 @@ flex-direction: column;
 .chart-container { min-height: 605px; position: relative; padding: 1.5rem; }
 .chart-wrapper { position: relative; width: 100%; height: 100%; }
 @media (max-width: 1023px) { .chart-container { min-height: 666px; padding: 1rem; } }
-@media (max-width: 640px) { .chart-container { min-height: 605px; } }
+@media (max-width: 640px) { .chart-container { min-height: 400px; padding: 0.5rem; } }
+
 .plotly .hovertext { z-index: 1000; }
 .hovertext { max-height: 280px; overflow-y: auto; }
 .hovertext::-webkit-scrollbar { width: 6px; }
 .hovertext::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
 .hovertext::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-.tab-container { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; overflow-x: auto;}
-.tab-btn {
-padding: 1rem 1.5rem;
-font-size: 1rem;
-font-weight: 600;
-color: #64748b;
-border: none;
-background: none;
-cursor: pointer;
-transition: all 0.3s ease;
-border-bottom: 3px solid transparent;
-margin-bottom: -2px;
-white-space: nowrap;
+
+/* Miglioramento Tab Mobile */
+.tab-container { 
+display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; 
+overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
 }
+.tab-container::-webkit-scrollbar { display: none; }
+.tab-btn {
+padding: 1rem 1.5rem; font-size: 1rem; font-weight: 600; color: #64748b;
+border: none; background: none; cursor: pointer; transition: all 0.3s ease;
+border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; flex-shrink: 0;
+}
+@media (max-width: 640px) { .tab-btn { padding: 0.75rem 1rem; font-size: 0.9rem; } }
 .tab-btn:hover { color: #0050ff; }
 .tab-btn.active { color: #0050ff; border-bottom-color: #0050ff; }
 .tab-content { display: none; }
 .tab-content.active { display: grid; }
 
 .chart-wrapper-box {
-min-width: 300px;
-background: #ffffff;
-border-radius: 8px;
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-padding: 15px;
-width: 100%;
+min-width: 0; 
+background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+padding: 15px; width: 100%; overflow: hidden;
 }
 
-.strategy-description {
-background-color: #f8fafc;
-border-radius: 6px;
-padding: 1.5rem;
-color: #334155;
-}
-
-.strategy-description h3 {
-margin-top: 0;
-color: #0f172a;
-}
+.strategy-description { background-color: #f8fafc; border-radius: 6px; padding: 1.5rem; color: #334155; }
+@media (max-width: 640px) { .strategy-description { padding: 1rem; } }
+.strategy-description h3 { margin-top: 0; color: #0f172a; }
 </style>
 </head>
 <body class="min-h-screen pt-[73px]">
 <nav class="border-b border-gray-200 bg-white/90 backdrop-blur-md fixed top-0 left-0 w-full z-50 shadow-sm h-[73px] flex items-center">
 <div class="w-full px-4 md:px-6 flex items-center justify-between">
 <div class="flex items-center gap-4">
-<button id="mobile-menu-btn" class="md:hidden text-slate-500 hover:text-slate-800 focus:outline-none text-2xl">
+<button id="mobile-menu-btn" class="md:hidden text-slate-500 hover:text-[#0050ff] focus:outline-none text-2xl transition-colors">
 <i class="fa-solid fa-bars"></i>
 </button>
 <div class="flex items-center gap-3">
 <img src="https://media.licdn.com/dms/image/v2/D4D0BAQF68-WEFB0KLg/company-logo_200_200/company-logo_200_200/0/1697810707337/conio_logo?e=2147483647&v=beta&t=al0vx5YOQv08DXnuzKaUvTg4FmCbTU8JpmEjziVADHE" alt="Conio Logo" class="w-10 h-10 rounded-full shadow-md object-cover">
-<span class="title-font text-2xl font-bold tracking-tight text-[#0a1b39]">Conio <span class="text-[#0050ff]">Analytics</span></span>
+<span class="title-font text-xl md:text-2xl font-bold tracking-tight text-[#0a1b39] truncate">Conio <span class="text-[#0050ff]">Analytics</span></span>
 </div>
 </div>
 </div>
 </nav>
 
-<aside id="sidebar" class="fixed top-[73px] left-0 w-64 h-[calc(100vh-73px)] bg-white border-r border-slate-200 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto shadow-lg md:shadow-none">
+<div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 z-30 hidden transition-opacity md:hidden"></div>
+
+<aside id="sidebar" class="fixed top-[73px] left-0 w-64 h-[calc(100vh-73px)] bg-white border-r border-slate-200 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto shadow-2xl md:shadow-none">
 <div class="p-4 flex flex-col gap-2">
 <button class="sidebar-btn active w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-[#0050ff] bg-blue-50" data-page="page-settori">
 <i class="fa-solid fa-chart-pie w-5 text-center"></i> Settori
@@ -101,14 +92,14 @@ color: #0f172a;
 </div>
 </aside>
 
-<main class="md:ml-64 p-4 md:p-8 transition-all duration-300 max-w-screen-2xl mx-auto">
+<main class="md:ml-64 p-4 md:p-8 transition-all duration-300 max-w-screen-2xl mx-auto w-full">
 
 <div id="page-settori" class="page-content block">
 <div class="mb-10">
 <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
 <div>
-<h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Indici Settoriali</h2>
-<p class="text-slate-500 mt-2 font-medium">Dynamic cryptocurrency portfolios</p>
+<h2 class="title-font text-2xl md:text-3xl font-bold tracking-tight text-[#0a1b39]">Indici Settoriali</h2>
+<p class="text-slate-500 mt-2 text-sm md:text-base font-medium">Dynamic cryptocurrency portfolios</p>
 </div>
 </div>
 
@@ -120,288 +111,292 @@ color: #0f172a;
 </div>
 
 <div id="mainStrategy" class="tab-content active">
-<div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
 <div>
 <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
 <p id="main-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 <div>
 <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-<p id="main-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+<p id="main-change-24h" class="text-xl md:text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 <div>
 <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-<p id="main-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+<p id="main-change-ytd" class="text-xl md:text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 </div>
 </div>
 
 <div class="strategy-description mb-8">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
-<p class="text-sm leading-relaxed">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice</h3>
+<p class="text-sm leading-relaxed text-justify">
 Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato per tracciare le 5 criptovalute a maggiore capitalizzazione all'interno del nostro universo di asset idonei. All'interno dell'indice, ogni criptovaluta è pesata in modo proporzionale alla propria capitalizzazione di mercato, offrendo un'esposizione che riflette fedelmente le reali gerarchie del settore. Per garantire che l'indice rimanga sempre rappresentativo, il portafoglio subisce un ribilanciamento automatico ogni sei mesi, durante il quale vengono ricalcolati i pesi e aggiornati gli asset in base all'attuale top 5. Infine, per rendere l'analisi delle performance più intuitiva, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC). Quest'ultimo viene inoltre utilizzato come benchmark di riferimento nei grafici, permettendo di confrontare visivamente e in modo immediato l'andamento della strategia rispetto al leader di mercato.
 </p>
 </div>
 
 <div class="chart-wrapper-box mb-8">
 <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-<div id="performance-chart"></div>
+<div class="w-full overflow-hidden"><div id="performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
 </div>
 </div>
 
-<div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+<div class="mb-8 w-full bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
-<table class="w-full text-sm text-center whitespace-nowrap">
+<div class="w-full overflow-x-auto pb-2">
+<table class="w-full text-sm text-center whitespace-nowrap min-w-[500px]">
 </table>
 </div>
+</div>
 
-<div id="main-allocation"></div>
+<div id="main-allocation" class="w-full"></div>
 <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
 </div>
 
 <div class="chart-wrapper-box mb-16">
 <h3 class="font-bold mb-4">Composizione</h3>
-<div id="composition-chart"></div>
+<div class="w-full overflow-hidden"><div id="composition-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
 </div>
 </div>
 
 <div class="mb-6">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Universo degli Asset</h3>
-<p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-3 title-font">Universo degli Asset</h3>
+<p class="mb-4 text-sm md:text-base">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-3 text-sm font-medium text-slate-500">
 <span>Bitcoin</span><span>Ethereum</span><span>XRP</span><span>Solana</span><span>Dogecoin</span><span>Cardano</span><span>Chainlink</span><span>Avalanche</span><span>Polkadot</span><span>Uniswap</span><span>Sky</span><span>Near</span><span>Cosmos</span><span>Polygon</span><span>Algorand</span><span>Aptos</span><span>Arbitrum</span><span>Stacks</span><span>Injective</span><span>Celestia</span><span>The Graph</span><span>Optimism</span><span>Sui</span><span>Stellar Lumens</span><span>XPL</span><span>Ondo</span><span>Hedera</span><span>Filecoin</span><span>Aave</span><span>Midnight</span><span>Ethereum Classic</span><span>Litecoin</span>
 </div>
 </div>
 </div>
 
 <div id="techMarketCap" class="tab-content">
-<div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
 <div>
 <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
 <p id="tech-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 <div>
 <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-<p id="tech-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+<p id="tech-change-24h" class="text-xl md:text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 <div>
 <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-<p id="tech-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+<p id="tech-change-ytd" class="text-xl md:text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 </div>
 </div>
 
 <div class="strategy-description mb-8">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Tech</h3>
-<p class="text-sm leading-relaxed">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Tech</h3>
+<p class="text-sm leading-relaxed text-justify">
 Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset che supportano infrastrutture e soluzioni tecnologiche avanzate. Per essere incluso nell'indice, ogni progetto deve soddisfare un criterio di capitalizzazione di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati proprio in base alla loro capitalizzazione, offrendo un'esposizione proporzionale al loro peso reale nel mercato. Per mantenere la strategy aggiornata e in linea con le soglie richieste, l'indice prevede un ribilanciamento automatico ogni sei mesi, durante il quale i pesi vengono ricalcolati e i componenti rivisti. Il valore di partenza dell'indice è stato equiparato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare le performance di questo comparto tecnologico rispetto al leader generale del mercato.
 </p>
 </div>
 
 <div class="chart-wrapper-box mb-8">
 <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-<div id="tech-performance-chart"></div>
+<div class="w-full overflow-hidden"><div id="tech-performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
 </div>
 </div>
 
-<div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+<div class="mb-8 w-full bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
-<table class="w-full text-sm text-center whitespace-nowrap">
+<div class="w-full overflow-x-auto pb-2">
+<table class="w-full text-sm text-center whitespace-nowrap min-w-[500px]">
 </table>
 </div>
+</div>
 
-<div id="tech-allocation"></div>
+<div id="tech-allocation" class="w-full"></div>
 <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice.</p>
 </div>
 
 <div class="chart-wrapper-box mb-16">
 <h3 class="font-bold mb-4">Composizione</h3>
-<div id="tech-weights-chart"></div>
+<div class="w-full overflow-hidden"><div id="tech-weights-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo e l'impatto dei ribilanciamenti periodici previsti dalla strategia.</p>
 </div>
 </div>
 
 <div class="mb-6">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Tech Asset</h3>
-<p class="mb-4">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-3 title-font">Tech Asset</h3>
+<p class="mb-4 text-sm md:text-base">L'universo di asset idonei per l'inclusione nell'indice comprende le seguenti criptovalute:</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-3 text-sm font-medium text-slate-500">
 <span>Ethereum</span><span>Solana</span><span>Cardano</span><span>Avalanche</span><span>Polkadot</span><span>Near</span><span>Cosmos</span><span>Algorand</span><span>Aptos</span><span>Celestia</span><span>Sui</span><span>Hedera</span>
 </div>
 </div>
 </div>
 
 <div id="extraStrategy1" class="tab-content">
-<div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
 <div>
 <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
 <p id="extra1-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 <div>
 <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-<p id="extra1-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+<p id="extra1-change-24h" class="text-xl md:text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 <div>
 <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-<p id="extra1-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+<p id="extra1-change-ytd" class="text-xl md:text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 </div>
 </div>
 
 <div class="strategy-description mb-8">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
-<p class="text-sm leading-relaxed">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice DeFi</h3>
+<p class="text-sm leading-relaxed text-justify">
 Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo esclusivo ai progetti di finanza decentralizzata (DeFi) presenti nel nostro universo di asset. Per garantire elevati standard di liquidità e solidità, l'inclusione nell'indice richiede il superamento di una soglia rigorosa: ogni protocollo deve vantare una capitalizzazione di mercato pari ad almeno 1 miliardo di dollari. All'interno del portafoglio, l'allocazione delle risorse è ponderata in base alla capitalizzazione dei singoli asset, riflettendo così il loro effettivo peso e l'influenza all'interno dell'ecosistema DeFi. La strategy prevede un ribilanciamento automatico con cadenza semestrale, un passaggio fondamentale per aggiornare i pesi e ricalcolare i componenti idonei in base alle fluttuazioni di mercato. Coerentemente con le altre strategies, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), scelto come benchmark di riferimento nei grafici per offrire un confronto visivo e immediato tra l'andamento del settore della finanza decentralizzata e quello della principale criptovaluta.
 </p>
 </div>
 
 <div class="chart-wrapper-box mb-8">
 <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-<div id="extra1-performance-chart"></div>
+<div class="w-full overflow-hidden"><div id="extra1-performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
 </div>
 </div>
 
-<div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+<div class="mb-8 w-full bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
-<table class="w-full text-sm text-center whitespace-nowrap">
-</table>
+<div class="w-full overflow-x-auto pb-2">
+<table class="w-full text-sm text-center whitespace-nowrap min-w-[500px]"></table>
+</div>
 </div>
 
-<div id="extra1-allocation"></div>
+<div id="extra1-allocation" class="w-full"></div>
 <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
 </div>
 
-<div class="chart-wrapper-box mb-16">
+<div class="chart-wrapper-box mb-16 mt-8">
 <h3 class="font-bold mb-4">Composizione</h3>
-<div id="extra1-composition-chart"></div>
+<div class="w-full overflow-hidden"><div id="extra1-composition-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
 </div>
 </div>
 
 <div class="mb-6">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Defi</h3>
-<p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Defi</h3>
+<p class="mb-4 text-sm md:text-base">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-3 text-sm font-medium text-slate-500">
 <span>Chainlink</span><span>Uniswap</span><span>Sky</span><span>Injective</span><span>Ondo</span><span>Aave</span>
 </div>
 </div>
 </div>
 
 <div id="extraStrategy2" class="tab-content">
-<div class="mb-8 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
 <div>
 <p class="text-sm font-medium text-slate-500">Valore Attuale</p>
 <p id="extra2-current-value" class="text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 <div>
 <p class="text-sm font-medium text-slate-500">Variazione (24h)</p>
-<p id="extra2-change-24h" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+<p id="extra2-change-24h" class="text-xl md:text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 <div>
 <p class="text-sm font-medium text-slate-500">Variazione (YTD)</p>
-<p id="extra2-change-ytd" class="text-2xl font-bold text-slate-800 mt-1">--</p>
+<p id="extra2-change-ytd" class="text-xl md:text-2xl font-bold text-slate-800 mt-1">--</p>
 </div>
 </div>
 </div>
 
 <div class="strategy-description mb-8">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Payments</h3>
-<p class="text-sm leading-relaxed">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-3 title-font">Meccanismo dell'Indice Payments</h3>
+<p class="text-sm leading-relaxed text-justify">
 Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato esclusivamente sulle criptovalute del nostro universo di asset progettate per innovare e migliorare l'efficienza dei sistemi di pagamento. Per garantire solidità e rilevanza, l'inclusione nell'indice è subordinata al superamento di una rigorosa soglia d'ingresso: ogni progetto deve raggiungere una capitalizzazione di mercato di almeno 1 miliardo di dollari. All'interno del portafoglio, gli asset sono ponderati in base alla loro capitalizzazione, offrendo così un'esposizione proporzionale alla loro effettiva adozione e grandezza nel settore. Per mantenere la composizione sempre aggiornata e fedele alle evoluzioni del mercato, la strategia prevede un ribilanciamento automatico con cadenza semestrale, momento in cui i pesi vengono ricalcolati e i componenti verificati. Infine, per rendere l'analisi delle performance il più intuitiva possibile, il valore di partenza dell'indice è stato allineato al prezzo iniziale di Bitcoin (BTC), che viene utilizzato in tutti i grafici come benchmark diretto per confrontare l'andamento del comparto pagamenti con il leader indiscusso del mercato.
 </p>
 </div>
 
 <div class="chart-wrapper-box mb-8">
 <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-<div id="extra2-performance-chart"></div>
+<div class="w-full overflow-hidden"><div id="extra2-performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
 </div>
 </div>
 
-<div class="mb-8 overflow-x-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+<div class="mb-8 w-full bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
-<table class="w-full text-sm text-center whitespace-nowrap">
-</table>
+<div class="w-full overflow-x-auto pb-2">
+<table class="w-full text-sm text-center whitespace-nowrap min-w-[500px]"></table>
+</div>
 </div>
 
-<div id="extra2-allocation"></div>
+<div id="extra2-allocation" class="w-full"></div>
 <div class="mt-2 mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questa tabella riepiloga l'allocazione corrente del portafoglio. Per ogni asset idoneo sono indicati il controvalore della capitalizzazione di mercato e il rispettivo peso percentuale all'interno dell'indice, calcolato secondo le regole della strategia.</p>
 </div>
 
-<div class="chart-wrapper-box mb-16">
+<div class="chart-wrapper-box mb-16 mt-8">
 <h3 class="font-bold mb-4">Composizione</h3>
-<div id="extra2-weights-chart"></div>
+<div class="w-full overflow-hidden"><div id="extra2-weights-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
 </div>
 </div>
 
 <div class="mb-6">
-<h3 class="text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Payments</h3>
-<p class="mb-4">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-2 text-slate-500">
+<h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-3 title-font">Asset Payments</h3>
+<p class="mb-4 text-sm md:text-base">L'universo di asset idonei per l'inclusione comprende le seguenti criptovalute:</p>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-3 text-sm font-medium text-slate-500">
 <span>Bitcoin</span><span>XRP</span><span>Stellar</span><span>Plasma</span>
 </div>
 </div>
 </div>
-</div>
-</div>
 
-<div id="page-market" class="page-content hidden">
+</div> </div> <div id="page-market" class="page-content hidden">
 <div class="mb-8">
-<h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Statistiche di Mercato</h2>
-<p class="text-sm text-slate-600 mt-4 leading-relaxed">
+<h2 class="title-font text-2xl md:text-3xl font-bold tracking-tight text-[#0a1b39]">Statistiche di Mercato</h2>
+<p class="text-sm md:text-base text-slate-600 mt-4 leading-relaxed text-justify">
 In questa sezione puoi monitorare le principali metriche macroeconomiche e di mercato che influenzano l'ecosistema delle criptovalute. L'analisi di parametri chiave come la Bitcoin Dominance, le correlazioni tra i vari asset digitali rispetto al leader di mercato, i volumi di scambio e l'andamento della volatilità fornisce una visione olistica e approfondita sui trend in corso. Questi strumenti interattivi sono stati appositamente pensati per aiutarti a comprendere i complessi flussi di capitale all'interno del mercato crypto, permettendoti di decifrare in modo più accurato e consapevole il sentiment generale degli investitori. Che si tratti di valutare l'avversione al rischio durante le fasi di contrazione o di misurare l'euforia nei periodi rialzisti, avere a disposizione una panoramica completa e aggiornata è fondamentale. In questo modo potrai contestualizzare le singole variazioni di prezzo all'interno del più ampio scenario finanziario globale, supportando in maniera data-driven le tue decisioni analitiche e strategiche di medio e lungo termine.
 </p>
 </div>
 
 <div class="mb-16">
-<div class="flex flex-col gap-10" id="market-analytics-charts-container">
-</div>
+<div class="flex flex-col gap-10" id="market-analytics-charts-container"></div>
 </div>
 
 <div class="mb-10">
-<div class="grid lg:grid-cols-2 gap-10">
-<div class="chart-card bg-white">
-<div class="chart-container p-0" style="min-height: 410px;">
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
+<div class="chart-card bg-white w-full">
+<div class="chart-container p-0 min-h-[350px] md:min-h-[410px]">
 <div class="chart-wrapper">
-<iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
+<iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=2136874869&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block; min-height: 350px;"></iframe>
 </div>
 </div>
-<div class="p-5 border-t border-slate-100 bg-slate-50 mt-auto">
-<p class="text-sm text-slate-600 leading-relaxed">Questo grafico confronta l'andamento storico del prezzo di Bitcoin (BTC) con la sua volatilità di mercato. Osservare i picchi di volatilità in relazione ai movimenti di prezzo permette di identificare le fasi di maggiore stress o euforia del mercato, aiutando a contestualizzare i cicli rialzisti e ribassisti storici della principale criptovaluta.</p>
+<div class="p-4 md:p-5 border-t border-slate-100 bg-slate-50 mt-auto">
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento storico del prezzo di Bitcoin (BTC) con la sua volatilità di mercato. Osservare i picchi di volatilità in relazione ai movimenti di prezzo permette di identificare le fasi di maggiore stress o euforia del mercato, aiutando a contestualizzare i cicli rialzisti e ribassisti storici della principale criptovaluta.</p>
 </div>
 </div>
-<div class="chart-card bg-white">
-<div class="chart-container p-0" style="min-height: 410px;">
+
+<div class="chart-card bg-white w-full">
+<div class="chart-container p-0 min-h-[350px] md:min-h-[410px]">
 <div class="chart-wrapper">
-<iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=1143695036&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block;"></iframe>
+<iframe loading="lazy" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCt8OSoZsjkgiE21iwp7Y_RhhJTO19c3n5oFxVmHzp1vS_7w5qMngjNb1EGmJp5LZVlu6JGf366JMo/pubchart?oid=1143695036&format=interactive" width="100%" height="100%" frameborder="0" allowfullscreen style="border: none; display: block; min-height: 350px;"></iframe>
 </div>
 </div>
-<div class="p-5 border-t border-slate-100 bg-slate-50 mt-auto">
-<p class="text-sm text-slate-600 leading-relaxed">Similmente al grafico precedente, questo strumento mette in relazione il prezzo storico di Ethereum (ETH) con i suoi livelli di volatilità. Poiché Ethereum rappresenta il fulcro della finanza decentralizzata (DeFi) e degli smart contract, monitorarne la volatilità rispetto al prezzo è fondamentale per comprendere i flussi di capitale e il sentiment di rischio associato al settore delle altcoin.</p>
+<div class="p-4 md:p-5 border-t border-slate-100 bg-slate-50 mt-auto">
+<p class="text-sm text-slate-600 leading-relaxed text-justify">Similmente al grafico precedente, questo strumento mette in relazione il prezzo storico di Ethereum (ETH) con i suoi livelli di volatilità. Poiché Ethereum rappresenta il fulcro della finanza decentralizzata (DeFi) e degli smart contract, monitorarne la volatilità rispetto al prezzo è fondamentale per comprendere i flussi di capitale e il sentiment di rischio associato al settore delle altcoin.</p>
 </div>
 </div>
 </div>
@@ -410,12 +405,12 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 
 <div id="page-builder" class="page-content hidden">
 <div class="mb-8">
-<h2 class="title-font text-3xl font-bold tracking-tight text-[#0a1b39]">Strategy Builder</h2>
-<p class="text-slate-500 mt-2 font-medium">Crea, backtesta e analizza i tuoi portafogli crypto personalizzati.</p>
+<h2 class="title-font text-2xl md:text-3xl font-bold tracking-tight text-[#0a1b39]">Strategy Builder</h2>
+<p class="text-slate-500 mt-2 text-sm md:text-base font-medium">Crea, backtesta e analizza i tuoi portafogli crypto personalizzati.</p>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-<div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit">
+<div class="lg:col-span-1 bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
 <h3 class="text-lg font-bold text-[#0a1b39] mb-4">Composizione Portafogli</h3>
 <div class="mb-6">
 <label class="block text-sm font-medium text-slate-700 mb-1">Aggiungi a:</label>
@@ -425,7 +420,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 </select>
 
 <label class="block text-sm font-medium text-slate-700 mb-1">Seleziona Asset</label>
-<div class="flex gap-2">
+<div class="flex flex-col sm:flex-row gap-2">
 <select id="builder-asset-select" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
 <option value="BTC">Bitcoin (BTC)</option>
 <option value="ETH">Ethereum (ETH)</option>
@@ -438,10 +433,12 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 <option value="DOGE">Dogecoin (DOGE)</option>
 <option value="UNI">Uniswap (UNI)</option>
 </select>
-<input type="number" id="builder-weight-input" placeholder="Peso %" min="1" max="100" class="block w-24 border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
-<button id="builder-add-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-3 rounded-lg transition-colors">
+<div class="flex gap-2 w-full sm:w-auto">
+<input type="number" id="builder-weight-input" placeholder="Peso %" min="1" max="100" class="block w-full sm:w-24 border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
+<button id="builder-add-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors flex-shrink-0">
 <i class="fa-solid fa-plus"></i>
 </button>
+</div>
 </div>
 </div>
 
@@ -453,8 +450,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 </button>
 </div>
 <div class="bg-slate-50 rounded-lg p-3 min-h-[80px] border border-slate-100 mb-2">
-<ul id="builder-portfolio-list-1" class="divide-y divide-slate-200 text-sm">
-</ul>
+<ul id="builder-portfolio-list-1" class="divide-y divide-slate-200 text-sm"></ul>
 </div>
 <div class="px-2">
 <span class="text-xs font-medium text-slate-600">Totale allocato:</span>
@@ -470,8 +466,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 </button>
 </div>
 <div class="bg-slate-50 rounded-lg p-3 min-h-[80px] border border-slate-100 mb-2">
-<ul id="builder-portfolio-list-2" class="divide-y divide-slate-200 text-sm">
-</ul>
+<ul id="builder-portfolio-list-2" class="divide-y divide-slate-200 text-sm"></ul>
 </div>
 <div class="px-2">
 <span class="text-xs font-medium text-slate-600">Totale allocato:</span>
@@ -490,7 +485,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 <option value="YTD">Year to Date</option>
 <option value="CUSTOM">Date Personalizzate</option>
 </select>
-<div id="custom-date-range" class="hidden grid grid-cols-2 gap-2 transition-all">
+<div id="custom-date-range" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-2 transition-all">
 <div>
 <label class="block text-xs font-medium text-slate-500 mb-1">Data Inizio</label>
 <input type="date" id="builder-start-date" class="block w-full border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
@@ -508,65 +503,65 @@ Run Strategy
 <p class="text-xs text-center text-slate-400 mt-3">I pesi di ogni portafoglio attivo devono essere al 100%.</p>
 </div>
 
-<div class="lg:col-span-2 flex flex-col gap-8">
+<div class="lg:col-span-2 flex flex-col gap-8 w-full">
 <div id="builder-results-placeholder" class="bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center h-full min-h-[400px]">
-<div class="text-center text-slate-400">
+<div class="text-center text-slate-400 p-4">
 <i class="fa-solid fa-chart-line text-4xl mb-3"></i>
 <p>Seleziona i tuoi asset e clicca "Run Strategy" per visualizzare i risultati.</p>
 </div>
 </div>
 
-<div id="builder-results-content" class="hidden flex-col gap-6">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-<p class="text-xs font-medium text-slate-500 uppercase mb-2">Rendimento Totale</p>
+<div id="builder-results-content" class="hidden flex-col gap-6 w-full">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-white p-3 md:p-4 rounded-xl border border-slate-200 shadow-sm">
+<p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase mb-2">Rend. Totale</p>
 <div class="flex justify-between items-center">
 <span class="text-xs font-bold text-slate-400">A:</span>
-<span id="b-stat-return-1" class="text-lg font-bold">--</span>
+<span id="b-stat-return-1" class="text-base md:text-lg font-bold">--</span>
 </div>
 <div class="flex justify-between items-center mt-1" id="box-b-stat-return-2">
 <span class="text-xs font-bold text-slate-400">B:</span>
-<span id="b-stat-return-2" class="text-lg font-bold">--</span>
+<span id="b-stat-return-2" class="text-base md:text-lg font-bold">--</span>
 </div>
 </div>
-<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-<p class="text-xs font-medium text-slate-500 uppercase mb-2">Volatilità (Ann.)</p>
+<div class="bg-white p-3 md:p-4 rounded-xl border border-slate-200 shadow-sm">
+<p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase mb-2">Volatilità</p>
 <div class="flex justify-between items-center">
 <span class="text-xs font-bold text-slate-400">A:</span>
-<span id="b-stat-vol-1" class="text-lg font-bold text-slate-800">--</span>
+<span id="b-stat-vol-1" class="text-base md:text-lg font-bold text-slate-800">--</span>
 </div>
 <div class="flex justify-between items-center mt-1" id="box-b-stat-vol-2">
 <span class="text-xs font-bold text-slate-400">B:</span>
-<span id="b-stat-vol-2" class="text-lg font-bold text-slate-800">--</span>
+<span id="b-stat-vol-2" class="text-base md:text-lg font-bold text-slate-800">--</span>
 </div>
 </div>
-<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-<p class="text-xs font-medium text-slate-500 uppercase mb-2">Max Drawdown</p>
+<div class="bg-white p-3 md:p-4 rounded-xl border border-slate-200 shadow-sm">
+<p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase mb-2">Max DD</p>
 <div class="flex justify-between items-center">
 <span class="text-xs font-bold text-slate-400">A:</span>
-<span id="b-stat-dd-1" class="text-lg font-bold text-slate-800">--</span>
+<span id="b-stat-dd-1" class="text-base md:text-lg font-bold text-slate-800">--</span>
 </div>
 <div class="flex justify-between items-center mt-1" id="box-b-stat-dd-2">
 <span class="text-xs font-bold text-slate-400">B:</span>
-<span id="b-stat-dd-2" class="text-lg font-bold text-slate-800">--</span>
+<span id="b-stat-dd-2" class="text-base md:text-lg font-bold text-slate-800">--</span>
 </div>
 </div>
-<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-<p class="text-xs font-medium text-slate-500 uppercase mb-2">Sharpe Ratio</p>
+<div class="bg-white p-3 md:p-4 rounded-xl border border-slate-200 shadow-sm">
+<p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase mb-2">Sharpe</p>
 <div class="flex justify-between items-center">
 <span class="text-xs font-bold text-slate-400">A:</span>
-<span id="b-stat-sharpe-1" class="text-lg font-bold text-slate-800">--</span>
+<span id="b-stat-sharpe-1" class="text-base md:text-lg font-bold text-slate-800">--</span>
 </div>
 <div class="flex justify-between items-center mt-1" id="box-b-stat-sharpe-2">
 <span class="text-xs font-bold text-slate-400">B:</span>
-<span id="b-stat-sharpe-2" class="text-lg font-bold text-slate-800">--</span>
+<span id="b-stat-sharpe-2" class="text-base md:text-lg font-bold text-slate-800">--</span>
 </div>
 </div>
 </div>
 
-<div class="chart-wrapper-box">
-<h3 class="font-bold mb-4">Equity Curve delle Strategie</h3>
-<div id="builder-performance-chart" style="min-height: 400px;"></div>
+<div class="chart-wrapper-box w-full">
+<h3 class="font-bold mb-4">Equity Curve</h3>
+<div class="w-full overflow-hidden"><div id="builder-performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
 </div>
 </div>
 
@@ -574,7 +569,7 @@ Run Strategy
 </div>
 </div>
 
-<footer class="text-center text-slate-500 text-sm py-12 border-t border-gray-200 mt-12">
+<footer class="text-center text-slate-500 text-sm py-8 md:py-12 border-t border-gray-200 mt-12">
 &copy; 2026 Conio Analytics
 </footer>
 </main>
@@ -583,10 +578,15 @@ Run Strategy
 (function() {
 const sidebar = document.getElementById('sidebar');
 const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 
-mobileMenuBtn.addEventListener('click', () => {
+function toggleMobileMenu() {
 sidebar.classList.toggle('-translate-x-full');
-});
+sidebarBackdrop.classList.toggle('hidden');
+}
+
+mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+sidebarBackdrop.addEventListener('click', toggleMobileMenu);
 
 // --- LOGICA MENU LATERALE ---
 document.querySelectorAll('.sidebar-btn').forEach(btn => {
@@ -608,6 +608,7 @@ document.getElementById(pageId).classList.add('block');
 
 if (window.innerWidth < 768) {
 sidebar.classList.add('-translate-x-full');
+sidebarBackdrop.classList.add('hidden');
 }
 
 setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
@@ -629,9 +630,14 @@ document.getElementById(tabId).classList.add('active');
 
 setTimeout(() => {
 window.dispatchEvent(new Event('resize'));
+if(window.Plotly) {
+const charts = document.querySelectorAll(`#${tabId} .js-plotly-plot`);
+charts.forEach(chart => Plotly.Plots.resize(chart));
+}
 }, 50);
 });
 });
+
 let cryptoNamesMap = {};
 
 async function loadCryptoNames() {
@@ -707,16 +713,30 @@ if (trace.customdata) trace.customdata = decodePlotlyBdata(trace.customdata);
 });
 }
 
-function getLayoutWithMargins(layout) {
+window.getLayoutWithMargins = function(layout) {
+const isMobile = window.innerWidth < 640;
 return {
 ...layout,
-margin: { l: 60, r: 80, t: 50, b: 40 },
+margin: { 
+l: isMobile ? 40 : 60, 
+r: isMobile ? 20 : 80, 
+t: isMobile ? 30 : 50, 
+b: isMobile ? 30 : 40 
+},
 plot_bgcolor: "transparent",
 paper_bgcolor: "transparent",
 font: { color: '#475569' },
 hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, color: "#0f172a" } }
 };
 }
+
+// Ridimensionamento dinamico dei grafici
+window.addEventListener('resize', () => {
+if(window.Plotly) {
+const activeCharts = document.querySelectorAll('.page-content.block .tab-content.active .js-plotly-plot, .page-content.block > .js-plotly-plot, #market-analytics-charts-container .js-plotly-plot');
+activeCharts.forEach(chart => Plotly.Plots.resize(chart));
+}
+});
 
 function buildAllocationTable(containerId, allocationObj, mcapObj = null) {
 const container = document.getElementById(containerId);
@@ -1035,12 +1055,12 @@ const config = chartConfigs[i];
 const chartId = `market-chart-${i}`;
 
 const chartWrapper = document.createElement('div');
-chartWrapper.className = 'chart-wrapper-box flex flex-col';
+chartWrapper.className = 'chart-wrapper-box flex flex-col w-full';
 chartWrapper.innerHTML = `
 <h3 class="font-bold mb-4 text-xl text-[#0a1b39]">${config.title}</h3>
-<div id="${chartId}" style="min-height: ${config.height}; width: 100%;"></div>
+<div class="w-full overflow-hidden"><div id="${chartId}" style="min-height: ${config.height}; width: 100%;"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-<p class="text-sm text-slate-600 leading-relaxed">${config.description}</p>
+<p class="text-sm text-slate-600 leading-relaxed text-justify">${config.description}</p>
 </div>
 `;
 container.appendChild(chartWrapper);
@@ -1255,7 +1275,7 @@ function displayStats(stats, prefix) {
 const returnEl = document.getElementById(`b-stat-return-${prefix}`);
 const isPositive = stats.returnPct >= 0;
 returnEl.textContent = isPositive ? `+${stats.returnPct.toFixed(2)}%` : `${stats.returnPct.toFixed(2)}%`;
-returnEl.className = isPositive ? "text-lg font-bold text-green-500" : "text-lg font-bold text-red-500";
+returnEl.className = isPositive ? "text-base md:text-lg font-bold text-green-500" : "text-base md:text-lg font-bold text-red-500";
 
 document.getElementById(`b-stat-vol-${prefix}`).textContent = stats.volAnn.toFixed(2) + '%';
 document.getElementById(`b-stat-dd-${prefix}`).textContent = stats.maxDd.toFixed(2) + '%';
@@ -1325,7 +1345,6 @@ let yData2 = [];
 let startIndex = 0;
 let initialPrices = null;
 
-// Troviamo il primo giorno in cui tutti gli asset selezionati esistono per avere un vero paragone
 for(let i = 0; i < sortedDates.length; i++) {
 const d = sortedDates[i];
 const prices = dateMap[d];
@@ -1399,14 +1418,11 @@ document.querySelectorAll('[id^="box-b-stat-"]').forEach(el => el.classList.remo
 document.querySelectorAll('[id^="box-b-stat-"]').forEach(el => el.classList.add('hidden'));
 }
 
-const layout = {
-margin: { l: 50, r: 20, t: 30, b: 40 },
-paper_bgcolor: 'transparent',
-plot_bgcolor: 'transparent',
+const layout = window.getLayoutWithMargins({
 xaxis: { showgrid: false },
 yaxis: { tickprefix: '$', gridcolor: '#f1f5f9' },
 hovermode: 'x unified'
-};
+});
 
 Plotly.newPlot('builder-performance-chart', traces, layout, {responsive: true, displayModeBar: false});
 
@@ -1421,6 +1437,7 @@ setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
 });
 
 updateBuilderUI();
+
 async function initDashboard() {
 await loadCryptoNames();
 loadStrategyCharts();
