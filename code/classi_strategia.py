@@ -907,10 +907,10 @@ class GlobalMarketAnalytics(BaseCryptoStrategy):
             clean_y_names = [re.sub(r'\d+', '', str(c).replace('-USD', '')) for c in df_heatmap.index]
             
             custom_colorscale = [
-                [0.0, "blue"],
-                [0.5, "green"],
-                [0.75, "white"],
-                [1.0, "red"]
+                [0.0, "#04114f"],
+                [0.5, "#0050ff"],
+                [0.75, "#8800ff"],
+                [1.0, "#ffffff"]
             ]
             
             fig_corr = px.imshow(
