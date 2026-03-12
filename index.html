@@ -431,7 +431,30 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 <option value="AVAX">Avalanche (AVAX)</option>
 <option value="LINK">Chainlink (LINK)</option>
 <option value="DOGE">Dogecoin (DOGE)</option>
+<option value="INJ">Injective (INJ)</option>
+<option value="NEAR">Near (NEAR)</option>
+<option value="LTC">Litecoin (LTC)</option>
+<option value="ONDO">Ondo (ONDO)</option>
+<option value="OP">Optimism (OP)</option>
+<option value="POL">Polygon (POL)</option>
+<option value="SKY">Sky (SKY)</option>
+<option value="STX">Stacks (STX)</option>
+<option value="SUI">Sui (SUI)</option>
+<option value="TIA">Celestia (TIA)</option>
 <option value="UNI">Uniswap (UNI)</option>
+<option value="XLM">Stellar (XLM)</option>
+<option value="XPL">Plasma (XPL)</option>
+<option value="AAVE">Aave (AAVE)</option>
+<option value="ALGO">Algorand (ALGO)</option>
+<option value="APT">Aptos (APT)</option>
+<option value="ARB">Arbitrum (ARB)</option>
+<option value="ATOM">Cosmos (ATOM)</option>
+<option value="ETC">Ethereum Classic (ETC)</option>
+<option value="FIL">Filecoin (FIL)</option>
+<option value="GRT">The Graph (GRT)</option>
+<option value="HBAR">Hedera (HBAR)</option>
+<option value="NIGHT">Night (NIGHT)</option>
+
 </select>
 <div class="flex gap-2 w-full sm:w-auto">
 <input type="number" id="builder-weight-input" placeholder="Peso %" min="1" max="100" class="block w-full sm:w-24 border-slate-300 rounded-lg shadow-sm focus:border-[#0050ff] focus:ring-[#0050ff] sm:text-sm p-2 border">
@@ -1239,14 +1262,37 @@ return;
 let tickerName = "btc";
 if (rawValue.includes("BTC")) tickerName = "btc";
 else if (rawValue.includes("ETH")) tickerName = "eth";
-else if (rawValue.includes("SOL")) tickerName = "sol";
 else if (rawValue.includes("XRP")) tickerName = "xrp";
-else if (rawValue.includes("ADA")) tickerName = "ada";
-else if (rawValue.includes("DOT")) tickerName = "dot";
-else if (rawValue.includes("AVAX")) tickerName = "avax";
-else if (rawValue.includes("LINK")) tickerName = "link";
+else if (rawValue.includes("SOL")) tickerName = "sol";
 else if (rawValue.includes("DOGE")) tickerName = "doge";
+else if (rawValue.includes("ADA")) tickerName = "ada";
+else if (rawValue.includes("LINK")) tickerName = "link";
+else if (rawValue.includes("AAVE")) tickerName = "aave";
+else if (rawValue.includes("ALGO")) tickerName = "algo";
+else if (rawValue.includes("APT")) tickerName = "apt";
+else if (rawValue.includes("ARB")) tickerName = "arb";
+else if (rawValue.includes("ATOM")) tickerName = "atom";
+else if (rawValue.includes("AVAX")) tickerName = "avax";
+else if (rawValue.includes("DOT")) tickerName = "dot";
+else if (rawValue.includes("ETC")) tickerName = "etc";
+else if (rawValue.includes("FIL")) tickerName = "fil";
+else if (rawValue.includes("GRT")) tickerName = "grt";
+else if (rawValue.includes("HBAR")) tickerName = "hbar";
+else if (rawValue.includes("INJ")) tickerName = "inj";
+else if (rawValue.includes("LTC")) tickerName = "ltc";
+else if (rawValue.includes("NEAR")) tickerName = "near";
+else if (rawValue.includes("NIGHT")) tickerName = "night";
+else if (rawValue.includes("ONDO")) tickerName = "ondo";
+else if (rawValue.includes("OP")) tickerName = "op";
+else if (rawValue.includes("POL")) tickerName = "pol";
+else if (rawValue.includes("sky")) tickerName = "sky";
+else if (rawValue.includes("STX")) tickerName = "stx";
+else if (rawValue.includes("SUI")) tickerName = "sui";
+else if (rawValue.includes("TIA")) tickerName = "tia";
 else if (rawValue.includes("UNI")) tickerName = "uni";
+else if (rawValue.includes("XLM")) tickerName = "xlm";
+else if (rawValue.includes("XPL")) tickerName = "xpl";
+
 
 const targetPortfolio = targetSelect === "1" ? p1 : p2;
 const existingIndex = targetPortfolio.findIndex(a => a.name === name);
