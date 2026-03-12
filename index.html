@@ -766,10 +766,10 @@ const fullName = cryptoNamesMap[asset] || tickerName;
 const weightPct = (weight * 100).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
 let mcapDisplay = "";
 if (mcapObj && mcapObj[asset]) {
-mcapDisplay = '$ ' + (mcapObj[asset] / 1e9).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' B';
+mcapDisplay = '€ ' + (mcapObj[asset] / 1e9).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' B';
 } else {
 const mockMcap = (Math.random() * 40 + 2).toFixed(2);
-mcapDisplay = `$ ${mockMcap} B`;
+mcapDisplay = `€ ${mockMcap.replace('.', ',')} B`;
 }
 
 const barWidth = Math.min((weight * 100), 100).toFixed(2) + '%';
@@ -818,7 +818,7 @@ years.forEach(year => {
 headers += `<th class="py-3 px-4 font-bold text-[#1e293b] text-base">${year}</th>`;
 });
 
-let stratRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Rendimento totale USD</td>';
+let stratRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Rendimento totale EUR</td>';
 years.forEach(year => {
 const val = rendimenti[year];
 const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
@@ -826,7 +826,7 @@ const colorClass = val > 0 ? 'text-green-500' : (val < 0 ? 'text-red-500' : 'tex
 stratRow += `<td class="py-3 px-4 font-bold ${colorClass}">${val > 0 ? '+' : ''}${valStr}%</td>`;
 });
 
-let benchRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Benchmark USD</td>';
+let benchRow = '<td class="py-3 px-4 text-left text-[#1e293b] font-medium">Benchmark EUR</td>';
 years.forEach(year => {
 const val = benchmark[year];
 const valStr = val.toLocaleString('it-IT', {minimumFractionDigits: 1, maximumFractionDigits: 1});
@@ -906,7 +906,7 @@ el.classList.remove('text-green-500', 'text-red-500');
 el.classList.add('text-slate-800');
 }
 
-el.textContent = `${sign}${absStr} / ${sign}${pctStr}%`;
+el.textContent = `${sign}€ ${absStr} / ${sign}${pctStr}%`;
 }
 
 async function fetchAndUpdate(strategy, path, allocationContainerId, tabId) {
@@ -915,7 +915,7 @@ const response = await fetch(path);
 if (response.ok) {
 const metrics = await response.json();
 const currentVal = metrics.ultimo_valore_indice;
-updateMetric(`${strategy}-current-value`, currentVal, '$', '', false);
+updateMetric(`${strategy}-current-value`, currentVal, '€ ', '', false);
 updateVariationMetric(`${strategy}-change-24h`, currentVal, metrics.variazione_24h_pct);
 updateVariationMetric(`${strategy}-change-ytd`, currentVal, metrics.variazione_ytd_pct);
 
@@ -943,10 +943,10 @@ if (perfResponse.ok) {
 const perfData = await perfResponse.json();
 if (performanceChartEl && perfData.data && perfData.layout) {
 processTraces(perfData.data);
-if (perfData.data.length > 0 && perfData.data[0]) perfData.data[0].hovertemplate = 'Indice: %{y:$,.0f}<extra></extra>';
-if (perfData.data.length > 1 && perfData.data[1]) perfData.data[1].hovertemplate = 'Benchmark: %{y:$,.0f}<extra></extra>';
+if (perfData.data.length > 0 && perfData.data[0]) perfData.data[0].hovertemplate = 'Indice: €%{y:,.0f}<extra></extra>';
+if (perfData.data.length > 1 && perfData.data[1]) perfData.data[1].hovertemplate = 'Benchmark: €%{y:,.0f}<extra></extra>';
 if (!perfData.layout.yaxis) perfData.layout.yaxis = {};
-perfData.layout.yaxis.tickformat = '$,.0f';
+perfData.layout.yaxis.tickprefix = '€ ';
 Plotly.newPlot(performanceChartEl, perfData.data, getLayoutWithMargins(perfData.layout), { responsive: true, displayModeBar: true });
 }
 }
@@ -974,9 +974,11 @@ if (techPerformanceChartEl && techPerfData.data && techPerfData.layout) {
 processTraces(techPerfData.data);
 techPerfData.data.forEach(trace => {
 if (trace.name && trace.name !== "Ribilanciamento") {
-trace.hovertemplate = '<b>%{fullData.name}</b>: %{y:$,.0f}<extra></extra>';
+trace.hovertemplate = '<b>%{fullData.name}</b>: €%{y:,.0f}<extra></extra>';
 }
 });
+if (!techPerfData.layout.yaxis) techPerfData.layout.yaxis = {};
+techPerfData.layout.yaxis.tickprefix = '€ ';
 Plotly.newPlot(techPerformanceChartEl, techPerfData.data, getLayoutWithMargins(techPerfData.layout), { responsive: true, displayModeBar: true });
 }
 }
@@ -999,6 +1001,13 @@ const extra1CompRes = await fetch('./charts/DefiMktCap_TH/weights.json');
 if (extra1PerfRes.ok) {
 const data = await extra1PerfRes.json();
 processTraces(data.data);
+data.data.forEach(trace => {
+if (trace.name && trace.name !== "Ribilanciamento") {
+trace.hovertemplate = '<b>%{fullData.name}</b>: €%{y:,.0f}<extra></extra>';
+}
+});
+if (!data.layout.yaxis) data.layout.yaxis = {};
+data.layout.yaxis.tickprefix = '€ ';
 if(extra1PerfChartEl) Plotly.newPlot(extra1PerfChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
 }
 if (extra1CompRes.ok) {
@@ -1015,6 +1024,13 @@ const extra2WeightsRes = await fetch('./charts/PagamentiMktCap_TH/weights.json')
 if (extra2PerfRes.ok) {
 const data = await extra2PerfRes.json();
 processTraces(data.data);
+data.data.forEach(trace => {
+if (trace.name && trace.name !== "Ribilanciamento") {
+trace.hovertemplate = '<b>%{fullData.name}</b>: €%{y:,.0f}<extra></extra>';
+}
+});
+if (!data.layout.yaxis) data.layout.yaxis = {};
+data.layout.yaxis.tickprefix = '€ ';
 if(extra2PerfChartEl) Plotly.newPlot(extra2PerfChartEl, data.data, getLayoutWithMargins(data.layout), { responsive: true, displayModeBar: true });
 }
 if (extra2WeightsRes.ok) {
@@ -1114,6 +1130,10 @@ line: { color: 'rgba(15, 23, 42, 0.35)', width: 1 }, layer: 'above'
 });
 });
 }
+} else if (config.file === 'market_volume.json' && chartData.data[0]) {
+chartData.data[0].hovertemplate = 'Volume: €%{y:,.0f}<extra></extra>';
+if (!chartData.layout.yaxis) chartData.layout.yaxis = {};
+chartData.layout.yaxis.tickprefix = '€ ';
 }
 Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true });
 }
@@ -1420,7 +1440,7 @@ document.querySelectorAll('[id^="box-b-stat-"]').forEach(el => el.classList.add(
 
 const layout = window.getLayoutWithMargins({
 xaxis: { showgrid: false },
-yaxis: { tickprefix: '$', gridcolor: '#f1f5f9' },
+yaxis: { tickprefix: '€ ', gridcolor: '#f1f5f9' },
 hovermode: 'x unified'
 });
 
