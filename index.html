@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <style>
-body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; overflow-x: hidden; }
+body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; }
 .title-font { font-family: 'Space Grotesk', sans-serif; }
 .chart-card {
 background: #ffffff;
@@ -24,8 +24,13 @@ flex-direction: column;
 }
 .chart-container { min-height: 605px; position: relative; padding: 1.5rem; width: 100%; max-width: 100%; }
 .chart-wrapper { position: relative; width: 100%; height: 100%; }
-@media (max-width: 1023px) { .chart-container { min-height: 500px; padding: 1rem; } }
-@media (max-width: 640px) { .chart-container { min-height: 400px; padding: 0.5rem; } }
+@media (max-width: 1023px) { 
+  .chart-container { min-height: 500px; padding: 1.25rem; } 
+}
+@media (max-width: 640px) { 
+  .chart-container { min-height: 380px; padding: 0.75rem; } 
+  .chart-wrapper-box { padding: 12px; }
+}
 
 .plotly .hovertext { z-index: 1000; }
 .hovertext { max-height: 280px; overflow-y: auto; }
@@ -78,8 +83,17 @@ padding: 15px; width: 100%; max-width: 100%; overflow: hidden; box-sizing: borde
 
 <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 z-30 hidden transition-opacity md:hidden"></div>
 
-<aside id="sidebar" class="fixed top-[73px] left-0 w-64 h-[calc(100vh-73px)] bg-white border-r border-slate-200 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto shadow-2xl md:shadow-none">
-<div class="p-4 flex flex-col gap-2">
+<aside id="sidebar" class="fixed top-0 md:top-[73px] left-0 w-72 md:w-64 h-full md:h-[calc(100vh-73px)] bg-white border-r border-slate-200 z-[60] md:z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto shadow-2xl md:shadow-none">
+<div class="p-6 md:p-4 flex flex-col gap-2 h-full">
+<div class="flex items-center justify-between mb-6 md:hidden">
+<div class="flex items-center gap-3">
+<img src="https://media.licdn.com/dms/image/v2/D4D0BAQF68-WEFB0KLg/company-logo_200_200/company-logo_200_200/0/1697810707337/conio_logo?e=2147483647&v=beta&t=al0vx5YOQv08DXnuzKaUvTg4FmCbTU8JpmEjziVADHE" alt="Conio Logo" class="w-8 h-8 rounded-full shadow-sm object-cover">
+<span class="title-font text-lg font-bold text-[#0a1b39]">Conio <span class="text-[#0050ff]">Analytics</span></span>
+</div>
+<button id="close-sidebar-btn" class="text-slate-400 hover:text-red-500 transition-colors p-2">
+<i class="fa-solid fa-xmark text-2xl"></i>
+</button>
+</div>
 <button class="sidebar-btn active w-full text-left px-4 py-3 rounded-xl font-semibold flex items-center gap-3 transition-colors text-[#0050ff] bg-blue-50" data-page="page-settori">
 <i class="fa-solid fa-chart-pie w-5 text-center"></i> Settori
 </button>
@@ -92,14 +106,14 @@ padding: 15px; width: 100%; max-width: 100%; overflow: hidden; box-sizing: borde
 </div>
 </aside>
 
-<main class="md:ml-64 p-4 md:p-8 transition-all duration-300 max-w-screen-2xl mx-auto w-full overflow-hidden md:overflow-visible">
+<main class="md:ml-64 p-4 md:p-6 lg:p-8 transition-all duration-300 overflow-hidden md:overflow-visible min-h-screen">
 
 <div id="page-settori" class="page-content block">
-<div class="mb-10">
-<div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+<div class="mb-6 md:mb-10">
+<div class="flex items-center justify-between mb-6 md:mb-8 flex-wrap gap-4">
 <div>
 <h2 class="title-font text-2xl md:text-3xl font-bold tracking-tight text-[#0a1b39]">Indici Settoriali</h2>
-<p class="text-slate-500 mt-2 text-sm md:text-base font-medium">Dynamic cryptocurrency portfolios</p>
+<p class="text-slate-500 mt-1 md:mt-2 text-sm md:text-base font-medium">Dynamic cryptocurrency portfolios</p>
 </div>
 </div>
 
@@ -411,9 +425,9 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 <p class="text-slate-500 mt-2 text-sm md:text-base font-medium">Crea, backtesta e analizza i tuoi portafogli crypto personalizzati o simula un piano di accumulo.</p>
 </div>
 
-<div class="mb-16 border-b border-slate-200 pb-12 w-full">
+<div class="mb-10 lg:mb-16 border-b border-slate-200 pb-10 lg:pb-12 w-full">
     <h3 class="title-font text-xl md:text-2xl font-bold tracking-tight text-[#0a1b39] mb-6">Build your Strategy</h3>
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
         
         <div class="xl:col-span-1 bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
             <h4 class="text-lg font-bold text-[#0a1b39] mb-4">Composizione</h4>
@@ -602,9 +616,9 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
     </div>
 </div>
 
-<div class="mb-12 w-full">
+<div class="mb-10 lg:mb-12 w-full">
     <h3 class="title-font text-xl md:text-2xl font-bold tracking-tight text-[#0a1b39] mb-6">Build your PAC</h3>
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 w-full">
         
         <div class="xl:col-span-1 bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
             <h4 class="text-lg font-bold text-[#0a1b39] mb-4">Composizione</h4>
@@ -755,7 +769,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 </div> 
 </main>
 
-<footer class="text-center text-slate-500 text-sm py-8 md:py-12 border-t border-gray-200 mt-12">
+<footer class="md:ml-64 text-center text-slate-500 text-sm py-8 md:py-12 border-t border-gray-200 mt-12">
 &copy; 2026 Conio Analytics
 </footer>
 
@@ -765,12 +779,15 @@ const sidebar = document.getElementById('sidebar');
 const mobileMenuBtn = document.getElementById('mobile-menu-btn');
 const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 
+const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
 function toggleMobileMenu() {
 sidebar.classList.toggle('-translate-x-full');
 sidebarBackdrop.classList.toggle('hidden');
 }
 
 mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+closeSidebarBtn.addEventListener('click', toggleMobileMenu);
 sidebarBackdrop.addEventListener('click', toggleMobileMenu);
 
 // --- LOGICA MENU LATERALE ---
@@ -901,10 +918,16 @@ if (trace.customdata) trace.customdata = decodePlotlyBdata(trace.customdata);
 // Modifica 3: Gestione Margini e autosize dinamico per dispositivi mobili/tablet/desktop
 window.getLayoutWithMargins = function(layout) {
 const isMobile = window.innerWidth < 640;
+const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
 return {
 ...layout,
-autosize: true, // Fondamentale per la responsività totale
-margin: { l: isMobile ? 40 : 60, r: isMobile ? 20 : 80, t: isMobile ? 40 : 50, b: isMobile ? 40 : 50 },
+autosize: true, 
+margin: { 
+    l: isMobile ? 30 : (isTablet ? 40 : 60), 
+    r: isMobile ? 10 : (isTablet ? 20 : 80), 
+    t: isMobile ? 30 : (isTablet ? 40 : 50), 
+    b: isMobile ? 30 : (isTablet ? 40 : 50) 
+},
 plot_bgcolor: "transparent",
 paper_bgcolor: "transparent",
 font: { color: '#475569' },
@@ -929,11 +952,11 @@ let html = `
 <table class="min-w-full text-sm text-left">
 <thead class="bg-slate-50 border-b border-slate-200">
 <tr>
-<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ticker</th>
-<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Asset</th>
-<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Market Cap</th>
-<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Allocazione</th>
-<th scope="col" class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider"></th>
+<th scope="col" class="px-3 md:px-6 py-3 md:py-4 text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Ticker</th>
+<th scope="col" class="px-3 md:px-6 py-3 md:py-4 text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Asset</th>
+<th scope="col" class="px-3 md:px-6 py-3 md:py-4 text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Market Cap</th>
+<th scope="col" class="px-3 md:px-6 py-3 md:py-4 text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Allocazione</th>
+<th scope="col" class="px-3 md:px-6 py-3 md:py-4 text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:table-cell"></th>
 </tr>
 </thead>
 <tbody class="divide-y divide-slate-100">
@@ -950,12 +973,12 @@ else { const mockMcap = (Math.random() * 40 + 2).toFixed(2); mcapDisplay = `€ 
 const barWidth = Math.min((weight * 100), 100).toFixed(2) + '%';
 html += `
 <tr class="hover:bg-slate-50/80 transition-colors group">
-<td class="px-6 py-4 whitespace-nowrap font-bold text-slate-600">${tickerName}</td>
-<td class="px-6 py-4 whitespace-nowrap font-semibold text-[#0a1b39]">${fullName}</td>
-<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-slate-600">${mcapDisplay}</td>
-<td class="px-6 py-4 whitespace-nowrap text-right font-bold text-[#0050ff]">${weightPct}</td>
-<td class="px-6 py-4 whitespace-nowrap w-48">
-<div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="bg-[#0050ff] h-2.5 rounded-full" style="width: ${barWidth}"></div></div>
+<td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap font-bold text-slate-600 text-xs md:text-sm">${tickerName}</td>
+<td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap font-semibold text-[#0a1b39] text-xs md:text-sm">${fullName}</td>
+<td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-right font-medium text-slate-600 text-xs md:text-sm">${mcapDisplay}</td>
+<td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-right font-bold text-[#0050ff] text-xs md:text-sm">${weightPct}</td>
+<td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap w-32 md:w-48 hidden sm:table-cell">
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="bg-[#0050ff] h-2 rounded-full" style="width: ${barWidth}"></div></div>
 </td>
 </tr>
 `;
@@ -1082,8 +1105,17 @@ for (let i = 0; i < chartConfigs.length; i++) {
 const config = chartConfigs[i];
 const chartId = `market-chart-${i}`;
 const chartWrapper = document.createElement('div');
-chartWrapper.className = 'chart-wrapper-box flex flex-col w-full';
-chartWrapper.innerHTML = `<h3 class="font-bold mb-4 text-xl text-[#0a1b39]">${config.title}</h3><div class="w-full overflow-hidden"><div id="${chartId}" style="min-height: ${config.height}; width: 100%;"></div></div><div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl"><p class="text-sm text-slate-600 leading-relaxed text-justify">${config.description}</p></div>`;
+const isMobile = window.innerWidth < 640;
+const responsiveHeight = isMobile ? (config.file === 'correlation_heatmap.json' ? '500px' : '350px') : config.height;
+
+chartWrapper.innerHTML = `
+    <h3 class="font-bold mb-3 md:mb-4 text-lg md:text-xl text-[#0a1b39]">${config.title}</h3>
+    <div class="w-full overflow-hidden">
+        <div id="${chartId}" style="min-height: ${responsiveHeight}; width: 100%;"></div>
+    </div>
+    <div class="mt-4 p-3 md:p-4 bg-slate-50 border border-slate-100 rounded-xl">
+        <p class="text-xs md:text-sm text-slate-600 leading-relaxed text-justify">${config.description}</p>
+    </div>`;
 container.appendChild(chartWrapper);
 
 try {
