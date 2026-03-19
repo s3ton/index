@@ -928,14 +928,16 @@ if (trace.customdata) trace.customdata = decodePlotlyBdata(trace.customdata);
 window.getLayoutWithMargins = function(layout) {
 const isMobile = window.innerWidth < 640;
 const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+const isHeatmap = layout._isHeatmap || false;
+
 const newLayout = {
 ...layout,
 autosize: true, 
 margin: { 
-    l: 0, 
+    l: isHeatmap ? (isMobile ? 60 : 80) : 0, 
     r: isMobile ? 0 : 5, 
     t: isMobile ? 30 : 40, 
-    b: isMobile ? 90 : (isTablet ? 110 : 130)
+    b: isMobile ? 60 : 70
 },
 plot_bgcolor: "transparent",
 paper_bgcolor: "transparent",
@@ -943,7 +945,7 @@ font: { color: '#475569' },
 hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, color: "#0f172a" } },
 legend: {
     orientation: 'h',
-    y: -0.35,
+    y: -0.15,
     yanchor: 'top',
     x: 0,
     xanchor: 'left',
@@ -954,9 +956,15 @@ legend: {
 };
 
 if (newLayout.yaxis) {
-    newLayout.yaxis = { ...newLayout.yaxis, ticklabelposition: "inside", tickfont: { color: "#94a3b8" }, title: { text: '' } };
+    newLayout.yaxis = { ...newLayout.yaxis, ticklabelposition: isHeatmap ? "outside" : "inside", tickfont: { color: "#94a3b8" }, title: { text: '' } };
 } else {
-    newLayout.yaxis = { ticklabelposition: "inside", tickfont: { color: "#94a3b8" }, title: { text: '' } };
+    newLayout.yaxis = { ticklabelposition: isHeatmap ? "outside" : "inside", tickfont: { color: "#94a3b8" }, title: { text: '' } };
+}
+
+if (newLayout.xaxis) {
+    newLayout.xaxis = { ...newLayout.xaxis, title: { text: '' }, rangeslider: { visible: false } };
+} else {
+    newLayout.xaxis = { title: { text: '' }, rangeslider: { visible: false } };
 }
 
 return newLayout;
@@ -1104,7 +1112,7 @@ if(element && data.data && data.layout) {
 processTraces(data.data);
 data.data.forEach(trace => { if(isPerf && trace.name !== "Ribilanciamento") trace.hovertemplate = `<b>%{fullData.name}</b>: ${tickPrefix}%{y:,.0f}<extra></extra>`; });
 if(isPerf) { if(!data.layout.yaxis) data.layout.yaxis = {}; data.layout.yaxis.tickprefix = tickPrefix; }
-Plotly.newPlot(element, data.data, getLayoutWithMargins(data.layout), {responsive: true, displayModeBar: true}).then(() => { setTimeout(() => Plotly.Plots.resize(element), 50); });
+Plotly.newPlot(element, data.data, getLayoutWithMargins(data.layout), {responsive: true, displayModeBar: false}).then(() => { setTimeout(() => Plotly.Plots.resize(element), 50); });
 }
 }
 } catch(e) {}
@@ -1158,7 +1166,9 @@ chartData.data[0].hovertemplate = 'X: %{x}<br>Y: %{y}<br>Correlazione: %{z:.4f}<
 chartData.data[0].zmin = -1; chartData.data[0].zmax = 1;
 chartData.data[0].colorscale = [[0.0, '#0a1a6b'],[0.5, '#0050ff'],[0.75, '#8800ff'],[1.0, '#ffffff']];
 
-// --- MODIFICA 1: Asse X in cima ---
+// --- MODIFICA 1: Asse Y fuori e asse X in cima ---
+chartData.layout._isHeatmap = true;
+
 // Cloniamo l'asse x inferiore su xaxis2 e lo posizioniamo "top"
 chartData.layout.xaxis2 = Object.assign({}, chartData.layout.xaxis || {}, {
     overlaying: 'x',
@@ -1206,7 +1216,7 @@ chartData.data[0].hovertemplate = 'Volume: €%{y:,.0f}<extra></extra>';
 if (!chartData.layout.yaxis) chartData.layout.yaxis = {}; chartData.layout.yaxis.tickprefix = '€ ';
 }
 
-Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true }).then(() => { setTimeout(() => Plotly.Plots.resize(chartEl), 50); });
+Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: false }).then(() => { setTimeout(() => Plotly.Plots.resize(chartEl), 50); });
 }
 }
 } catch (e) { console.error(e); }
