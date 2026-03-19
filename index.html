@@ -1324,18 +1324,28 @@ if (zData && xData && yData) {
                     showarrow: false,
                     font: { color: '#94a3b8', size: 24 }
                 });
+                            }
+                        }
+                    }
+                }
+                } else if (config.file === 'btc_dominance.json' && chartData.data[0]) {
+                    chartData.data[0].hovertemplate = 'Dominance: %{y:.0f}%<extra></extra>';
+                    if (!chartData.layout.yaxis) chartData.layout.yaxis = {};
+                    chartData.layout.yaxis.ticksuffix = '%';
+                    chartData.layout.yaxis.tickformat = '.0f';
+                } else if (config.file === 'market_volume.json' && chartData.data[0]) {
+                if (chartData.data[0].y && Array.isArray(chartData.data[0].y)) {
+                    chartData.data[0].y = chartData.data[0].y.map(v => v / 1e9);
+                }
+                chartData.data[0].hovertemplate = 'Volume: €%{y:.2f} B<extra></extra>';
+                if (!chartData.layout.yaxis) chartData.layout.yaxis = {};
+                chartData.layout.yaxis.tickprefix = '€ ';
+                chartData.layout.yaxis.ticksuffix = ' B';
+                chartData.layout.yaxis.tickformat = ',.1f';
             }
+            Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: false }).then(() => { setTimeout(() => Plotly.Plots.resize(chartEl), 50); });
         }
     }
-}
-} else if (config.file === 'market_volume.json' && chartData.data[0]) {
-chartData.data[0].hovertemplate = 'Volume: €%{y:,.0f}<extra></extra>';
-if (!chartData.layout.yaxis) chartData.layout.yaxis = {}; chartData.layout.yaxis.tickprefix = '€ ';
-}
-
-Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: false }).then(() => { setTimeout(() => Plotly.Plots.resize(chartEl), 50); });
-}
-}
 } catch (e) { console.error(e); }
 }
 }
