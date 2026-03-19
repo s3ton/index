@@ -67,6 +67,8 @@ padding: 15px; width: 100%; max-width: 100%; overflow: hidden; box-sizing: borde
 .plotly .modebar { background: transparent !important; box-shadow: none !important; }
 .modebar-group { background: transparent !important; box-shadow: none !important; }
 .modebar-btn { background: transparent !important; }
+.modebar-btn path { fill: #64748b !important; }
+.modebar-btn:hover path { fill: #0050ff !important; }
 
 .strategy-description { background-color: #f8fafc; border-radius: 6px; padding: 1.5rem; color: #334155; }
 @media (max-width: 640px) { .strategy-description { padding: 1rem; } }
@@ -159,7 +161,7 @@ Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato
 
 <div class="chart-wrapper-box mb-8">
 <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-<div class="w-full overflow-hidden"><div id="performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+<div class="w-full overflow-hidden"><div id="performance-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
 <p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
 </div>
@@ -180,7 +182,7 @@ Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato
 
 <div class="chart-wrapper-box mb-16">
 <h3 class="font-bold mb-4">Composizione</h3>
-<div class="w-full overflow-hidden"><div id="composition-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+<div class="w-full overflow-hidden"><div id="composition-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
 <p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
 </div>
@@ -223,7 +225,7 @@ Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato escl
 
 <div class="chart-wrapper-box mb-8">
 <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-<div class="w-full overflow-hidden"><div id="tech-performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+<div class="w-full overflow-hidden"><div id="tech-performance-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
 <p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
 </div>
@@ -244,7 +246,7 @@ Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato escl
 
 <div class="chart-wrapper-box mb-16">
 <h3 class="font-bold mb-4">Composizione</h3>
-<div class="w-full overflow-hidden"><div id="tech-weights-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+<div class="w-full overflow-hidden"><div id="tech-weights-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
 <p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo e l'impatto dei ribilanciamenti periodici previsti dalla strategia.</p>
 </div>
@@ -287,7 +289,7 @@ Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo
 
 <div class="chart-wrapper-box mb-8">
 <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-<div class="w-full overflow-hidden"><div id="extra1-performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+<div class="w-full overflow-hidden"><div id="extra1-performance-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
 <p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
 </div>
@@ -307,7 +309,7 @@ Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo
 
 <div class="chart-wrapper-box mb-16 mt-8">
 <h3 class="font-bold mb-4">Composizione</h3>
-<div class="w-full overflow-hidden"><div id="extra1-composition-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+<div class="w-full overflow-hidden"><div id="extra1-composition-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
 <p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
 </div>
@@ -350,7 +352,7 @@ Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato 
 
 <div class="chart-wrapper-box mb-8">
 <h3 class="font-bold mb-4">Performance dell'Indice</h3>
-<div class="w-full overflow-hidden"><div id="extra2-performance-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+<div class="w-full overflow-hidden"><div id="extra2-performance-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
 <p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico confronta l'andamento delle performance nel tempo della strategia rispetto al benchmark di riferimento (Bitcoin). Sull'asse temporale sono inoltre evidenziate le date in cui è avvenuto il ribilanciamento automatico del portafoglio.</p>
 </div>
@@ -370,7 +372,7 @@ Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato 
 
 <div class="chart-wrapper-box mb-16 mt-8">
 <h3 class="font-bold mb-4">Composizione</h3>
-<div class="w-full overflow-hidden"><div id="extra2-weights-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+<div class="w-full overflow-hidden"><div id="extra2-weights-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
 <div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
 <p class="text-sm text-slate-600 leading-relaxed text-justify">Questo grafico illustra l'evoluzione della composizione del portafoglio nel tempo. Mostra visivamente come l'esposizione ai vari asset cambi a causa delle fluttuazioni di mercato e come venga ripristinata o aggiornata in occasione dei ribilanciamenti periodici previsti dalla strategia.</p>
 </div>
@@ -616,7 +618,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 
                 <div class="chart-wrapper-box w-full">
                     <h3 class="font-bold mb-4">Equity Curve</h3>
-                    <div class="w-full overflow-hidden"><div id="strat-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+                    <div class="w-full overflow-hidden"><div id="strat-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
                 </div>
             </div>
         </div>
@@ -766,7 +768,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 
                 <div class="chart-wrapper-box w-full">
                     <h3 class="font-bold mb-4">Valore del PAC nel Tempo</h3>
-                    <div class="w-full overflow-hidden"><div id="pac-chart" class="w-full min-h-[300px] md:min-h-[400px]"></div></div>
+                    <div class="w-full overflow-hidden"><div id="pac-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
                 </div>
             </div>
         </div>
@@ -930,16 +932,34 @@ const newLayout = {
 ...layout,
 autosize: true, 
 margin: { 
-    l: 10, 
-    r: isMobile ? 10 : (isTablet ? 20 : 80), 
-    t: isMobile ? 30 : (isTablet ? 40 : 50), 
-    b: isMobile ? 30 : (isTablet ? 40 : 50) 
+    l: 0, 
+    r: isMobile ? 0 : 5, 
+    t: isMobile ? 30 : 40, 
+    b: isMobile ? 90 : (isTablet ? 110 : 130)
 },
 plot_bgcolor: "transparent",
 paper_bgcolor: "transparent",
 font: { color: '#475569' },
-hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, color: "#0f172a" } }
+hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, color: "#0f172a" } },
+legend: {
+    orientation: 'h',
+    y: -0.35,
+    yanchor: 'top',
+    x: 0,
+    xanchor: 'left',
+    bgcolor: 'transparent',
+    borderwidth: 0,
+    font: { size: 12, color: '#475569' }
+}
 };
+
+if (newLayout.yaxis) {
+    newLayout.yaxis = { ...newLayout.yaxis, ticklabelposition: "inside", tickfont: { color: "#94a3b8" }, title: { text: '' } };
+} else {
+    newLayout.yaxis = { ticklabelposition: "inside", tickfont: { color: "#94a3b8" }, title: { text: '' } };
+}
+
+return newLayout;
 }
 
 // Modifica 3: Resize istantaneo di tutti i grafici visibili
@@ -1084,7 +1104,7 @@ if(element && data.data && data.layout) {
 processTraces(data.data);
 data.data.forEach(trace => { if(isPerf && trace.name !== "Ribilanciamento") trace.hovertemplate = `<b>%{fullData.name}</b>: ${tickPrefix}%{y:,.0f}<extra></extra>`; });
 if(isPerf) { if(!data.layout.yaxis) data.layout.yaxis = {}; data.layout.yaxis.tickprefix = tickPrefix; }
-Plotly.newPlot(element, data.data, getLayoutWithMargins(data.layout), {responsive: true, displayModeBar: true});
+Plotly.newPlot(element, data.data, getLayoutWithMargins(data.layout), {responsive: true, displayModeBar: true}).then(() => { setTimeout(() => Plotly.Plots.resize(element), 50); });
 }
 }
 } catch(e) {}
@@ -1186,7 +1206,7 @@ chartData.data[0].hovertemplate = 'Volume: €%{y:,.0f}<extra></extra>';
 if (!chartData.layout.yaxis) chartData.layout.yaxis = {}; chartData.layout.yaxis.tickprefix = '€ ';
 }
 
-Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true });
+Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true }).then(() => { setTimeout(() => Plotly.Plots.resize(chartEl), 50); });
 }
 }
 } catch (e) { console.error(e); }
