@@ -61,8 +61,12 @@ background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0
 padding: 15px; width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box;
 }
 
-.plotly .modebar { background: transparent !important; }
-.modebar { background: transparent !important; }
+.modebar-container,
+.plotly .modebar-container { background: transparent !important; box-shadow: none !important; }
+.modebar,
+.plotly .modebar { background: transparent !important; box-shadow: none !important; }
+.modebar-group { background: transparent !important; box-shadow: none !important; }
+.modebar-btn { background: transparent !important; }
 
 .strategy-description { background-color: #f8fafc; border-radius: 6px; padding: 1.5rem; color: #334155; }
 @media (max-width: 640px) { .strategy-description { padding: 1rem; } }
@@ -936,14 +940,6 @@ paper_bgcolor: "transparent",
 font: { color: '#475569' },
 hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, color: "#0f172a" } }
 };
-
-if (newLayout.yaxis) {
-    newLayout.yaxis = { ...newLayout.yaxis, ticklabelposition: "inside", tickfont: { color: "#cbd5e1" } };
-} else {
-    newLayout.yaxis = { ticklabelposition: "inside", tickfont: { color: "#cbd5e1" } };
-}
-
-return newLayout;
 }
 
 // Modifica 3: Resize istantaneo di tutti i grafici visibili
