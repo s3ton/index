@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Conio • Crypto Analytics</title>
 <meta name="description" content="Real-time crypto market analytics dashboard with live data."/>
 
@@ -22,9 +22,9 @@ box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
 display: flex;
 flex-direction: column;
 }
-.chart-container { min-height: 605px; position: relative; padding: 1.5rem; width: 100%; max-width: 100%; }
+.chart-container { min-height: 605px; position: relative; padding: 1.5rem; }
 .chart-wrapper { position: relative; width: 100%; height: 100%; }
-@media (max-width: 1023px) { .chart-container { min-height: 500px; padding: 1rem; } }
+@media (max-width: 1023px) { .chart-container { min-height: 666px; padding: 1rem; } }
 @media (max-width: 640px) { .chart-container { min-height: 400px; padding: 0.5rem; } }
 
 .plotly .hovertext { z-index: 1000; }
@@ -47,13 +47,13 @@ border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; 
 @media (max-width: 640px) { .tab-btn { padding: 0.75rem 1rem; font-size: 0.9rem; } }
 .tab-btn:hover { color: #0050ff; }
 .tab-btn.active { color: #0050ff; border-bottom-color: #0050ff; }
-.tab-content { display: none; width: 100%; }
+.tab-content { display: none; }
 .tab-content.active { display: grid; }
 
 .chart-wrapper-box {
 min-width: 0; 
 background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-padding: 15px; width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box;
+padding: 15px; width: 100%; overflow: hidden;
 }
 
 .strategy-description { background-color: #f8fafc; border-radius: 6px; padding: 1.5rem; color: #334155; }
@@ -92,7 +92,7 @@ padding: 15px; width: 100%; max-width: 100%; overflow: hidden; box-sizing: borde
 </div>
 </aside>
 
-<main class="md:ml-64 p-4 md:p-8 transition-all duration-300 max-w-screen-2xl mx-auto w-full overflow-hidden md:overflow-visible">
+<main class="md:ml-64 p-4 md:p-8 transition-all duration-300 max-w-screen-2xl mx-auto w-full">
 
 <div id="page-settori" class="page-content block">
 <div class="mb-10">
@@ -111,7 +111,7 @@ padding: 15px; width: 100%; max-width: 100%; overflow: hidden; box-sizing: borde
 </div>
 
 <div id="mainStrategy" class="tab-content active">
-<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm w-full">
+<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
 <h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
 <div>
@@ -147,7 +147,7 @@ Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato
 <div class="mb-8 w-full bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
 <div class="w-full overflow-x-auto pb-2">
-<table class="w-full text-sm text-center whitespace-nowrap min-w-full md:min-w-[500px]">
+<table class="w-full text-sm text-center whitespace-nowrap min-w-[500px]">
 </table>
 </div>
 </div>
@@ -175,7 +175,7 @@ Il <strong>Top 5 Market Cap Index</strong> è un portafoglio dinamico progettato
 </div>
 
 <div id="techMarketCap" class="tab-content">
-<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm w-full">
+<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
 <h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
 <div>
@@ -211,7 +211,7 @@ Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato escl
 <div class="mb-8 w-full bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
 <div class="w-full overflow-x-auto pb-2">
-<table class="w-full text-sm text-center whitespace-nowrap min-w-full md:min-w-[500px]">
+<table class="w-full text-sm text-center whitespace-nowrap min-w-[500px]">
 </table>
 </div>
 </div>
@@ -239,7 +239,7 @@ Il <strong>Conio Tech Index</strong> è un portafoglio tematico focalizzato escl
 </div>
 
 <div id="extraStrategy1" class="tab-content">
-<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm w-full">
+<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
 <h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
 <div>
@@ -275,7 +275,7 @@ Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo
 <div class="mb-8 w-full bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
 <div class="w-full overflow-x-auto pb-2">
-<table class="w-full text-sm text-center whitespace-nowrap min-w-full md:min-w-[500px]"></table>
+<table class="w-full text-sm text-center whitespace-nowrap min-w-[500px]"></table>
 </div>
 </div>
 
@@ -302,7 +302,7 @@ Il <strong>Conio DeFi Index</strong> è un portafoglio tematico dedicato in modo
 </div>
 
 <div id="extraStrategy2" class="tab-content">
-<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm w-full">
+<div class="mb-8 p-4 md:p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
 <h3 class="text-lg md:text-xl font-bold text-[#0a1b39] mb-4 title-font">Overview dell'Indice</h3>
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
 <div>
@@ -338,7 +338,7 @@ Il <strong>Conio Payments Index</strong> è un portafoglio tematico focalizzato 
 <div class="mb-8 w-full bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <h3 class="font-bold mb-6 text-[#0a1b39]">Rendimenti Annuali</h3>
 <div class="w-full overflow-x-auto pb-2">
-<table class="w-full text-sm text-center whitespace-nowrap min-w-full md:min-w-[500px]"></table>
+<table class="w-full text-sm text-center whitespace-nowrap min-w-[500px]"></table>
 </div>
 </div>
 
@@ -374,12 +374,12 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 </p>
 </div>
 
-<div class="mb-16 w-full">
-<div class="flex flex-col gap-10 w-full" id="market-analytics-charts-container"></div>
+<div class="mb-16">
+<div class="flex flex-col gap-10" id="market-analytics-charts-container"></div>
 </div>
 
-<div class="mb-10 w-full">
-<div class="grid grid-cols-1 xl:grid-cols-2 gap-10 w-full">
+<div class="mb-10">
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
 <div class="chart-card bg-white w-full">
 <div class="chart-container p-0 min-h-[350px] md:min-h-[410px]">
 <div class="chart-wrapper">
@@ -411,11 +411,11 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
 <p class="text-slate-500 mt-2 text-sm md:text-base font-medium">Crea, backtesta e analizza i tuoi portafogli crypto personalizzati o simula un piano di accumulo.</p>
 </div>
 
-<div class="mb-16 border-b border-slate-200 pb-12 w-full">
+<div class="mb-16 border-b border-slate-200 pb-12">
     <h3 class="title-font text-xl md:text-2xl font-bold tracking-tight text-[#0a1b39] mb-6">Build your Strategy</h3>
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <div class="xl:col-span-1 bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
+        <div class="lg:col-span-1 bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
             <h4 class="text-lg font-bold text-[#0a1b39] mb-4">Composizione</h4>
             
             <div class="mb-6">
@@ -537,7 +537,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
             <p class="text-xs text-center text-slate-400 mt-3">I pesi di ogni portafoglio attivo devono essere al 100%.</p>
         </div>
 
-        <div class="xl:col-span-2 flex flex-col gap-8 w-full min-w-0">
+        <div class="lg:col-span-2 flex flex-col gap-8 w-full">
             <div id="strat-results-placeholder" class="bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center h-full min-h-[400px]">
                 <div class="text-center text-slate-400 p-4">
                     <i class="fa-solid fa-chart-line text-4xl mb-3"></i>
@@ -602,11 +602,11 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
     </div>
 </div>
 
-<div class="mb-12 w-full">
+<div class="mb-12">
     <h3 class="title-font text-xl md:text-2xl font-bold tracking-tight text-[#0a1b39] mb-6">Build your PAC</h3>
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <div class="xl:col-span-1 bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
+        <div class="lg:col-span-1 bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
             <h4 class="text-lg font-bold text-[#0a1b39] mb-4">Composizione</h4>
             
             <div class="mb-6">
@@ -715,7 +715,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
             <p class="text-xs text-center text-slate-400 mt-3">Il portafoglio deve avere allocazione al 100%.</p>
         </div>
 
-        <div class="xl:col-span-2 flex flex-col gap-8 w-full min-w-0">
+        <div class="lg:col-span-2 flex flex-col gap-8 w-full">
             <div id="pac-results-placeholder" class="bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center h-full min-h-[400px]">
                 <div class="text-center text-slate-400 p-4">
                     <i class="fa-solid fa-chart-line text-4xl mb-3"></i>
@@ -898,13 +898,11 @@ if (trace.customdata) trace.customdata = decodePlotlyBdata(trace.customdata);
 });
 }
 
-// Modifica 3: Gestione Margini e autosize dinamico per dispositivi mobili/tablet/desktop
 window.getLayoutWithMargins = function(layout) {
 const isMobile = window.innerWidth < 640;
 return {
 ...layout,
-autosize: true, // Fondamentale per la responsività totale
-margin: { l: isMobile ? 40 : 60, r: isMobile ? 20 : 80, t: isMobile ? 40 : 50, b: isMobile ? 40 : 50 },
+margin: { l: isMobile ? 40 : 60, r: isMobile ? 20 : 80, t: isMobile ? 30 : 50, b: isMobile ? 30 : 40 },
 plot_bgcolor: "transparent",
 paper_bgcolor: "transparent",
 font: { color: '#475569' },
@@ -912,7 +910,6 @@ hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { size: 12, colo
 };
 }
 
-// Modifica 3: Resize istantaneo di tutti i grafici visibili
 window.addEventListener('resize', () => {
 if(window.Plotly) {
 const activeCharts = document.querySelectorAll('.page-content.block .tab-content.active .js-plotly-plot, .page-content.block > .js-plotly-plot, #market-analytics-charts-container .js-plotly-plot, #page-builder .js-plotly-plot');
@@ -925,7 +922,7 @@ const container = document.getElementById(containerId);
 if (!container || !allocationObj) return;
 let html = `
 <div class="mt-8 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-<div class="overflow-x-auto w-full">
+<div class="overflow-x-auto">
 <table class="min-w-full text-sm text-left">
 <thead class="bg-slate-50 border-b border-slate-200">
 <tr>
@@ -1045,6 +1042,7 @@ fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-all
 }
 
 async function loadStrategyCharts() {
+// (Ometto i try-catch originali dei grafici statici per snellezza, usano le stesse routine di elaborazione di prima)
 const loadChart = async (url, element, tickPrefix = '€ ', isPerf = true) => {
 try {
 const res = await fetch(url);
@@ -1085,7 +1083,6 @@ const chartWrapper = document.createElement('div');
 chartWrapper.className = 'chart-wrapper-box flex flex-col w-full';
 chartWrapper.innerHTML = `<h3 class="font-bold mb-4 text-xl text-[#0a1b39]">${config.title}</h3><div class="w-full overflow-hidden"><div id="${chartId}" style="min-height: ${config.height}; width: 100%;"></div></div><div class="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl"><p class="text-sm text-slate-600 leading-relaxed text-justify">${config.description}</p></div>`;
 container.appendChild(chartWrapper);
-
 try {
 const response = await fetch(`./charts/market_analytics/${config.file}`);
 if (response.ok) {
@@ -1093,60 +1090,14 @@ const chartData = await response.json();
 const chartEl = document.getElementById(chartId);
 if (chartEl && chartData.data && chartData.layout) {
 processTraces(chartData.data);
-
 if (config.file === 'correlation_heatmap.json' && chartData.data[0]) {
 chartData.data[0].hovertemplate = 'X: %{x}<br>Y: %{y}<br>Correlazione: %{z:.4f}<extra></extra>';
 chartData.data[0].zmin = -1; chartData.data[0].zmax = 1;
 chartData.data[0].colorscale = [[0.0, '#0a1a6b'],[0.5, '#0050ff'],[0.75, '#8800ff'],[1.0, '#ffffff']];
-
-// --- MODIFICA 1: Asse X in cima ---
-// Cloniamo l'asse x inferiore su xaxis2 e lo posizioniamo "top"
-chartData.layout.xaxis2 = Object.assign({}, chartData.layout.xaxis || {}, {
-    overlaying: 'x',
-    side: 'top',
-    matches: 'x',
-    showticklabels: true
-});
-
-// TRUCCO PLOTLY: Aggiungiamo una traccia invisibile legata a xaxis2 per forzare il rendering dell'asse superiore
-chartData.data.push({
-    x: chartData.data[0].x,
-    y: chartData.data[0].y,
-    type: 'scatter',
-    mode: 'markers',
-    marker: { color: 'rgba(0,0,0,0)' }, // Trasparente: non si vede nel grafico
-    xaxis: 'x2',
-    yaxis: 'y',
-    showlegend: false,
-    hoverinfo: 'skip'
-});
-
-// --- MODIFICA 2: Annotazione testuale a "X" ---
-const zData = chartData.data[0].z;
-const xData = chartData.data[0].x;
-const yData = chartData.data[0].y;
-chartData.layout.annotations = chartData.layout.annotations || [];
-
-if (zData && xData && yData) {
-    for (let row = 0; row < yData.length; row++) {
-        for (let col = 0; col < xData.length; col++) {
-            if (zData[row][col] === null || isNaN(zData[row][col])) {
-                chartData.layout.annotations.push({
-                    x: xData[col],
-                    y: yData[row],
-                    text: '✕',
-                    showarrow: false,
-                    font: { color: '#94a3b8', size: 24 }
-                });
-            }
-        }
-    }
-}
 } else if (config.file === 'market_volume.json' && chartData.data[0]) {
 chartData.data[0].hovertemplate = 'Volume: €%{y:,.0f}<extra></extra>';
 if (!chartData.layout.yaxis) chartData.layout.yaxis = {}; chartData.layout.yaxis.tickprefix = '€ ';
 }
-
 Plotly.newPlot(chartEl, chartData.data, getLayoutWithMargins(chartData.layout), { responsive: true, displayModeBar: true });
 }
 }
