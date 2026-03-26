@@ -918,6 +918,8 @@ page.classList.remove('block');
 });
 document.getElementById(pageId).classList.remove('hidden');
 document.getElementById(pageId).classList.add('block');
+window.scrollTo({ top: 0, behavior: 'instant' });
+
 
 if (window.innerWidth < 768) {
 sidebar.classList.add('-translate-x-full');
@@ -940,6 +942,8 @@ content.classList.remove('active');
 
 const tabId = this.getAttribute('data-tab');
 document.getElementById(tabId).classList.add('active');
+window.scrollTo({ top: 0, behavior: 'instant' });
+
 
 setTimeout(() => {
 window.dispatchEvent(new Event('resize'));
@@ -1506,12 +1510,13 @@ return { returnPct, volAnn, maxDd: maxDd * 100, sharpe };
 async function fetchCommonDates(allAssets, tfId, startId, endId) {
 let dateMap = {};
 for (const ticker of allAssets) {
-const res = await fetch(`./data/historical/${ticker}.json`);
+const res = await fetch(`./data/price_data/${ticker}.json`);
 if (!res.ok) throw new Error(`Dati storici per ${ticker} non trovati.`);
 const data = await res.json();
-for(let i=0; i<data.dates.length; i++) {
-if(!dateMap[data.dates[i]]) dateMap[data.dates[i]] = {};
-dateMap[data.dates[i]][ticker] = data.prices[i];
+for(let i=0; i<data.length; i++) {
+const entry = data[i];
+if(!dateMap[entry.data]) dateMap[entry.data] = {};
+dateMap[entry.data][ticker] = entry.prezzo;
 }
 }
 const allSortedDates = Object.keys(dateMap).sort();
