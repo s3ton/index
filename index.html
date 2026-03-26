@@ -1205,7 +1205,7 @@ if (metrics.rendimenti_annuali && metrics.benchmark_annuali && tabId) buildRetur
 } catch (e) { console.error(`Error loading metrics for ${strategy}:`, e); }
 }
 
-fetchAndUpdate('main', './charts/Top5mktcap/metrics.json', 'main-allocation', 'mainStrategy');
+fetchAndUpdate('main', './charts/Top5MktCap/metrics.json', 'main-allocation', 'mainStrategy');
 fetchAndUpdate('tech', './charts/TechMktCap_TH/metrics.json', 'tech-allocation', 'techMarketCap');
 fetchAndUpdate('extra1', './charts/DefiMktCap_TH/metrics.json', 'extra1-allocation', 'extraStrategy1');
 fetchAndUpdate('extra2', './charts/PagamentiMktCap_TH/metrics.json', 'extra2-allocation', 'extraStrategy2');
@@ -1226,8 +1226,8 @@ Plotly.newPlot(element, data.data, getLayoutWithMargins(data.layout), {responsiv
 }
 } catch(e) {}
 };
-loadChart('./charts/Top5mktcap/performance.json', performanceChartEl);
-loadChart('./charts/Top5mktcap/weights.json', compositionChartEl, '', false);
+loadChart('./charts/Top5MktCap/performance.json', performanceChartEl);
+loadChart('./charts/Top5MktCap/weights.json', compositionChartEl, '', false);
 loadChart('./charts/TechMktCap_TH/performance.json', techPerformanceChartEl);
 loadChart('./charts/TechMktCap_TH/weights.json', techWeightsChartEl, '', false);
 loadChart('./charts/DefiMktCap_TH/performance.json', extra1PerfChartEl);
