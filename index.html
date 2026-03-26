@@ -1425,19 +1425,7 @@ document.getElementById('strat-clear-2').addEventListener('click', () => { pStra
 document.getElementById('pac-clear').addEventListener('click', () => { pPac = []; updatePacUI(); document.getElementById('pac-results-placeholder').classList.remove('hidden'); document.getElementById('pac-results-content').classList.add('hidden'); document.getElementById('pac-results-content').classList.remove('flex'); });
 
 function getTickerName(rawValue) {
-let tickerName = "btc";
-if (rawValue.includes("BTC")) tickerName = "btc"; else if (rawValue.includes("ETH")) tickerName = "eth"; else if (rawValue.includes("XRP")) tickerName = "xrp";
-else if (rawValue.includes("SOL")) tickerName = "sol"; else if (rawValue.includes("DOGE")) tickerName = "doge"; else if (rawValue.includes("ADA")) tickerName = "ada";
-else if (rawValue.includes("LINK")) tickerName = "link"; else if (rawValue.includes("AAVE")) tickerName = "aave"; else if (rawValue.includes("ALGO")) tickerName = "algo";
-else if (rawValue.includes("APT")) tickerName = "apt"; else if (rawValue.includes("ARB")) tickerName = "arb"; else if (rawValue.includes("ATOM")) tickerName = "atom";
-else if (rawValue.includes("AVAX")) tickerName = "avax"; else if (rawValue.includes("DOT")) tickerName = "dot"; else if (rawValue.includes("ETC")) tickerName = "etc";
-else if (rawValue.includes("FIL")) tickerName = "fil"; else if (rawValue.includes("GRT")) tickerName = "grt"; else if (rawValue.includes("HBAR")) tickerName = "hbar";
-else if (rawValue.includes("INJ")) tickerName = "inj"; else if (rawValue.includes("LTC")) tickerName = "ltc"; else if (rawValue.includes("NEAR")) tickerName = "near";
-else if (rawValue.includes("NIGHT")) tickerName = "night"; else if (rawValue.includes("ONDO")) tickerName = "ondo"; else if (rawValue.includes("OP")) tickerName = "op";
-else if (rawValue.includes("POL")) tickerName = "pol"; else if (rawValue.includes("SKY") || rawValue.includes("sky")) tickerName = "sky"; else if (rawValue.includes("STX")) tickerName = "stx";
-else if (rawValue.includes("SUI")) tickerName = "sui"; else if (rawValue.includes("TIA")) tickerName = "tia"; else if (rawValue.includes("UNI")) tickerName = "uni";
-else if (rawValue.includes("XLM")) tickerName = "xlm"; else if (rawValue.includes("XPL")) tickerName = "xpl";
-return tickerName;
+    return rawValue.toUpperCase();
 }
 
 document.getElementById('strat-add-btn').addEventListener('click', () => {
