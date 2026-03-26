@@ -1122,9 +1122,9 @@ async function loadMarketAnalyticsCharts() {
 const container = document.getElementById('market-analytics-charts-container');
 if (!container) return;
 const chartConfigs = [
-{ file: 'btc_dominance.json', title: 'BTC Dominance', description: 'Il grafico della BTC Dominance mostra la quota di mercato...', height: '500px' },
-{ file: 'correlation_heatmap.json', title: 'Correlazione Asset con BTC', description: 'Questa mappa di calore (heatmap) evidenzia in che modo...', height: '850px' },
-{ file: 'market_volume.json', title: 'Volume del Mercato Crypto', description: 'Il grafico mostra l\'evoluzione dei volumi...', height: '500px' }
+{ file: 'btc_dominance.json', title: 'BTC Dominance', description: 'Il grafico della BTC Dominance mostra la quota di mercato di Bitcoin rispetto alle altre criptovalute listate su Conio.', height: '500px' },
+{ file: 'correlation_heatmap.json', title: 'Correlazione Asset con BTC', description: 'Questa mappa di calore (heatmap) evidenzia la correlazione tra i vari asset listati su Conio e Bitcoin. Un valore di 1 indica una correlazione positiva perfetta, mentre un valore di -1 indica una correlazione negativa perfetta. Più il colore è scuro e meno gli asset sono correlati tra loro.', height: '850px' },
+{ file: 'market_volume.json', title: 'Volume del Mercato Crypto', description: 'Il grafico mostra l\'evoluzione dei volumi di scambio delle criptovalute listate su Conio nel tempo.', height: '500px' }
 ];
 
 for (let i = 0; i < chartConfigs.length; i++) {
