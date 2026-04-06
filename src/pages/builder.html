@@ -1,0 +1,220 @@
+<div class="mb-10">
+<h2 class="title-font text-2xl md:text-3xl font-bold tracking-tight text-[#0a1b39]">Strategy Builder</h2>
+<p class="text-slate-500 mt-2 text-sm md:text-base font-medium">Crea, backtesta e analizza i tuoi portafogli crypto personalizzati. Attiva il PAC per simulare un piano di accumulo.</p>
+</div>
+
+<div class="mb-10 lg:mb-16 border-b border-slate-200 pb-10 lg:pb-12 w-full">
+    <h3 class="title-font text-xl md:text-2xl font-bold tracking-tight text-[#0a1b39] mb-6">Build your Strategy</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+        
+        <div class="xl:col-span-1 flex flex-col gap-6 w-full">
+            
+            <!-- PORTAFOGLIO A -->
+            <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-lg font-bold text-[#0a1b39]">Portafoglio A</h4>
+                    <button onclick="togglePortfolio(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-500" id="portfolio-toggle-1">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+
+                <div id="portfolio-content-1" class="hidden flex flex-col">
+
+                <div class="bg-slate-50/50 rounded-xl p-3 min-h-[100px] border border-slate-100 mb-4">
+                    <ul id="strat-list-1" class="divide-y divide-slate-100 text-sm"></ul>
+                    <div id="empty-msg-1" class="py-4 text-slate-400 italic text-center text-xs">Nessun asset inserito.</div>
+                </div>
+
+                <div class="flex justify-between items-center mb-4 px-1">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Totale:</span>
+                        <span id="strat-total-1" class="font-bold text-base text-slate-800 ml-1">0%</span>
+                    </div>
+                    <button onclick="openAddAssetModal(1)" class="bg-[#0050ff]/10 hover:bg-[#0050ff]/20 text-[#0050ff] text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Aggiungi Asset
+                    </button>
+                </div>
+
+                <div class="border-t border-slate-100 pt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h5 class="text-[11px] font-bold text-slate-400 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-gears"></i> Setup Investimento
+                        </h5>
+                        <label class="flex items-center gap-1.6 cursor-pointer select-none bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">
+                            <input type="checkbox" id="pac-toggle-1" class="w-3.5 h-3.5 accent-[#0050ff] rounded cursor-pointer">
+                            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tight">PAC</span>
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="setup-item">
+                            <label class="setup-label">Capitale Iniziale (€)</label>
+                            <input type="number" id="strat-capital-1" value="1" min="1" class="setup-input">
+                        </div>
+                        
+                        <div id="pac-inputs-1" class="hidden grid grid-cols-2 gap-3 transition-all">
+                            <div class="setup-item">
+                                <label class="setup-label">Quota PAC (€)</label>
+                                <input type="number" id="strat-pac-amount-1" value="500" min="1" class="setup-input">
+                            </div>
+                            <div class="setup-item">
+                                <label class="setup-label">Freq. (gg)</label>
+                                <input type="number" id="strat-pac-frequency-1" value="30" min="1" class="setup-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- PORTAFOGLIO B -->
+            <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-lg font-bold text-[#0a1b39]">Portafoglio B <span class="text-slate-400 font-normal">(Confronto)</span></h4>
+                    <button onclick="togglePortfolio(2)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-500" id="portfolio-toggle-2">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+
+                <div id="portfolio-content-2" class="hidden flex flex-col">
+
+                <div class="bg-slate-50/50 rounded-xl p-3 min-h-[100px] border border-slate-100 mb-4">
+                    <ul id="strat-list-2" class="divide-y divide-slate-100 text-sm"></ul>
+                    <div id="empty-msg-2" class="py-4 text-slate-400 italic text-center text-xs">Nessun asset inserito.</div>
+                </div>
+
+                <div class="flex justify-between items-center mb-4 px-1">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Totale:</span>
+                        <span id="strat-total-2" class="font-bold text-base text-slate-800 ml-1">0%</span>
+                    </div>
+                    <button onclick="openAddAssetModal(2)" class="bg-[#ff8c00]/10 hover:bg-[#ff8c00]/20 text-[#ff8c00] text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Aggiungi Asset
+                    </button>
+                </div>
+
+                <div class="border-t border-slate-100 pt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h5 class="text-[11px] font-bold text-slate-400 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-gears"></i> Setup Investimento
+                        </h5>
+                        <label class="flex items-center gap-1.6 cursor-pointer select-none bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">
+                            <input type="checkbox" id="pac-toggle-2" class="w-3.5 h-3.5 accent-[#ff8c00] rounded cursor-pointer">
+                            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tight">PAC</span>
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="setup-item">
+                            <label class="setup-label">Capitale Iniziale (€)</label>
+                            <input type="number" id="strat-capital-2" value="1" min="1" class="setup-input">
+                        </div>
+                        
+                        <div id="pac-inputs-2" class="hidden grid grid-cols-2 gap-3 transition-all">
+                            <div class="setup-item">
+                                <label class="setup-label">Quota PAC (€)</label>
+                                <input type="number" id="strat-pac-amount-2" value="500" min="1" class="setup-input">
+                            </div>
+                            <div class="setup-item">
+                                <label class="setup-label">Freq. (gg)</label>
+                                <input type="number" id="strat-pac-frequency-2" value="30" min="1" class="setup-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- GLOBAL PARAMS AND RUN -->
+            <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Timeframe Backtest</label>
+                    <select id="strat-timeframe" class="block w-full border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-[#0050ff] focus:ring-0 sm:text-sm p-2.5 border">
+                        <option value="1M">Ultimo Mese</option>
+                        <option value="6M">Ultimi 6 Mesi</option>
+                        <option value="1Y" selected>Ultimo Anno</option>
+                        <option value="3Y">Ultimi 3 Anni</option>
+                        <option value="5Y">Ultimi 5 Anni</option>
+                        <option value="YTD">Year to Date</option>
+                        <option value="CUSTOM">Date Personalizzate</option>
+                    </select>
+                    
+                    <div id="strat-custom-dates" class="hidden grid grid-cols-2 gap-2 mt-2">
+                        <input type="date" id="strat-start-date" class="setup-input">
+                        <input type="date" id="strat-end-date" class="setup-input">
+                    </div>
+                </div>
+
+                <button id="strat-run-btn" class="w-full bg-[#0050ff] hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                    Esegui Analisi
+                </button>
+            </div>
+        </div>
+
+        <div class="xl:col-span-2 flex flex-col gap-8 w-full min-w-0">
+            <div id="strat-results-placeholder" class="bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center min-h-[500px]">
+                <div class="text-center text-slate-400 p-4">
+                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-chart-line text-2xl text-slate-300"></i>
+                    </div>
+                    <p class="font-medium text-slate-500">Configura i portafogli e clicca su "Esegui Analisi"</p>
+                </div>
+            </div>
+
+            <div id="strat-results-content" class="hidden flex-col gap-6 w-full">
+                <!-- Confronto Metrics Table -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden w-full">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-4 font-bold">Metrica Summary</th>
+                                    <th class="px-4 py-4 font-bold text-[#0050ff]">Portafoglio A</th>
+                                    <th id="strat-th-b" class="px-4 py-4 font-bold text-[#ff8c00] hidden">Portafoglio B</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-4 py-3.5 font-medium text-slate-600 italic">Capitale Investito</td>
+                                    <td id="td-stat-invested-1" class="px-4 py-3.5 font-bold text-slate-800">--</td>
+                                    <td id="td-stat-invested-2" class="px-4 py-3.5 font-bold text-slate-800 hidden">--</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-4 py-3.5 font-medium text-slate-600">Valore Finale</td>
+                                    <td id="td-stat-final-1" class="px-4 py-3.5 font-bold text-slate-800">--</td>
+                                    <td id="td-stat-final-2" class="px-4 py-3.5 font-bold text-slate-800 hidden">--</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-4 py-3.5 font-medium text-slate-600">Rendimento Totale</td>
+                                    <td id="td-stat-return-1" class="px-4 py-3.5 font-bold text-slate-800">--</td>
+                                    <td id="td-stat-return-2" class="px-4 py-3.5 font-bold text-slate-800 hidden">--</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-4 py-3.5 font-medium text-slate-600">Volatilità Ann.</td>
+                                    <td id="td-stat-vol-1" class="px-4 py-3.5 font-bold text-slate-800">--</td>
+                                    <td id="td-stat-vol-2" class="px-4 py-3.5 font-bold text-slate-800 hidden">--</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-4 py-3.5 font-medium text-slate-600">Max Drawdown</td>
+                                    <td id="td-stat-dd-1" class="px-4 py-3.5 font-bold text-slate-800">--</td>
+                                    <td id="td-stat-dd-2" class="px-4 py-3.5 font-bold text-slate-800 hidden">--</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-4 py-3.5 font-medium text-slate-600">Sharpe Ratio</td>
+                                    <td id="td-stat-sharpe-1" class="px-4 py-3.5 font-bold text-slate-800">--</td>
+                                    <td id="td-stat-sharpe-2" class="px-4 py-3.5 font-bold text-slate-800 hidden">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm w-full">
+                    <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-[#0050ff] rounded-full"></span>
+                        Andamento Equity Curve
+                    </h3>
+                    <div class="w-full overflow-hidden"><div id="strat-chart" class="w-full min-h-[450px] md:min-h-[550px]"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
