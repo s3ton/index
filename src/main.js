@@ -52,13 +52,7 @@ document.querySelectorAll('.sidebar-btn').forEach(btn => {
         });
         document.getElementById(pageId).classList.remove('hidden');
         document.getElementById(pageId).classList.add('block');
-        
-        // Risoluzione bug scroll mobile: reset scroll con timeout per assicurare il rendering
-        setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: 'instant' });
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-        }, 10);
+        window.scrollTo({ top: 0, behavior: 'instant' });
 
         if (window.innerWidth < 768) {
             sidebar.classList.add('-translate-x-full');
