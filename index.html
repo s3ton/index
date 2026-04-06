@@ -575,17 +575,13 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
             <!-- PORTAFOGLIO A -->
             <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
                 <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center gap-2">
-                        <h4 class="text-lg font-bold text-[#0a1b39]">Portafoglio A</h4>
-                        <label class="flex items-center gap-1.6 cursor-pointer select-none bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">
-                            <input type="checkbox" id="pac-toggle-1" class="w-3.5 h-3.5 accent-[#0050ff] rounded cursor-pointer">
-                            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tight">PAC</span>
-                        </label>
-                    </div>
-                    <button id="strat-clear-1" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors hidden">
-                        <i class="fa-solid fa-trash-can mr-1"></i> Pulisci
+                    <h4 class="text-lg font-bold text-[#0a1b39]">Portafoglio A</h4>
+                    <button onclick="togglePortfolio(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-500" id="portfolio-toggle-1">
+                        <i class="fa-solid fa-chevron-down"></i>
                     </button>
                 </div>
+
+                <div id="portfolio-content-1" class="hidden flex flex-col">
 
                 <div class="bg-slate-50/50 rounded-xl p-3 min-h-[100px] border border-slate-100 mb-4">
                     <ul id="strat-list-1" class="divide-y divide-slate-100 text-sm"></ul>
@@ -603,9 +599,15 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
                 </div>
 
                 <div class="border-t border-slate-100 pt-4">
-                    <h5 class="text-[11px] font-bold text-slate-400 uppercase mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-gears"></i> Setup Investimento
-                    </h5>
+                    <div class="flex justify-between items-center mb-3">
+                        <h5 class="text-[11px] font-bold text-slate-400 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-gears"></i> Setup Investimento
+                        </h5>
+                        <label class="flex items-center gap-1.6 cursor-pointer select-none bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">
+                            <input type="checkbox" id="pac-toggle-1" class="w-3.5 h-3.5 accent-[#0050ff] rounded cursor-pointer">
+                            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tight">PAC</span>
+                        </label>
+                    </div>
                     <div class="grid grid-cols-1 gap-4">
                         <div class="setup-item">
                             <label class="setup-label">Capitale Iniziale (€)</label>
@@ -624,22 +626,19 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
 
             <!-- PORTAFOGLIO B -->
             <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit w-full">
                 <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center gap-2">
-                        <h4 class="text-lg font-bold text-[#0a1b39]">Portafoglio B <span class="text-slate-400 font-normal">(Confronto)</span></h4>
-                        <label class="flex items-center gap-1.6 cursor-pointer select-none bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">
-                            <input type="checkbox" id="pac-toggle-2" class="w-3.5 h-3.5 accent-[#ff8c00] rounded cursor-pointer">
-                            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tight">PAC</span>
-                        </label>
-                    </div>
-                    <button id="strat-clear-2" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors hidden">
-                        <i class="fa-solid fa-trash-can mr-1"></i> Pulisci
+                    <h4 class="text-lg font-bold text-[#0a1b39]">Portafoglio B <span class="text-slate-400 font-normal">(Confronto)</span></h4>
+                    <button onclick="togglePortfolio(2)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-500" id="portfolio-toggle-2">
+                        <i class="fa-solid fa-chevron-down"></i>
                     </button>
                 </div>
+
+                <div id="portfolio-content-2" class="hidden flex flex-col">
 
                 <div class="bg-slate-50/50 rounded-xl p-3 min-h-[100px] border border-slate-100 mb-4">
                     <ul id="strat-list-2" class="divide-y divide-slate-100 text-sm"></ul>
@@ -657,9 +656,15 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
                 </div>
 
                 <div class="border-t border-slate-100 pt-4">
-                    <h5 class="text-[11px] font-bold text-slate-400 uppercase mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-gears"></i> Setup Investimento
-                    </h5>
+                    <div class="flex justify-between items-center mb-3">
+                        <h5 class="text-[11px] font-bold text-slate-400 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-gears"></i> Setup Investimento
+                        </h5>
+                        <label class="flex items-center gap-1.6 cursor-pointer select-none bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">
+                            <input type="checkbox" id="pac-toggle-2" class="w-3.5 h-3.5 accent-[#ff8c00] rounded cursor-pointer">
+                            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tight">PAC</span>
+                        </label>
+                    </div>
                     <div class="grid grid-cols-1 gap-4">
                         <div class="setup-item">
                             <label class="setup-label">Capitale Iniziale (€)</label>
@@ -677,6 +682,7 @@ In questa sezione puoi monitorare le principali metriche macroeconomiche e di me
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -1340,14 +1346,14 @@ const emptyMsg = document.getElementById(`empty-msg-${pIndex}`);
 let totalWeight = 0;
 let html = '';
 
-if (portfolio.length === 0) {
-if (emptyMsg) emptyMsg.classList.remove('hidden');
-clearBtn.classList.add('hidden');
-} else {
-if (emptyMsg) emptyMsg.classList.add('hidden');
-clearBtn.classList.remove('hidden');
-portfolio.forEach((asset, index) => {
-totalWeight += asset.weight;
+    if (portfolio.length === 0) {
+        if (emptyMsg) emptyMsg.classList.remove('hidden');
+        if (clearBtn) clearBtn.classList.add('hidden');
+    } else {
+        if (emptyMsg) emptyMsg.classList.add('hidden');
+        if (clearBtn) clearBtn.classList.remove('hidden');
+        portfolio.forEach((asset, index) => {
+            totalWeight += asset.weight;
 html += `
 <li class="py-2.5 flex justify-between items-center group">
 <div class="flex flex-col">
@@ -1432,10 +1438,24 @@ function getTickerName(rawValue) {
     return rawValue.toUpperCase();
 }
 
-// Close modal on backdrop click
-document.getElementById('asset-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'asset-modal') closeAddAssetModal();
-});
+window.togglePortfolio = function(index) {
+    const content = document.getElementById(`portfolio-content-${index}`);
+    const toggleBtn = document.getElementById(`portfolio-toggle-${index}`);
+    const icon = toggleBtn.querySelector('i');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        content.classList.add('hidden');
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+    
+    // Resize plotly charts if any
+    setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+};
 
 window.removeAsset = function(pType, pIndex, index) {
 if (pType === 'STRAT') {
@@ -1444,9 +1464,6 @@ if (pType === 'STRAT') {
     updateStratUI();
 }
 }
-
-document.getElementById('strat-clear-1').addEventListener('click', () => { pStrat1 = []; updateStratUI(); document.getElementById('strat-results-placeholder').classList.remove('hidden'); document.getElementById('strat-results-content').classList.add('hidden'); document.getElementById('strat-results-content').classList.remove('flex'); document.getElementById('strat-pac-results').classList.add('hidden'); document.getElementById('strat-pac-results').classList.remove('flex'); });
-document.getElementById('strat-clear-2').addEventListener('click', () => { pStrat2 = []; updateStratUI(); document.getElementById('strat-results-placeholder').classList.remove('hidden'); document.getElementById('strat-results-content').classList.add('hidden'); document.getElementById('strat-results-content').classList.remove('flex'); });
 
 const pacToggle1 = document.getElementById('pac-toggle-1');
 const pacToggle2 = document.getElementById('pac-toggle-2');
