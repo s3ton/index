@@ -1,3 +1,4 @@
+@import "tailwindcss";
 body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; }
 .title-font { font-family: 'Space Grotesk', sans-serif; }
 .chart-card {
@@ -182,7 +183,7 @@ width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box;
   }
 
   .setup-grid {
-    display: grid; grid-template-cols: 1fr 1fr; gap: 12px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
     margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9;
   }
   .setup-item { display: flex; flex-direction: column; gap: 4px; }
