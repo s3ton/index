@@ -1,4 +1,5 @@
 @import "tailwindcss";
+:root { scroll-padding-top: 73px; }
 body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fb; color: #1e293b; }
 .title-font { font-family: 'Space Grotesk', sans-serif; }
 .chart-card {
@@ -131,8 +132,8 @@ width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box;
   /* Tab buttons */
   .tab-btn { padding: 0.6rem 0.75rem !important; font-size: 0.82rem !important; }
 
-  /* Main padding reduction */
-  main { padding: 0.75rem !important; }
+  /* Main padding reduction - incrementata leggermente per visibilità titoli */
+  main { padding: 1.25rem 0.75rem 0.75rem 0.75rem !important; }
 
   /* Footer */
   footer { padding: 1rem 0.75rem !important; font-size: 0.75rem; }
